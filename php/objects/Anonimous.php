@@ -1,10 +1,14 @@
 <?php
 include_once "../styles/Template.php";
-
+include_once "../abstracts/Controller.php";
+session_cache_limiter ('nocache,private');
+session_start();
 
 /* Tot el que un usuari no autentificat pugui realitzar anira aqui */
 
 class Anonimous extends Template{
+
+    use Controller;
 
     public function __construct()
     {
@@ -55,7 +59,7 @@ class Anonimous extends Template{
             ');
     }
 
-    public function register()
+    public function register($error = "")
     {
         $this->includeSection = false;
         $this->spanUser       = "";
@@ -70,6 +74,7 @@ class Anonimous extends Template{
 
                 <form class="container-box" accept-charset="UTF-8">
 
+                    ' .$error. '
                     ' .Registers::register(). '
 
                     <div class="input-group">
@@ -85,4 +90,57 @@ class Anonimous extends Template{
             </div>
         ');
     }
+
+    public function startSession($email, $pwd){
+        $user = $this->select("SELECT * FROM users WHERE email = '{$email}' AND pwd = '{$pwd}';");
+
+        if ($user) {
+
+            session_cache_limiter('nocache,private');
+            session_start();
+            $user = $user->fetch_assoc();
+            $_SESSION['typeUser'] = $user['typeUser'];
+            $_SESSION['name'] = $user['name'];
+            $_SESSION['user'] = $user['email'];
+
+
+            switch ($user['typeUser']) {
+                case "user":
+                    $_SESSION['home'] = "Books.php";
+                    break;
+
+                case "librarian":
+                    $_SESSION['home'] = "Users.php";
+                    break;
+
+                case "admin":
+                    $_SESSION['home'] = "Users.php";
+                    break;
+            }
+
+            if (isset($_REQUEST['rememberMe']) && $_REQUEST['rememberMe'] == "remember") {
+                setcookie("email", $user['email'], time() + 7776000, "/");
+                setcookie("pwd"  , $user['pwd']  , time() + 7776000, "/");
+            }
+
+
+            //The htmlspecialchars() is used to prevent attacks related XSS
+            header($_SESSION['home'] . '?' . htmlspecialchars(SID));
+
+        } else  $this->login("Incorrect E-mail or Password");
+
+    }
+    public function insertUser($request)
+    {
+        if($this->insert("users",$request))
+        {
+            $this->login();
+        }
+        else
+        {
+            $this->register("<h2>Insert error</h2>");
+        }
+    }
 }
+
+

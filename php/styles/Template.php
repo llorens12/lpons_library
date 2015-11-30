@@ -6,17 +6,14 @@ include_once "CommonStyles.php";
  */
 class Template
 {
-
     /**
      * @var string: This var contains the name of the project.
      */
     protected $nameProject = "Library";
 
-
     protected $typeUser, $nameUser, $emailUser, $home, $currentOptionMenu, $sid;
 
     protected $includeSection, $spanUser, $textButton, $linkButton, $linkUser, $linkTerms, $linkContact;
-
 
 
     protected $permission = true;
@@ -256,7 +253,7 @@ class Template
             ';
     }
 
-    protected function showTable($data)
+    protected function setTable($data)
     {
         /**
          * This save the <thead> content

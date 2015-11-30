@@ -1,18 +1,18 @@
 <?php
 
-class Controller{
+trait Controller{
 
     private $connection;
 
 
-    public function __construct()
+    protected  function startConnection()
     {
         $this->connection = new mysqli("localhost", "root", "", "lpons_library");
     }
 
-
-    public function select($sentence)
+    protected function select($sentence)
     {
+        $this->startConnection();
         $return = $this->connection->query($sentence);
         $this->connection->close();
         return $return;
@@ -20,6 +20,7 @@ class Controller{
 
     protected function insert($table, $data)
     {
+        $this->startConnection();
         $columns = "";
         $valuesColumns ="";
 
@@ -42,6 +43,7 @@ class Controller{
 
     protected function update($table, $data, $primaryKey, $valuePrimaryKey)
     {
+        $this->startConnection();
         $set="";
 
         foreach($data as $column => $value){
@@ -63,6 +65,7 @@ class Controller{
 
     protected function delete($table, $primaryKey, $valuePrimaryKey)
     {
+        $this->startConnection();
         $return = $this->connection->query
         ("
             DELETE FROM {$table}

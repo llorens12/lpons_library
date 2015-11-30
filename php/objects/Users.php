@@ -39,7 +39,7 @@ class User extends Template{
     }
 }
 
-$control = new Controller();
+/*$control = new Controller();
 $data = $control->select("select * from users");
 $p = new User($_SESSION['name'],$_SESSION['user'],$_SESSION['typeUser'],$_SESSION['home'],SID,"Users");
 $p->showTable($data);
