@@ -1,5 +1,6 @@
 <?php
 include_once "../styles/Template.php";
+include_once "../abstracts/Controller.php";
 
 session_cache_limiter ('nocache,private');
 session_start();
@@ -38,8 +39,10 @@ class User extends Template{
     }
 }
 
+$control = new Controller();
+$data = $control->select("select * from users");
 $p = new User($_SESSION['name'],$_SESSION['user'],$_SESSION['typeUser'],$_SESSION['home'],SID,"Users");
-$p->setContent(texto());
+$p->showTable($data);
 echo $p;
 
 

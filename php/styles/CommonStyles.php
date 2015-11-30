@@ -1,94 +1,48 @@
 <?php
-class Forms{
-    static function login($error = ""){
 
-        if($error != "")
-            $error = '<h5><span class="label label-danger">'.$error.'</span></h5>';
+class Registers
+{
 
+    static function register()
+    {
         return
             '
-            <div class="col-lg-3 col-md-6 col-sm-9 col-xs-12 col-centered box">
-                <label class="box-tittle"><h3>Login</h3></label>
-                <form class="container-box" action="php/startSession.php" method="POST">
-                    ' .$error. '
-                    <div class="input-group">
-                        <span class="input-group-addon icons"><i class="fa fa-at"></i></span>
-                        <input type="email" name="email" class="form-control" placeholder="example@example.com" required="">
-
-                    </div>
-                    <div class="input-group">
-                        <span class="input-group-addon icons"><i class="fa fa-key"></i></span>
-                        <input type="password" name="pwd" class="form-control" placeholder="Password" required="">
-                    </div>
-                    <div class="input-group" id="rememberMe">
-                        <div class="checkbox">
-                            <label>
-                                <input type="checkbox" name="rememberMe" value="remember"> Remember me
-                            </label>
-                        </div>
-                    </div>
-                    <div class="form-group" id="btn-signin">
-                        <button type="submit" class="btn btn-default" >
-                            Sign In
-                        </button>
-                    </div>
-                </form>
-            </div>
-            ';
-    }
-
-    static function register(){
-        return
-            '
-             <div class="col-lg-3 col-md-6 col-sm-9 col-xs-12 col-centered box">
-                <label class="box-tittle"><h3>Register</h3></label>
-
-                <form class="container-box" accept-charset="UTF-8">
-                    <div class="input-group">
-                        <span class="input-group-addon glyphicon glyphicon-user icons"></span>
-                        <input type="text" class="form-control" placeholder="Name" required="">
-                    </div>
-                    <div class="input-group">
-                        <span class="input-group-addon icons"><i class="fa fa-users"></i></span>
-                        <input type="text" class="form-control" placeholder="Surname" required="">
-                    </div>
-                    <div class="input-group">
-                        <span class="input-group-addon icons"><i class="fa fa-at"></i></span>
-                        <input type="email" class="form-control" placeholder="example@example.com" required="">
-                    </div>
-                    <div class="input-group">
-                        <span class="input-group-addon glyphicon glyphicon-earphone icons"></span>
-                        <input type="tel" class="form-control" placeholder="XXX-XX-XX-XX" pattern="[0-9]{3}-[0-9]{2}-[0-9]{2}-[0-9]{2}" required="">
-                    </div>
-                    <div class="input-group">
-                        <span class="input-group-addon icons"><i class="fa fa-key"></i></span>
-                        <input type="password" class="form-control" placeholder="Password" required="">
-                    </div>
-                    <div class="input-group">
-                        <span class="input-group-addon icons"><i class="fa fa-key"></i></span>
-                        <input type="password" class="form-control" placeholder="Repeat Password" required="">
-                    </div>
-                    <div class="form-group" id="btn-register">
-                        <button type="submit" class="btn btn-default">
-                            Register
-                        </button>
-                    </div>
-                </form>
-            </div>
+                <div class="input-group">
+                    <span class="input-group-addon glyphicon glyphicon-user icons"></span>
+                    <input type="text" class="form-control" placeholder="Name" required="">
+                </div>
+                <div class="input-group">
+                    <span class="input-group-addon icons"><i class="fa fa-users"></i></span>
+                    <input type="text" class="form-control" placeholder="Surname" required="">
+                </div>
+                <div class="input-group">
+                    <span class="input-group-addon icons"><i class="fa fa-at"></i></span>
+                    <input type="email" class="form-control" placeholder="example@example.com" required="">
+                </div>
+                <div class="input-group">
+                    <span class="input-group-addon glyphicon glyphicon-earphone icons"></span>
+                    <input type="tel" class="form-control" placeholder="XXX-XX-XX-XX" pattern="[0-9]{3}-[0-9]{2}-[0-9]{2}-[0-9]{2}"
+                           required="">
+                </div>
+                <div class="input-group">
+                    <span class="input-group-addon icons"><i class="fa fa-key"></i></span>
+                    <input type="password" class="form-control" placeholder="Password" required="">
+                </div>
             ';
     }
 }
 
 
+class Menus
+{
 
-class Menus{
 
-
-    static function userConfig($nameUser){
+    static function userConfig($nameUser)
+    {
         return '
             <div class="btn-group  sub-menu" id="nameUser">
                 <spqn class="dropdown-toggle" >
-                    ' .$nameUser. '
+                    ' . $nameUser . '
                     <span class="caret"></span>
                 </spqn>
                 <ul class="dropdown-menu">
@@ -109,11 +63,13 @@ class Menus{
         ';
     }
 
-    static function menuUser(){
+    static function menuUser()
+    {
 
     }
 
-    static function menuLibrarian(){
+    static function menuLibrarian()
+    {
         return '
             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
                 <a href="#" class="btn btn-lg btn-primary btn-menu">
@@ -164,7 +120,8 @@ class Menus{
             ';
     }
 
-    static function menuAdministrator(){
+    static function menuAdministrator()
+    {
         return '
             <div class="row text-center content-menu" id="navigation">
 

@@ -10,16 +10,16 @@ class Template
     /**
      * @var string: This var contains the name of the project.
      */
-    private $nameProject = "Library";
+    protected $nameProject = "Library";
 
 
-    private $typeUser, $nameUser, $emailUser, $home, $currentOptionMenu, $sid;
+    protected $typeUser, $nameUser, $emailUser, $home, $currentOptionMenu, $sid;
 
-    private $includeSection, $spanUser, $textButton, $linkButton, $linkUser, $linkTerms, $linkContact;
+    protected $includeSection, $spanUser, $textButton, $linkButton, $linkUser, $linkTerms, $linkContact;
 
-    private $css, $jquery, $myjs;
 
-    protected $permission = false;
+
+    protected $permission = true;
     private $content = "";
 
 
@@ -30,7 +30,7 @@ class Template
      * @param string $permision:         If is user, libraryan or Admin
      * @param string $currentOptionMenu: Actual section of menu
      */
-    function __construct($nameUser = "", $emailUser = "Anonimous", $typeUser = "", $home = "index.php", $sid = "", $currentOptionMenu = "")
+    function __construct($nameUser = "", $emailUser = "Anonimous", $typeUser = "", $home = "index.php", $currentOptionMenu = "", $sid = "")
     {
 
         $this->nameUser          = $nameUser;
@@ -42,9 +42,6 @@ class Template
 
 
         $this->includeSection = true;
-        $this->css            = "../../css/mycss.css";
-        $this->jquery         = "../../js/jquery-2.1.4.min.js";
-        $this->myjs           = "../../js/myjs.js";
         $this->spanUser       = Menus::userConfig($this->nameUser);
         $this->textButton     = "Log Out";
         $this->linkButton     = "../logout.php";
@@ -107,11 +104,11 @@ class Template
                 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 
                 <!-- My css -->
-                <link href="'.$this->css.'" rel="stylesheet">
+                <link href="../../css/mycss.css" rel="stylesheet">
                 <!-- jQuery -->
-                <script src="'.$this->jquery.'"></script>
+                <script src="../../js/jquery-2.1.4.min.js"></script>
                 <!-- My js  -->
-                <script src="'.$this->myjs.'"></script>
+                <script src="../../js/myjs.js"></script>
 
             </head>
         ';
@@ -259,31 +256,84 @@ class Template
             ';
     }
 
-    public function showLogin()
+    protected function showTable($data)
     {
-        $this->optionsLoginRegister();
-        $this->textButton     = "Register";
-        $this->linkButton     = "index.php?register=''";
+        /**
+         * This save the <thead> content
+         */
+        $contentTheadTr="<th>#</th>";
 
-        echo $this->html();
-    }
+        /**
+         * This save the number of current object
+         */
+        $objectNumber = 1;
 
-    public function showRegister()
-    {
-        $this->optionsLoginRegister();
-        $this->textButton     = "Log In";
-        $this->linkButton     = "index.php";
+        /**
+         * This save the <tbody> content
+         */
+        $contentTbody="";
 
-        echo $this->html();
-    }
+        /**
+         * This is a sentinel, controls if it has been inserted the <thead>
+         */
+        $thead=true;
 
-    private function optionsLoginRegister()
-    {
-        $this->includeSection = false;
-        $this->css            = "css/mycss.css";
-        $this->jquery         = "js/jquery-2.1.4.min.js";
-        $this->myjs           = "js/myjs.js";
-        $this->spanUser       = "";
+
+        /**
+         * Keeps track of each row
+         */
+        while($object = $data->fetch_assoc())
+        {
+            $contentTr="";
+            foreach($object as $column => $value)
+            {
+                if($thead) $contentTheadTr .= "<th>".$column."</th>";
+                $contentTr .= "<td>".$value."</td>";
+
+            }
+            $thead = false;
+            $contentTbody .=
+                '<tr>'.
+
+                '<th scope="row">'
+                .$objectNumber.
+                '</th>'
+
+                .$contentTr.
+
+                '<td>
+                    <a href="#">
+                        <span class="glyphicon glyphicon-edit"></span>
+                    </a>
+                </td>
+
+                <td>
+                    <a href="#">
+                        <span class="glyphicon glyphicon-remove"></span>
+                    </a>
+                </td>
+            </tr>';
+            $objectNumber++;
+        }
+
+        $this->content = '
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    '.$contentTheadTr.'
+                    <th>
+                        Edit
+                    </th>
+                    <th>
+                        Remove
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                '.$contentTbody.'
+            </tbody>
+        </table>
+    ';
     }
 
     public function __toString()
