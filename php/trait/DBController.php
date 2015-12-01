@@ -1,6 +1,6 @@
 <?php
 
-trait Controller{
+trait DBController{
 
     private $connection;
 

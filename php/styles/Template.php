@@ -15,9 +15,9 @@ class Template
 
     protected $includeSection, $spanUser, $textButton, $linkButton, $linkUser, $linkTerms, $linkContact;
 
+    protected $content = "";
 
-    protected $permission = true;
-    private $content = "";
+
 
 
     /**
@@ -27,7 +27,7 @@ class Template
      * @param string $permision:         If is user, libraryan or Admin
      * @param string $currentOptionMenu: Actual section of menu
      */
-    function __construct($nameUser = "", $emailUser = "Anonimous", $typeUser = "", $home = "index.php", $currentOptionMenu = "", $sid = "")
+    function __construct($nameUser = "", $emailUser = "Anonimous", $typeUser = "", $home = "Anonimous.php", $currentOptionMenu = "", $sid = "")
     {
 
         $this->nameUser          = $nameUser;
@@ -52,22 +52,6 @@ class Template
 
     }
 
-    /**
-     * @param $content
-     */
-    public function setContent($content)
-    {
-        $this->content = $content;
-    }
-
-    /**
-     * @return string
-     */
-    public function getContent()
-    {
-        return $this->content;
-    }
-
     private function html()
     {
         return
@@ -89,10 +73,8 @@ class Template
                 </title>
                 <!-- Latest compiled and minified CSS -->
                 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-                <!-- Optional theme -->
-                <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
                 <!--http://fortawesome.github.io/Font-Awesome/icons/-->
-                <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+                <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 
                 <!-- Bootstrap -->
                 <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -253,91 +235,12 @@ class Template
             ';
     }
 
-    protected function setTable($data)
-    {
-        /**
-         * This save the <thead> content
-         */
-        $contentTheadTr="<th>#</th>";
-
-        /**
-         * This save the number of current object
-         */
-        $objectNumber = 1;
-
-        /**
-         * This save the <tbody> content
-         */
-        $contentTbody="";
-
-        /**
-         * This is a sentinel, controls if it has been inserted the <thead>
-         */
-        $thead=true;
-
-
-        /**
-         * Keeps track of each row
-         */
-        while($object = $data->fetch_assoc())
-        {
-            $contentTr="";
-            foreach($object as $column => $value)
-            {
-                if($thead) $contentTheadTr .= "<th>".$column."</th>";
-                $contentTr .= "<td>".$value."</td>";
-
-            }
-            $thead = false;
-            $contentTbody .=
-                '<tr>'.
-
-                '<th scope="row">'
-                .$objectNumber.
-                '</th>'
-
-                .$contentTr.
-
-                '<td>
-                    <a href="#">
-                        <span class="glyphicon glyphicon-edit"></span>
-                    </a>
-                </td>
-
-                <td>
-                    <a href="#">
-                        <span class="glyphicon glyphicon-remove"></span>
-                    </a>
-                </td>
-            </tr>';
-            $objectNumber++;
-        }
-
-        $this->content = '
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    '.$contentTheadTr.'
-                    <th>
-                        Edit
-                    </th>
-                    <th>
-                        Remove
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                '.$contentTbody.'
-            </tbody>
-        </table>
-    ';
+    public function showError($error = "Has occurred an error, please try again"){
+        $this->content = $error;
     }
 
     public function __toString()
     {
-        if(!$this->permission)
-            $this->setContent("<h2>Permission denied</h2>");
-
         return utf8_encode($this->html());
     }
 

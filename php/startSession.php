@@ -37,11 +37,11 @@ if (isset($_REQUEST['email'], $_REQUEST['pwd']) || isset($_COOKIE['email'], $_CO
                 break;
 
             case "librarian":
-                $_SESSION['home'] = "Users.php";
+                $_SESSION['home'] = "User.php";
                 break;
 
             case "admin":
-                $_SESSION['home'] = "Users.php";
+                $_SESSION['home'] = "User.php";
                 break;
         }
 

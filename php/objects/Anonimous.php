@@ -1,14 +1,13 @@
 <?php
 include_once "../styles/Template.php";
-include_once "../abstracts/Controller.php";
-session_cache_limiter ('nocache,private');
-session_start();
+include_once "../trait/DBController.php";
+
 
 /* Tot el que un usuari no autentificat pugui realitzar anira aqui */
 
 class Anonimous extends Template{
 
-    use Controller;
+    use DBController;
 
     public function __construct()
     {
@@ -27,7 +26,7 @@ class Anonimous extends Template{
         if($error != "")
             $error = '<h5><span class="label label-danger">'.$error.'</span></h5>';
 
-        $this->setContent(
+        $this->content =
             '
             <div class="col-lg-3 col-md-6 col-sm-9 col-xs-12 col-centered box">
                 <label class="box-tittle"><h3>Login</h3></label>
@@ -56,7 +55,7 @@ class Anonimous extends Template{
                     </div>
                 </form>
             </div>
-            ');
+            ';
     }
 
     public function register($error = "")
@@ -66,8 +65,10 @@ class Anonimous extends Template{
         $this->textButton     = "Log In";
         $this->linkButton     = "index.php";
 
+        if($error != "")
+            $error = '<h5><span class="label label-danger">'.$error.'</span></h5>';
 
-        $this->setContent(
+        $this->content =
         '
             <div class="col-lg-3 col-md-6 col-sm-9 col-xs-12 col-centered box">
                 <label class="box-tittle"><h3>Register</h3></label>
@@ -88,35 +89,23 @@ class Anonimous extends Template{
                     </div>
                 </form>
             </div>
-        ');
+        ';
     }
 
     public function startSession($email, $pwd){
-        $user = $this->select("SELECT * FROM users WHERE email = '{$email}' AND pwd = '{$pwd}';");
 
-        if ($user) {
+        $user = $this->select("SELECT * FROM users WHERE email = '{$email}' AND pwd = '{$pwd}';")->fetch_assoc();
+
+        if (count($user) != 0) {
 
             session_cache_limiter('nocache,private');
             session_start();
             $user = $user->fetch_assoc();
             $_SESSION['typeUser'] = $user['typeUser'];
             $_SESSION['name'] = $user['name'];
-            $_SESSION['user'] = $user['email'];
+            $_SESSION['email'] = $user['email'];
+            $_SESSION['home'] = $user['home'];
 
-
-            switch ($user['typeUser']) {
-                case "user":
-                    $_SESSION['home'] = "Books.php";
-                    break;
-
-                case "librarian":
-                    $_SESSION['home'] = "Users.php";
-                    break;
-
-                case "admin":
-                    $_SESSION['home'] = "Users.php";
-                    break;
-            }
 
             if (isset($_REQUEST['rememberMe']) && $_REQUEST['rememberMe'] == "remember") {
                 setcookie("email", $user['email'], time() + 7776000, "/");
@@ -130,8 +119,15 @@ class Anonimous extends Template{
         } else  $this->login("Incorrect E-mail or Password");
 
     }
+
     public function insertUser($request)
     {
+        $request['pwd']     = md5($request['pwd']);
+        $request['typeUser'] = "user";
+        $request['registered'] = date('Y-m-d');
+        $request['home']= "";
+
+
         if($this->insert("users",$request))
         {
             $this->login();
@@ -142,5 +138,4 @@ class Anonimous extends Template{
         }
     }
 }
-
 
