@@ -1,19 +1,15 @@
 <?php
-include_once "../styles/Template.php";
-include_once "../trait/DBController.php";
 
 class User extends Template{
     use DBController;
 
-    public function __construct($nameUser, $emailUser, $typeUser, $home, $currentOptionMenu, $sid)
+    public function __construct($nameUser, $emailUser, $typeUser, $sid)
     {
-        parent::__construct($nameUser, $emailUser, $typeUser, $home, $currentOptionMenu, $sid);
+        parent::__construct($nameUser, $emailUser, $typeUser, $sid);
+        $this->setUserMenuTop($this->myUserMenuTop());
     }
 
-    /**
-     * @param $data
-     * @param bool|true $edit
-     */
+
     protected function showTable($data, $edit = true)
     {
 
@@ -108,6 +104,7 @@ class User extends Template{
 
     public function showBooks(){
 
+        $_SESSION['menu']="Books";
 
         $m= '
         <a class="list-books" href="">
@@ -124,5 +121,82 @@ class User extends Template{
 
 
         ';
+    }
+
+    public function logOut()
+    {
+        session_destroy();
+
+        if(isset($_COOKIE['email'], $_COOKIE['pwd'])){
+            setcookie("email", "", 0, "/");
+            setcookie("pwd"  , "", 0, "/");
+        };
+    }
+
+    private function myUserMenuTop(){
+        return
+        '
+            <span class="dropdown-toggle">
+                ' . $this->nameUser . '
+                <span class="caret"></span>
+            </span>
+            <ul class="dropdown-menu">
+                <li>
+                    <a href="#">
+                        My profile
+                    </a>
+
+                </li>
+                <li>
+                    <a href="#">
+                        Configuration
+                    </a>
+                </li>
+            </ul>
+        ';
+    }
+
+    private function myContentMenu(){
+
+        $books = "default";
+        $reserves = "default";
+
+        if(isset($_SESSION['menu']))
+        {
+            switch($_SESSION['menu'])
+            {
+
+                case "Books":
+
+                    $books = "primary";
+                    break;
+
+                case "Reserves":
+
+                    $books = "primary";
+                    break;
+            }
+        }
+        return
+        '
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                <a href="#" class="btn btn-lg btn-'.$books.' btn-menu">
+                    Books
+                </a>
+            </div>
+
+
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 border-left">
+                <a href="#" class="btn btn-'.$reserves.' btn-lg btn-menu">
+                    My reserves
+                </a>
+            </div>
+        ';
+    }
+
+    public function __toString()
+    {
+        $this->setContentMenu($this->myContentMenu());
+        return utf8_encode($this->html());
     }
 }

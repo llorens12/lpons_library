@@ -1,4 +1,5 @@
-<html lang="en">
+<html lang="en"
+>
 
     <head>
 
@@ -55,39 +56,7 @@
 
             <section class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 
-                <div class="input-group">
-                    <span class="input-group-addon icons"><i class="fa fa-user"></i></span>
-                    <select class="form-control" name="user">
-                        <option VALUE="abc"> ABC</option>
-                        <option VALUE="def"> def</option>
-                        <option VALUE="hij"> hij</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <span class="input-group-addon icons"><i class="fa fa-book"></i></span>
-                    <select class="form-control" name="book">
-                        <option VALUE="abc"> ABC</option>
-                        <option VALUE="def"> def</option>
-                        <option VALUE="hij"> hij</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <span class="input-group-addon icons"><i class="fa fa-calendar-plus-o"></i></span>
-                    <input type="date" class="form-control" placeholder="dd/mm/aaaa" name="date-start"  required="">
-                </div>
-                <div class="input-group">
-                    <span class="input-group-addon icons"><i class="fa fa-calendar-times-o"></i></span>
-                    <input type="date" class="form-control" placeholder="dd/mm/aaaa" name="date-finish" required="">
-                </div>
-                <div class="input-group">
-                    <span class="input-group-addon icons"><i class="fa fa-paper-plane"></i></span>
-                    <div class="checkbox form-control" id="commited-reserves">
-                        <label>
-                            <input type="checkbox" name="committed" value="true">
-                            Committed?
-                        </label>
-                    </div>
-                </div>
+
 
 
             </section>

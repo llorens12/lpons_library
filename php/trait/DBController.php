@@ -7,14 +7,15 @@ trait DBController{
 
     protected  function startConnection()
     {
-        $this->connection = new mysqli("localhost", "root", "", "lpons_library");
+        if($this->connection == NULL) {
+            $this->connection = new mysqli("localhost", "root", "", "lpons_library");
+        }
     }
 
     protected function select($sentence)
     {
         $this->startConnection();
         $return = $this->connection->query($sentence);
-        $this->connection->close();
         return $return;
     }
 
@@ -26,7 +27,7 @@ trait DBController{
 
         foreach($data as $column => $value){
             $columns .= $column.", ";
-            $valuesColumns .= $value.", ";
+            $valuesColumns .= "'".$value."', ";
         }
 
         $columns = trim($columns, ", ");
@@ -37,7 +38,7 @@ trait DBController{
             INSERT INTO {$table} ({$columns})
             VALUES ({$valuesColumns});
         ");
-        $this->connection->close();
+
         return $return;
     }
 
@@ -58,23 +59,25 @@ trait DBController{
             SET    {$set}
             WHERE  {$primaryKey} = {$valuePrimaryKey};
         ");
-        $this->connection->close();
+
 
         return $return;
     }
 
-    protected function delete($table, $primaryKey, $valuePrimaryKey)
+    protected function delete($table, $where)
     {
         $this->startConnection();
         $return = $this->connection->query
         ("
             DELETE FROM {$table}
-            WHERE  {$primaryKey} = {$valuePrimaryKey};
+            WHERE  {$where};
         ");
-        $this->connection->close();
+
 
         return $return;
     }
 
-
+    protected function close(){
+        $this->connection->close();
+    }
 }

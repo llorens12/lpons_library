@@ -36,7 +36,7 @@ header, footer {
 }
 
 main {
-    margin-top: 110px;
+    margin-top: 80px;
     padding-bottom: 150px;
 
 }
@@ -162,7 +162,7 @@ footer{
 
 #menu-separator{
     margin-top: 40px !important;
-    margin-bottom: 6%;
+    margin-bottom: 3%;
     width: 50%;
     border-top: 1px black solid;
     display: inline-block;

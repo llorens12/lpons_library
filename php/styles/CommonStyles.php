@@ -17,7 +17,7 @@ class Registers
                 </div>
                 <div class="input-group">
                     <span class="input-group-addon icons"><i class="fa fa-at"></i></span>
-                    <input type="email" class="form-control" placeholder="example@example.com" name="email" required="">
+                    <input type="email" class="form-control" placeholder="example@example.com" name="email" id="email" required="">
                 </div>
                 <div class="input-group">
                     <span class="input-group-addon glyphicon glyphicon-earphone icons"></span>
@@ -25,7 +25,7 @@ class Registers
                 </div>
                 <div class="input-group">
                     <span class="input-group-addon icons"><i class="fa fa-key"></i></span>
-                    <input type="password" class="form-control" placeholder="Password" name="pwd" required="">
+                    <input type="password" class="form-control" placeholder="Password" name="pwd" id="pwd" required="">
                 </div>
             ';
     }
@@ -43,7 +43,7 @@ class Registers
                 </div>
                 <div class="input-group">
                     <span class="input-group-addon icons"><i class="fa fa-text-height"></i></span>
-                    <textarea maxlength="50" rows="2" class="form-control" placeholder="Desctiption..." name="description" required=""></textarea>
+                    <textarea maxlength="80" rows="2" class="form-control" placeholder="Desctiption..." name="description" required=""></textarea>
                 </div>
                 <div class="input-group">
                     <span class="input-group-addon icons"><i class="fa fa-text-height"></i></span>
@@ -108,10 +108,10 @@ class Menus
     {
         return '
             <div class="btn-group  sub-menu" id="nameUser">
-                <spqn class="dropdown-toggle" >
+                <span class="dropdown-toggle" >
                     ' . $nameUser . '
                     <span class="caret"></span>
-                </spqn>
+                </span>
                 <ul class="dropdown-menu">
                     <li>
                         <a href="#">

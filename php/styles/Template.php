@@ -1,5 +1,4 @@
 <?php
-include_once "CommonStyles.php";
 
 /**
  * Class Template: This class is the base of the structure with page
@@ -11,14 +10,14 @@ class Template
      */
     protected $nameProject = "Library";
 
-    protected $typeUser, $nameUser, $emailUser, $home, $currentOptionMenu, $sid;
+    protected $typeUser, $nameUser, $emailUser, $sid;
 
-    protected $includeSection, $spanUser, $textButton, $linkButton, $linkUser, $linkTerms, $linkContact;
+    protected $includeSection, $textButton, $linkButton, $linkUser, $linkTerms, $linkContact;
+
+    private   $contentMenu = "";
+    private   $userMenuTop = "";
 
     protected $content = "";
-
-
-
 
     /**
      * @param $typePage:                 Specific type of page (Common,Login,Register)
@@ -27,21 +26,18 @@ class Template
      * @param string $permision:         If is user, libraryan or Admin
      * @param string $currentOptionMenu: Actual section of menu
      */
-    function __construct($nameUser = "", $emailUser = "Anonimous", $typeUser = "", $home = "Anonimous.php", $currentOptionMenu = "", $sid = "")
+    function __construct($nameUser = "", $emailUser = "Anonimous", $typeUser = "", $sid = "")
     {
 
         $this->nameUser          = $nameUser;
         $this->emailUser         = $emailUser;
         $this->typeUser          = $typeUser;
-        $this->home              = $home;
         $this->sid               = $sid;
-        $this->currentOptionMenu = $currentOptionMenu;
 
 
         $this->includeSection = true;
-        $this->spanUser       = Menus::userConfig($this->nameUser);
         $this->textButton     = "Log Out";
-        $this->linkButton     = "../logout.php";
+        $this->linkButton     = "controller.php?method=logOut";
 
 
 
@@ -52,7 +48,7 @@ class Template
 
     }
 
-    private function html()
+    protected function html()
     {
         return
             '<html lang="en">' .
@@ -69,7 +65,7 @@ class Template
                 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
                 <title>
-                    ' . $this->currentOptionMenu . '
+                    ' . $this->nameProject . '
                 </title>
                 <!-- Latest compiled and minified CSS -->
                 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
@@ -83,11 +79,11 @@ class Template
                 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 
                 <!-- My css -->
-                <link href="../../css/mycss.css" rel="stylesheet">
+                <link href="../css/mycss.css" rel="stylesheet">
                 <!-- jQuery -->
-                <script src="../../js/jquery-2.1.4.min.js"></script>
+                <script src="../js/jquery-2.1.4.min.js"></script>
                 <!-- My js  -->
-                <script src="../../js/myjs.js"></script>
+                <script src="../js/myjs.js"></script>
 
             </head>
         ';
@@ -114,7 +110,7 @@ class Template
             <header class="navbar navbar-inverse">
 
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
-                    <a type="link" id="link-logo" href="' . $this->home . '">
+                    <a type="link" id="link-logo" href="controller.php">
                         <h2 class="navbar-text">
                             ' . $this->nameProject . '
                         </h2>
@@ -122,13 +118,13 @@ class Template
                 </div>
 
                 <div class="col-lg-4 col-md-4 col-sm-4 hidden-xs hidden-phone text-center" id="nav-btn-home">
-                    <a class="btn btn-default navbar-btn" id="btn-home" href="' . $this->home . '">
+                    <a class="btn btn-default navbar-btn" id="btn-home" href="controller.php">
                         <span class="glyphicon glyphicon-home"></span>
                     </a>
                 </div>
 
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 text-right">
-                    ' . $this->spanUser . '
+                    ' . $this->userMenuTop . '
                     <a id="nav-btn-right" class="btn btn-default navbar-btn" href="' . $this->linkButton . '">
                         ' . $this->textButton . '
                     </a>
@@ -167,7 +163,7 @@ class Template
             '
             <section class="row row-centered">
 
-                '.$this->menu().'
+                '.$this->contentMenu.'
 
                 <div class="row row-centered" id="content">
 
@@ -178,33 +174,6 @@ class Template
                 </div>
 
             </section>
-            ';
-    }
-
-    private function menu(){
-
-        $contentMenu="";
-
-        switch($this->typeUser){
-
-            case "librarian":
-                $contentMenu = Menus::menuLibrarian();
-                break;
-            case "user":
-                break;
-
-            case "admin":
-                break;
-
-            default:
-                return "";
-        }
-
-        return '
-            <div class="row row-centered">
-                '.$contentMenu.'
-            </div>
-            <hr id="menu-separator">
             ';
     }
 
@@ -233,6 +202,32 @@ class Template
                 </p>
             </footer>
             ';
+    }
+
+    /**
+     * @param mixed $contentMenu
+     */
+    protected function setContentMenu($contentMenu)
+    {
+        $this->contentMenu =
+            '
+                <div class="row row-centered">
+                    '.$contentMenu.'
+                </div>
+                <hr id="menu-separator">';
+    }
+
+    /**
+     * @param string|void $userMenuTop
+     */
+    protected function setUserMenuTop($userMenuTop)
+    {
+        $this->userMenuTop =
+        '
+            <div class="btn-group  sub-menu" id="nameUser">
+                '.$userMenuTop.'
+            </div>
+        ';
     }
 
     public function showError($error = "Has occurred an error, please try again"){
