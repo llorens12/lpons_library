@@ -25,7 +25,7 @@ class Anonimous extends Template{
         if($error != "")
             $error = '<h5><span class="label label-danger">'.$error.'</span></h5>';
 
-        $this->content =
+        $this->setContent(
             '
             <div class="col-lg-3 col-md-6 col-sm-9 col-xs-12 col-centered box">
                 <label class="box-tittle"><h3>Login</h3></label>
@@ -54,7 +54,7 @@ class Anonimous extends Template{
                     </div>
                 </form>
             </div>
-            ';
+            ');
     }
 
     public function register($error = "")
@@ -69,12 +69,12 @@ class Anonimous extends Template{
         if($error != "")
             $error = '<h5><span class="label label-danger">'.$error.'</span></h5>';
 
-        $this->content =
+        $this->setContent(
         '
             <div class="col-lg-3 col-md-6 col-sm-9 col-xs-12 col-centered box">
                 <label class="box-tittle"><h3>Register</h3></label>
 
-                <form class="container-box" accept-charset="UTF-8" action="controller.php?method=insertUser" method="POST" id="registerForm" onsubmit="return registerContent(event)">
+                <form class="container-box" accept-charset="UTF-8" action="controller.php?insert=user" method="POST" id="registerForm" onsubmit="return registerContent(event)">
 
                     <div id="error">
                     ' .$error. '
@@ -92,7 +92,7 @@ class Anonimous extends Template{
                     </div>
                 </form>
             </div>
-        ';
+        ');
     }
 
     public function startSession($email, $pwd, $remember)
@@ -111,7 +111,7 @@ class Anonimous extends Template{
             $_SESSION['typeUser'] = $user['typeUser'];
             $_SESSION['name'] = $user['name'];
             $_SESSION['email'] = $user['email'];
-            $_SESSION['home'] = $user['home'];
+            $_SESSION['home'] = "controller.php?method=".$user['home'];
 
 
             if ($remember) {
@@ -129,19 +129,19 @@ class Anonimous extends Template{
         $request['pwd']     = md5($request['pwd']);
         $request['typeUser'] = "user";
         $request['registered'] = date('Y-m-d');
-        $request['home']= "controller.php?method=showBooks";
 
 
-        if($this->insert("users",$request))
-        {
-            $this->close();
+        ($this->insert("users",$request))? $this->login() : $this->register("Register error");
+
+        $this->close();
+
+    }
+
+    public function __toString()
+    {
+        if($this->getContent() == "")
             $this->login();
-        }
-        else
-        {
-            $this->close();
-            $this->register("Register error");
-        }
+        return utf8_encode($this->html());
     }
 }
 

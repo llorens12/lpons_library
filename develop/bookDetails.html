@@ -1,0 +1,249 @@
+<html lang="en">
+<head>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <title>
+        Library
+    </title>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <!--http://fortawesome.github.io/Font-Awesome/icons/-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+
+    <!-- Bootstrap -->
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesnt work if you view the page via file:// -->
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+
+    <!-- My css -->
+    <link href="../css/mycss.css" rel="stylesheet">
+    <!-- jQuery -->
+    <script src="../js/jquery-2.1.4.min.js"></script>
+    <!-- My js  -->
+    <script src="../js/myjs.js"></script>
+
+</head>
+<body>
+
+<div id="body-separator">
+    <header class="navbar navbar-inverse">
+
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
+            <a type="link" id="link-logo" href="controller.php">
+                <h2 class="navbar-text">
+                    Library
+                </h2>
+            </a>
+        </div>
+
+        <div class="col-lg-4 col-md-4 col-sm-4 hidden-xs hidden-phone text-center" id="nav-btn-home">
+            <a class="btn btn-default navbar-btn" id="btn-home" href="controller.php">
+                <span class="glyphicon glyphicon-home"></span>
+            </a>
+        </div>
+
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 text-right">
+
+            <div class="btn-group  sub-menu" id="nameUser">
+
+            <span class="dropdown-toggle">
+Lorenzo
+                <span class="caret"></span>
+            </span>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a href="#">
+                            My profile
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="#">
+                            Configuration
+                        </a>
+                    </li>
+                </ul>
+
+            </div>
+
+            <a id="nav-btn-right" class="btn btn-default navbar-btn" href="controller.php?method=logOut">
+                Log Out
+            </a>
+        </div>
+
+    </header>
+
+    <main class="container row-centered" id="main-tag">
+        <section class="row row-centered">
+
+
+            <div class="row row-centered">
+
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                    <a href="#" class="btn-menu btn btn-lg btn-primary active">
+                        Books
+                    </a>
+                </div>
+
+
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 border-left">
+                    <a href="#" class="btn-menu btn btn-default btn-lg ">
+                        My reserves
+                    </a>
+                </div>
+
+            </div>
+            <hr id="menu-separator">
+
+
+            <div class="row row-centered" id="content">
+
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+
+                    <!--///////////////////////////////////////////////////////////////////////////////////-->
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" id="div-details-books">
+
+                        <div id="img-details-books">
+
+                            <img class="details-img" src="http://image.casadellibro.com/a/l/t1/49/9788496797949.jpg"/>
+
+                            <label class="label label-default">ISBN: <label id="book-isbn">234324</label></label>
+                            <br><br>
+                            <label class="label label-default">Category: Action</label>
+                            <br><br>
+                            <label class="label label-default">Author: Juan Pablo Segundo</label>
+
+                        </div>
+
+                        <div id="text-details-books">
+
+
+                            <h1>Title of the Book</h1>
+
+
+                            <p>Muy lejos, más allá de las montañas de palabras, alejados de los países de las vocales y
+                                las
+                                consonantes, viven los textos simulados. Viven aislados en casas de letras, en la costa
+                                de
+                                la semántica, un gran océano de lenguas. Un riachuelo llamado Pons fluye por su pueblo y
+                                los
+                                abastece con las normas necesarias. Hablamos de un país paraisomático en el que a uno le
+                                caen pedazos de frases asadas en la boca. Ni siquiera los todopoderosos signos de
+                                puntuación
+                                dominan a los textos simulados; una vida, se puede decir, poco ortográfica. Pero un buen
+                                día, una pequeña línea de texto simulado, llamada Lorem Ipsum, decidió aventurarse y
+                                salir
+                                al vasto mundo de la gramática. El gran Oxmox le desanconsejó hacerlo, ya que esas
+                                tierras
+                                estaban llenas de comas malvadas, signos de interrogación salvajes y puntos y coma
+                                traicioneros, pero el texto simulado no se dejó atemorizar. Empacó sus siete versales,
+                                enfundó su inicial en el cinturón y se puso en camino. Cuando ya había escalado las
+                                primeras
+                                colinas de las montañas cursivas, se dio media vuelta para dirigir su mirada por última
+                                vez,
+                                hacia su ciudad natal Letralandia, el encabezamiento del pueblo Alfabeto y el subtítulo
+                                de
+                                su propia calle, la calle del renglón. Una pregunta retórica se le pasó por la mente y
+                                le
+                                puso melancólico, pero enseguida reemprendió su marcha. De nuevo en camino, se encontró
+                                con
+                                una copia. La copia advirtió al pequeño texto simulado de que en el lugar del que ella
+                                venía, la habían reescrito miles de veces y que todo lo que había quedado de su original
+                                era
+                                la palabra "y", así que más le valía al pequeño texto simulado volver a su país, donde
+                                estaría mucho más seguro. Pero nada de lo dicho por la copia pudo convencerlo, de manera
+                                que
+                                al cabo de poco tiempo, unos pérfidos redactores publicitarios lo encontraron y
+                                emborracharon con Longe y Parole para llevárselo después a su agencia, donde abusaron de
+                                él
+                                para sus proyectos, una y otra vez. Y si aún no lo han reescrito, lo siguen utilizando
+                                hasta
+                                ahora. Muy lejos, más allá de las montañas de palabras, alejados de los países de las
+                                vocales y las consonantes, viven los textos simulados. Viven aislados en casas de
+                                letras, en
+                                la costa de la semántica, un gran océano de lenguas. Un riachuelo llamado Pons fluye por
+                                su
+                                pueblo y los abastece con las normas necesarias. Hablamos de un país paraisomático en el
+                                que
+                                a uno le caen pedazos de frases asadas en la boca. Ni siquiera los todopoderosos signos
+                                de
+                                puntuación dominan a los textos simulados; una vida, se puede decir, poco ortográfica.
+                                Pero
+                                un buen día, una pequeña línea de texto simulado, llamada Lorem Ipsum, decidió
+                                aventurarse y
+                                salir al vasto mundo de la gramática. El gran Oxmox le desanconsejó hacerlo, ya que esas
+                                tierras estaban llenas de comas malvadas, signos de interrogación salvajes y puntos y
+                                coma
+                                traicioneros, pero el texto simulado no se dejó atemorizar. Empacó sus siete versales,
+                                enfundó su inicial en el cinturón y se puso en camino. Cuando ya había escalado las
+                                primeras
+                                colinas de las m</p>
+
+                            <div id="options-reserves">
+
+                                <a class="btn btn-primary" id="btn-reserve-20-days">Reserve 20 days</a>
+                                <button class="btn btn-default active"  onclick="" id="btn-personalized-reserve">
+                                    <span>Personalized reserve
+                                        <span class="caret"></span>
+                                        <span class="sr-only">Toggle Dropdown</span>
+                                    </span>
+                                </button>
+
+                            </div>
+
+                            <div class="hidden" id="personalized-reserve">
+
+                                <form action="#" method="post" onsubmit="return checkReserveDisponibility()">
+
+                                    <div class="input-group" id="start-date-reserve-personalized">
+                                        <span class="input-group-addon icons"><i class="fa fa-calendar-plus-o"></i></span>
+                                        <input type="date" class="form-control" placeholder="dd/mm/aaaa" name="date-start" id="date-start" required="">
+                                    </div>
+                                    <div class="input-group" id="finish-date-reserve-personalized">
+                                        <span class="input-group-addon icons"><i class="fa fa-calendar-times-o"></i></span>
+                                        <input type="date" class="form-control" placeholder="dd/mm/aaaa" name="date-finish" id="date-finish" required="">
+                                    </div>
+
+                                    <label class="label label-danger hidden" id="label-error-personalized-reserve">The reserve is not available</label>
+                                    <br>
+                                    <button type="submit" class="btn btn-default">Reserve</button>
+                                </form>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!--///////////////////////////////////////////////////////////////////////////////////-->
+
+                </div>
+
+            </div>
+
+        </section>
+    </main>
+</div>
+<footer class="navbar navbar-inverse text-center">
+    <p class="col-lg-4 col-md-4 col-sm-4 col-xs-12 navbar-text">
+        Signed in as
+        <a href="#" class="navbar-link">
+            lorenzoponsbarber@gmail.com
+        </a>
+    </p>
+
+    <p class="col-lg-4 col-md-4 col-sm-4 col-xs-12 navbar-text">
+        <a href="#" class="navbar-link">
+            Terms &amp; conditions
+        </a>
+    </p>
+
+    <p class="col-lg-4 col-md-4 col-sm-4 col-xs-12 navbar-text">
+        <a href="#" class="navbar-link">
+            Contact
+        </a>
+    </p>
+</footer>
+</body>
+</html>

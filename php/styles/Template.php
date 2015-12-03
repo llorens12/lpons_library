@@ -8,16 +8,16 @@ class Template
     /**
      * @var string: This var contains the name of the project.
      */
-    protected $nameProject = "Library";
+    protected $nameProject = "Alaior Library";
 
-    protected $typeUser, $nameUser, $emailUser, $sid;
+    protected $typeUser, $nameUser, $emailUser, $home, $sid;
 
     protected $includeSection, $textButton, $linkButton, $linkUser, $linkTerms, $linkContact;
 
     private   $contentMenu = "";
     private   $userMenuTop = "";
 
-    protected $content = "";
+    private   $content = "";
 
     /**
      * @param $typePage:                 Specific type of page (Common,Login,Register)
@@ -26,13 +26,14 @@ class Template
      * @param string $permision:         If is user, libraryan or Admin
      * @param string $currentOptionMenu: Actual section of menu
      */
-    function __construct($nameUser = "", $emailUser = "Anonimous", $typeUser = "", $sid = "")
+    function __construct($nameUser = "", $emailUser = "Anonimous", $typeUser = "", $home = "controller.php", $sid = "")
     {
 
         $this->nameUser          = $nameUser;
         $this->emailUser         = $emailUser;
         $this->typeUser          = $typeUser;
-        $this->sid               = $sid;
+        $this->home              = $home;
+        $this->sid               = htmlspecialchars($sid);
 
 
         $this->includeSection = true;
@@ -72,11 +73,6 @@ class Template
                 <!--http://fortawesome.github.io/Font-Awesome/icons/-->
                 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 
-                <!-- Bootstrap -->
-                <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-                <!-- WARNING: Respond.js doesnt work if you view the page via file:// -->
-                <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-                <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 
                 <!-- My css -->
                 <link href="../css/mycss.css" rel="stylesheet">
@@ -84,6 +80,12 @@ class Template
                 <script src="../js/jquery-2.1.4.min.js"></script>
                 <!-- My js  -->
                 <script src="../js/myjs.js"></script>
+
+                <!-- Bootstrap -->
+                <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+                <!-- WARNING: Respond.js doesnt work if you view the page via file:// -->
+                <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+                <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 
             </head>
         ';
@@ -110,7 +112,7 @@ class Template
             <header class="navbar navbar-inverse">
 
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
-                    <a type="link" id="link-logo" href="controller.php">
+                    <a type="link" id="link-logo" href="'.$this->home.'">
                         <h2 class="navbar-text">
                             ' . $this->nameProject . '
                         </h2>
@@ -118,7 +120,7 @@ class Template
                 </div>
 
                 <div class="col-lg-4 col-md-4 col-sm-4 hidden-xs hidden-phone text-center" id="nav-btn-home">
-                    <a class="btn btn-default navbar-btn" id="btn-home" href="controller.php">
+                    <a class="btn btn-default navbar-btn" id="btn-home" href="'.$this->home.'">
                         <span class="glyphicon glyphicon-home"></span>
                     </a>
                 </div>
@@ -205,7 +207,7 @@ class Template
     }
 
     /**
-     * @param mixed $contentMenu
+     * @param string $contentMenu
      */
     protected function setContentMenu($contentMenu)
     {
@@ -218,7 +220,7 @@ class Template
     }
 
     /**
-     * @param string|void $userMenuTop
+     * @param string $userMenuTop
      */
     protected function setUserMenuTop($userMenuTop)
     {
@@ -230,8 +232,26 @@ class Template
         ';
     }
 
+    /**
+     * @return string
+     */
+    protected function getContent()
+    {
+        return $this->content;
+    }
+
+    /**
+     * @param string $content
+     */
+    protected function setContent($content)
+    {
+        $this->content = $content;
+    }
+
+
+
     public function showError($error = "Has occurred an error, please try again"){
-        $this->content = $error;
+        $this->content = "<h1 class='text-center'><span class='label label-danger'>".$error."</span></h1>";
     }
 
     public function __toString()

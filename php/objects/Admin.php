@@ -3,9 +3,9 @@
 
 class Admin extends Librarian{
 
-    public function __construct($nameUser, $emailUser, $typeUser, $sid)
+    public function __construct($nameUser, $emailUser, $typeUser, $home, $sid)
     {
-        parent::__construct($nameUser, $emailUser, $typeUser, $sid);
+        parent::__construct($nameUser, $emailUser, $typeUser, $home, $sid);
     }
 
 
@@ -13,6 +13,8 @@ class Admin extends Librarian{
     public function __toString()
     {
         $this->setContentMenu($this->myContentMenu());
+        if($this->getContent() == "")
+            $this->setContent("<h1 style='text-align: center'>ERROR: action not found</h1>");
         return utf8_encode($this->html());
     }
 }

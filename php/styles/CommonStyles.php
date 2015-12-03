@@ -5,6 +5,10 @@ class Registers
 
     static function register()
     {
+
+
+
+
         return
             '
                 <div class="input-group">
@@ -39,15 +43,15 @@ class Registers
                 </div>
                 <div class="input-group">
                     <span class="input-group-addon icons"><i class="fa fa-book"></i></span>
-                    <input type="text" class="form-control" placeholder="Title" name="title" required="">
+                    <input maxlength="50"  type="text" class="form-control" placeholder="Title" name="title" required="">
                 </div>
                 <div class="input-group">
                     <span class="input-group-addon icons"><i class="fa fa-text-height"></i></span>
-                    <textarea maxlength="80" rows="2" class="form-control" placeholder="Desctiption..." name="description" required=""></textarea>
+                    <textarea maxlength="250" rows="2" class="form-control" placeholder="Desctiption..." name="description" required=""></textarea>
                 </div>
                 <div class="input-group">
                     <span class="input-group-addon icons"><i class="fa fa-text-height"></i></span>
-                    <textarea maxlength="200" rows="5" class="form-control" placeholder="Summary..." name="summary" required=""></textarea>
+                    <textarea maxlength="3000" rows="5" class="form-control" placeholder="Summary..." name="summary" required=""></textarea>
                 </div>
                 <div class="input-group">
                     <span class="input-group-addon icons"><i class="fa fa-hashtag"></i></span>

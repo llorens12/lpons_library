@@ -1,0 +1,228 @@
+<HTML>
+<HEAD>
+
+    <!-- Código descargado gratuitamente de HTMLpoint, el sitio italiano del web publishing
+                                       http://www.htmlpoint.com -->
+
+    <TITLE>Ejemplos Javascript: ejemplo práctico </TITLE>
+
+    <SCRIPT LANGUAGE="JavaScript">
+
+        <!--
+
+        // Copyright (c) 1996-1997 Tomer Shiran. All rights reserved.
+        // Permission given to use the script provided that this notice remains as is.
+        // Additional scripts can be found at http://www.geocities.com/~yehuda/
+
+        // Boolean variable specified if alert should be displayed if cookie exceeds 4KB
+        var caution = false
+
+        // name - name of the cookie
+        // value - value of the cookie
+        // [expires] - expiration date of the cookie (defaults to end of current session)
+        // [path] - path for which the cookie is valid (defaults to path of calling document)
+        // [domain] - domain for which the cookie is valid (defaults to domain of calling document)
+        // [secure] - Boolean value indicating if the cookie transmission requires a secure transmission
+        // * an argument defaults when it is assigned null as a placeholder
+        // * a null placeholder is not required for trailing omitted arguments
+        function setCookie(name, value, expires, path, domain, secure) {
+            var curCookie = name + "=" + escape(value) +
+                    ((expires) ? "; expires=" + expires.toGMTString() : "") +
+                    ((path) ? "; path=" + path : "") +
+                    ((domain) ? "; domain=" + domain : "") +
+                    ((secure) ? "; secure" : "")
+            if (!caution || (name + "=" + escape(value)).length <= 4000)
+                document.cookie = curCookie
+            else
+            if (confirm("Cookie exceeds 4KB and will be cut!"))
+                document.cookie = curCookie
+        }
+
+        // name - name of the desired cookie
+        // * return string containing value of specified cookie or null if cookie does not exist
+        function getCookie(name) {
+            var prefix = name + "="
+            var cookieStartIndex = document.cookie.indexOf(prefix)
+            if (cookieStartIndex == -1)
+                return null
+            var cookieEndIndex = document.cookie.indexOf(";", cookieStartIndex + prefix.length)
+            if (cookieEndIndex == -1)
+                cookieEndIndex = document.cookie.length
+            return unescape(document.cookie.substring(cookieStartIndex + prefix.length, cookieEndIndex))
+        }
+
+        // name - name of the cookie
+        // [path] - path of the cookie (must be same as path used to create cookie)
+        // [domain] - domain of the cookie (must be same as domain used to create cookie)
+        // * path and domain default if assigned null or omitted if no explicit argument proceeds
+        function deleteCookie(name, path, domain) {
+            if (getCookie(name)) {
+                document.cookie = name + "=" +
+                        ((path) ? "; path=" + path : "") +
+                        ((domain) ? "; domain=" + domain : "") +
+                        "; expires=Thu, 01-Jan-70 00:00:01 GMT"
+            }
+        }
+
+        // date - any instance of the Date object
+        // * you should hand all instances of the Date object to this function for "repairs"
+        // * this function is taken from Chapter 14, "Time and Date in JavaScript", in "Learn Advanced JavaScript Programming"
+        function fixDate(date) {
+            var base = new Date(0)
+            var skew = base.getTime()
+            if (skew > 0)
+                date.setTime(date.getTime() - skew)
+        }
+
+        // constructor function to create an entry (parent or child)
+        function item(parent, text, depth) {
+            this.parent = parent // is this item a parent?
+            this.text = text // text for link (may include HTML)
+            this.depth = depth // nested depth
+        }
+
+        // constructor function to create array (compatible with all browsers)
+        function makeArray(length) {
+            this.length = length // length of array (integer)
+        }
+
+        // create items of outline
+        function makeDatabase() {
+            outline = new makeArray(9) // create global object
+
+            // create items in outline
+            outline[0] = new item(true, 'computer companies', 0)
+            outline[1] = new item(false, '<A HREF="http://www.intel.com">Intel</A>', 1)
+            outline[2] = new item(true, 'software', 1)
+            outline[3] = new item(false, '<A HREF="http://www.netscape.com">Netscape</A>', 2)
+            outline[4] = new item(false, '<A HREF="http://www.microsoft.com">Microsoft</A>', 2)
+            outline[5] = new item(false, '<A HREF="http://www.netscent.com">Netscent</A>', 1)
+            outline[6] = new item(true, 'shareware Web sites', 0)
+            outline[7] = new item(false, '<A HREF="http://www.jumbo.com">Jumbo</A>', 1)
+            outline[8] = new item(false, '<A HREF="http://www.windows95.com">Windows95.com</A>', 1)
+
+            // determine current state of each item and assign to state properties
+            setStates()
+
+            // set image for each item (only items with true state)
+            setImages()
+        }
+
+        function setStates() {
+            // assign current cookie to local variable
+            var storedValue = getCookie("outline")
+
+            // if desired cookie not found (null)
+            if (!storedValue) {
+                // set states to default if no cookie found
+                for (var i = 0; i < outline.length; ++i) {
+                    // only topmost level is visible by default
+                    if (outline[i].depth == 0)
+                        outline[i].state = true
+                    else
+                        outline[i].state = false
+                }
+            } else {
+                // extract current states from cookie (0 => false, 1 => true)
+                for (var i = 0; i < outline.length; ++i) {
+                    if (storedValue.charAt(i) == '1')
+                        outline[i].state = true
+                    else
+                        outline[i].state = false
+                }
+            }
+        }
+
+        function setImages() {
+            // loop through all elements of the outline "array" (object)
+            for (var i = 0; i < outline.length; ++i) {
+                if (outline[i].state)
+                    if (outline[i].parent) // outline[i] is a parent
+                        if (outline[i + 1].state) // outline[i] is exploded
+                            outline[i].pic = '<A HREF="javascript:toggle(' + i + ')"><IMG SRC="exploded.gif" BORDER=0></A>'
+                        else // outline[i] is collapsed
+                            outline[i].pic = '<A HREF="javascript:toggle(' + i + ')"><IMG SRC="collapsd.gif" BORDER=0></A>'
+                    else // outline[i] is only a child (not a parent)
+                        outline[i].pic = '<IMG SRC="child.gif" BORDER=0>'
+            }
+        }
+
+        // change from expanded to collapsed and vice versa
+        function toggle(num) {
+            // loop starts at item following argument
+            // terminate loop when:
+            //   a) last element of outline "array" reached
+            //   b) current item (outline[i]) is not deeper than toggled item (outline[num])
+            for (var i = num + 1; i < outline.length && outline[i].depth >= outline[num].depth + 1; ++i) {
+                // if current item (outline[i]) is a direct child of outline[num]
+                if (outline[i].depth == outline[num].depth + 1)
+                    outline[i].state = !outline[i].state // toggle state
+            }
+
+            // store new states in cookie
+            setStorage()
+
+            // reload page
+            history.go(0)
+        }
+
+        function setStorage() {
+            // initialize local variable to empty string
+            var text = ""
+
+            // loop through all properties of outline "array"
+            for (var i = 0; i < outline.length; ++i) {
+                // use "1" character to represent true state, and "0" for false state
+                text += (outline[i].state) ? "1" : "0"
+            }
+
+            // create cookie named "outline" with "binary" string
+            setCookie("outline", text)
+        }
+
+        // update database
+        makeDatabase()
+
+        // -->
+
+    </SCRIPT>
+
+</HEAD>
+
+<BODY bgcolor="white">
+
+<SCRIPT LANGUAGE="JavaScript">
+    <!--
+
+    // use <PRE> to enable indentation via spaces
+    document.write('<PRE><H4>')
+
+    // loop through elements of outline "array"
+    for (var i = 0; i < outline.length; ++i) {
+        // if current item's state is true
+        if (outline[i].state) {
+            // place three spaces for each nesting (depth * 3 spaces)
+            for (var j = 0; j < outline[i].depth * 3; ++j) {
+                document.write(' ')
+            }
+
+            // follow indentation with picture, another space, text, and new line
+            document.write(outline[i].pic, ' ', outline[i].text, '<BR>')
+        } else {
+            // current item's state is false (skip all its children)
+            var previous = i
+            for (var k = i + 1; k < outline.length && outline[k].depth >= outline[previous].depth; ++k) {
+                ++i
+            }
+        }
+    }
+
+    // end <PRE> to return to normal formatting
+    document.write('</H4></PRE>')
+
+    // -->
+</SCRIPT>
+
+
+</body>
+</html>

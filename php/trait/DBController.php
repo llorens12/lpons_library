@@ -15,8 +15,7 @@ trait DBController{
     protected function select($sentence)
     {
         $this->startConnection();
-        $return = $this->connection->query($sentence);
-        return $return;
+        return $this->connection->query($sentence);
     }
 
     protected function insert($table, $data)
@@ -33,13 +32,11 @@ trait DBController{
         $columns = trim($columns, ", ");
         $valuesColumns = trim($valuesColumns, ", ");
 
-        $return = $this->connection->query
+        return $this->connection->query
         ("
             INSERT INTO {$table} ({$columns})
             VALUES ({$valuesColumns});
         ");
-
-        return $return;
     }
 
     protected function update($table, $data, $primaryKey, $valuePrimaryKey)
@@ -53,28 +50,23 @@ trait DBController{
 
         $set = trim($set, ", ");
 
-        $return = $this->connection->query
+        return $this->connection->query
         ("
             UPDATE {$table}
             SET    {$set}
             WHERE  {$primaryKey} = {$valuePrimaryKey};
         ");
-
-
-        return $return;
     }
 
     protected function delete($table, $where)
     {
         $this->startConnection();
-        $return = $this->connection->query
+
+        return $this->connection->query
         ("
             DELETE FROM {$table}
             WHERE  {$where};
         ");
-
-
-        return $return;
     }
 
     protected function close(){

@@ -8,19 +8,18 @@ include_once "objects/Librarian.php";
 include_once "objects/Admin.php";
 include_once "objects/Ajax.php";
 
+//register_shutdown_function('fatalErrorHandler');
+
 session_cache_limiter('nocache,private');
 session_start();
 
-if (!isset($_SESSION['email'], $_SESSION['typeUser'], $_SESSION['name'], $_SESSION['home']) && isset($_COOKIE['email'], $_COOKIE['pwd']))
-{
-    if(isset($_REQUEST['method']) && $_REQUEST['method'] != "startSession")
+if (!isset($_SESSION['email'], $_SESSION['typeUser'], $_SESSION['name'], $_SESSION['home']) && isset($_COOKIE['email'], $_COOKIE['pwd'])) {
+    if (isset($_REQUEST['method']) && $_REQUEST['method'] != "startSession")
         header('Location: controller.php?method=startSession');
 }
 
 
-
-if (isset($_REQUEST['ajax']))
-{
+if (isset($_REQUEST['ajax'])) {
     $ajax = new Ajax();
 
     switch ($_REQUEST['ajax']) {
@@ -34,40 +33,33 @@ if (isset($_REQUEST['ajax']))
 
     }
 }
-
-else
-{
+else {
     $user;
 
-    if (!isset($_SESSION['email'], $_SESSION['typeUser'], $_SESSION['name'], $_SESSION['home']))
-    {
+    if (!isset($_SESSION['email'], $_SESSION['typeUser'], $_SESSION['name'], $_SESSION['home'])) {
         $user = new Anonimous();
-    } else
-    {
-        switch ($_SESSION['typeUser'])
-        {
+    } else {
+        switch ($_SESSION['typeUser']) {
             case "user":
 
-                $user = new User($_SESSION['name'], $_SESSION['email'], $_SESSION['typeUser'], SID);
+                $user = new User($_SESSION['name'], $_SESSION['email'], $_SESSION['typeUser'], $_SESSION['home'], SID);
                 break;
 
             case "librarian":
 
-                $user = new Librarian($_SESSION['name'], $_SESSION['email'], $_SESSION['typeUser'], SID);
+                $user = new Librarian($_SESSION['name'], $_SESSION['email'], $_SESSION['typeUser'], $_SESSION['home'], SID);
                 break;
 
             case "admin":
 
-                $user = new Admin($_SESSION['name'], $_SESSION['email'], $_SESSION['typeUser'], SID);
+                $user = new Admin($_SESSION['name'], $_SESSION['email'], $_SESSION['typeUser'], $_SESSION['home'], SID);
                 break;
         }
     }
 
+    if (isset($_REQUEST['method'])) {
+        switch ($_REQUEST['method']) {
 
-    if(isset($_REQUEST['method']))
-    {
-        switch ($_REQUEST['method'])
-        {
             case "register":
 
                 $user->register();
@@ -98,15 +90,7 @@ else
                     } else {
                         $user->login("Incorrect E-mail or Password");
                     }
-                } else {
-                    header('Location: controller.php');
                 }
-                break;
-
-            case "insertUser":
-
-                unset($_REQUEST['method']);
-                $user->insertUser($_REQUEST);
                 break;
 
             case "logOut":
@@ -114,12 +98,77 @@ else
                 $user->logOut();
                 header('Location: controller.php');
                 break;
-        }
-    }elseif(isset($_SESSION['home'])){
-        header('Location: controller.php?'.$_SESSION['home']);
-    }
 
+            case "showUsers":
+
+                $user->showUsers();
+                break;
+
+            case "showBooks":
+
+                $category = "";
+                $search   = "";
+
+                if(isset($_REQUEST['category']))
+                    $category = $_REQUEST['category'];
+
+                elseif(isset($_REQUEST['search']))
+                    $search = $_REQUEST['search'];
+
+
+                $user->showBooks($category,$search);
+                break;
+
+            case "showBook":
+
+                (isset($_REQUEST['isbn']))? $user->showBook($_REQUEST['isbn']) : NULL;
+                break;
+
+            case "error":
+
+                (isset($_REQUEST['error'])) ?
+
+                    $user->showError($_REQUEST['error'])
+                    :
+                    $user->showError();
+
+                break;
+
+        }
+    }
+    elseif(isset($_REQUEST['insert'])){
+
+        switch ($_REQUEST['insert']){
+
+            case "user":
+
+                unset($_REQUEST['insert']);
+                $user->insertUser($_REQUEST);
+                break;
+        }
+    }
+    echo $user;
 }
-echo $user;
+
+
+
+/**
+ *
+ * Handling fatal error
+ *
+ */
+
+    function fatalErrorHandler()
+    {
+# Getting last error
+        $error = error_get_last();
+
+# Checking if last error is a fatal error
+        if(($error['type'] === E_ERROR) || ($error['type'] === E_USER_ERROR))
+        {
+# Here we handle the error, displaying HTML, logging, ...
+            header('Location: controller.php?method=error&error=Permission denied'.htmlspecialchars(SID));
+        }
+    }
 
 

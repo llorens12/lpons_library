@@ -7,20 +7,61 @@ $(document).ready(function()
          },function()
          {
              $(this).removeClass('open');
-             console.log("sale");
          });
+
+
+        $("#btn-personalized-reserve").click(function(){
+
+            var thisBtn = $(this);
+            var btn20days = $("#btn-reserve-20-days");
+            var personalizedReserve = $("#personalized-reserve");
+
+            if (!thisBtn.hasClass('show-personalized'))
+            {
+                thisBtn.addClass("show-personalized");
+                personalizedReserve.removeClass("hidden");
+                btn20days.attr("disabled",true);
+
+            }
+            else
+            {
+                thisBtn.removeClass("show-personalized");
+                personalizedReserve.addClass("hidden");
+                btn20days.attr("disabled",false);
+            }
+
+        });
     }
+
 );
 
+
+function checkReserveDisponibility(){
+
+
+
+    var dataCheck = "ajax=reserveDisponibility&isbn="+$("#book-isbn").html()+"&dateStart="+$("#date-start").val()+"&dateFinish="+$("#date-finish").val();
+
+    console.log(dataCheck);
+
+    if(disponibilityAjax(dataCheck)){
+        return true;
+    }else{
+        $("#label-error-personalized-reserve").removeClass("hidden");
+        return false;
+    }
+
+}
 
 function registerContent(event){
 
     var pwd = $('#pwd');
     var pwd1 = $('#pwd1');
     var email = $('#email');
+    var verification= "ajax=emailDisponibility&email="+email.val();
 
 
-    if(!emailDisponibility() || pwd.val() !== pwd1.val()){
+    if(!disponibilityAjax(verification) || pwd.val() !== pwd1.val() || pwd.val() == ""){
         $('#error').html('<h5><span class="label label-danger">Incorrect fields</span></h5>');
         pwd.val("").parent().addClass("has-error");
         pwd1.val("").parent().addClass("has-error");
@@ -31,10 +72,10 @@ function registerContent(event){
     return true;
 }
 
-function emailDisponibility(){
 
-    var email = $('#email').val();
-    var dataString = "ajax=emailDisponibility&email="+email;
+function disponibilityAjax(dataString){
+
+
     var disponibility;
 
     $.ajax
@@ -50,6 +91,5 @@ function emailDisponibility(){
             disponibility = (data == "true");
         }
     });
-    console.log(disponibility);
     return disponibility;
 }
