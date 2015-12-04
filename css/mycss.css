@@ -346,3 +346,9 @@ footer{
 #finish-date-reserve-personalized{
     float: right;
 }
+
+.not-active{
+    pointer-events: none;
+    cursor: default;
+    opacity: 0.65;
+}

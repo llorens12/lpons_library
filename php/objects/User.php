@@ -15,6 +15,7 @@ class User extends Template{
 
 
     public function showReserves(){
+        $_SESSION['menu']="Reserves";
         $reserves = $this->select(
             "
                 SELECT isbn AS  'ISBN', title AS  'Title', author AS  'Author', category AS  'Category', date_start AS  'Start', date_finish AS  'End', sent AS  'Sent', received AS  'Received'
@@ -23,8 +24,9 @@ class User extends Template{
                 WHERE user =  '".$this->emailUser."'
                 ORDER BY date_finish DESC
             ");
+        $this->close();
 
-        $this->setContent($this->tableStyle($reserves, true, false,));
+        $this->setContent($this->styleBooksMenu().$this->getTable($reserves, true, true, "Reserve","",$this->emailUser,true,false));
     }
 
     public function showBooks($category = "", $search = ""){
@@ -81,7 +83,7 @@ class User extends Template{
     }
 
 
-    protected function tableStyle($data, $edit = false, $drop = false, $typeObject = "", $PrimaryKey = "", $valuePrimaryKey = "", $reserveDelimiter = false, $info = false)
+    protected function getTable($data, $edit = false, $drop = false, $typeObject = "", $primaryKey = "", $valuePrimaryKey = "", $reserveDelimiter = false, $info = false)
     {
 
         /**
@@ -94,14 +96,14 @@ class User extends Template{
         $objectNumber   = 1;
         $contentTbody   = "";
         $thead          = true;
-        $currentDate    = date('Y-m-d');
         $stateEdit      = "";
         $stateDelete    = "";
+        $valueLink      = "";
 
 
 
 
-
+        ($valuePrimaryKey)? $valueLink = $valuePrimaryKey : $valueLink = "";
 
         /**
          * Keeps track of each row
@@ -131,20 +133,39 @@ class User extends Template{
                     . $contentTr;
 
 
-            ($reserveDelimiter
-                && !is_null($object['Received'])
-                && $object['Start']->diff($object['End']) == $this->MAX_DAYS_RESERVE )
-                    ? $stateEdit = "disabled" : $stateEdit = "";
+            if($reserveDelimiter
+              && is_null($object['Received'])
+              && date_create($object['Start'])->diff(date_create($object['End']))->format("d") < $this->MAX_DAYS_RESERVE )
+            {
+                $stateEdit = "";
+            }
+            else
+            {
+                $stateEdit = "not-active";
+            }
 
-            ($reserveDelimiter && !is_null($object['Sent']))? $stateDelete = "disabled" : $stateDelete = "";
 
+            if($reserveDelimiter
+              && is_null($object['Sent']) && is_null($object['Received'])
+              && date_create($object['Start'])->diff(date_create($object['End']))->format("d") < $this->MAX_DAYS_RESERVE )
+            {
+                $stateDelete = "";
+            }
+            else
+            {
+                $stateDelete = "not-active";
+            }
+
+
+
+            ($primaryKey != "")? $valueLink = $primaryKey : NULL;
 
 
             if($info){
                 $contentTbody .=
                     '
                     <td>
-                        <a href="controller.php?method=showInfo' . $typeObject . '&primaryKey=' . $object[$PrimaryKey] . '" title="Show more info">
+                        <a href="controller.php?method=showInfo' . $typeObject . '&primaryKey=' . $valueLink . '" title="Show more info">
                             <i class="fa fa-info-circle"></i>
                         </a>
                     </td>
@@ -156,13 +177,19 @@ class User extends Template{
                 $contentTbody .=
                     '
                     <td>
-                        <a href="controller.php?method=showEdit' . $typeObject . '&primaryKey=' . $object[$PrimaryKey] . '" title="Edit">
+                        <a href="controller.php?method=showEdit' . $typeObject . '&primaryKey=' . $valueLink . '" title="Edit" class="'.$stateEdit.'">
                             <span class="glyphicon glyphicon-edit"></span>
                         </a>
                     </td>
+                    ';
+             }
 
+
+            if($drop) {
+                $contentTbody .=
+                '
                     <td>
-                        <a href="controller.php?delete=' . $typeObject . '&primaryKey=' . $object[$PrimaryKey] . '" title="Delete">
+                        <a href="controller.php?delete=' . $typeObject . '&primaryKey=' . $valueLink . '" title="Delete" class="'.$stateDelete.'">
                             <span class="glyphicon glyphicon-remove"></span>
                         </a>
                     </td>
@@ -207,7 +234,7 @@ class User extends Template{
         }
 
 
-        $this->setContent( '
+        return '
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -218,7 +245,7 @@ class User extends Template{
                 ' . $contentTbody . '
             </tbody>
         </table>
-    ');
+        ';
     }
 
 
@@ -429,7 +456,7 @@ class User extends Template{
 
 
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 border-left" title="Show my reserves">
-                <a href="#" class="btn btn-'.$reserves.' btn-lg btn-menu">
+                <a href="controller.php?method=showReserves" class="btn btn-'.$reserves.' btn-lg btn-menu">
                     My reserves
                 </a>
             </div>

@@ -109,7 +109,7 @@ class Librarian extends User{
     public function showUsers()
     {
         $_SESSION['menu'] = "users";
-        $this->showTable(
+        $this->getTable(
             $this->select("SELECT * FROM USERS")
         );
 

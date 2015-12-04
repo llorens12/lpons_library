@@ -124,6 +124,11 @@ else {
                 (isset($_REQUEST['isbn']))? $user->showBook($_REQUEST['isbn']) : NULL;
                 break;
 
+            case "showReserves":
+
+                $user->showReserves();
+                break;
+
             case "error":
 
                 (isset($_REQUEST['error'])) ?
