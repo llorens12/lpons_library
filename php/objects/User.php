@@ -14,22 +14,56 @@ class User extends Template{
 
 
 
-    public function showReserves(){
+    public function showReserves($category = "",$search = ""){
 
         $_SESSION['menu']="Reserves";
 
+        $filterData = array(
+            "isbn"          =>"ISBN",
+            "title"         =>"Title",
+            "author"        =>"Author",
+            "category"      =>"Category",
+            "date_start"    =>"Start",
+            "date_finish"   =>"End",
+            "sent"          =>"Sent",
+            "recived"       =>"Received"
+        );
 
 
-        $reserves = $this->select(
+        $sentence =
             "
                 SELECT isbn AS  'ISBN', title AS  'Title', author AS  'Author', category AS  'Category', date_start AS  'Start', date_finish AS  'End', sent AS  'Sent', received AS  'Received'
                 FROM (reserves LEFT JOIN copybooks ON copybook = id)
                   LEFT JOIN books ON book = isbn
                 WHERE user =  '".$this->emailUser."'
-            ");
+            ";
+
+
+        if($category != "" && $category != "*") {
+            $sentence .= " ORDER BY '" . $this->getKeyToValue($filterData,$category) . "'";
+        }
+        elseif($search != "") {
+            $sentence .=
+                "
+                   AND (LOWER(author) LIKE LOWER('%" . $search . "%')
+                   OR LOWER(title) LIKE LOWER('%" . $search . "%')
+                   OR LOWER(isbn) LIKE LOWER('%" . $search . "%')
+                   OR date_start    ='" . $search . "'
+                   OR date_finish   ='" . $search . "'
+                   OR sent          ='" . $search . "'
+                   OR received       ='" . $search . "'
+                   )
+                ";
+
+        }
+
+
+        $reserves = $this->select($sentence);
         $this->close();
 
-        $this->setContent($this->getTable($reserves, true, true, "Reserve","",$this->emailUser,true,false));
+        $this->setContent(
+            $this->getFilterMenu("Order by","Default",$filterData,"Search...","showReserves").
+            $this->getTable($reserves, true, true, "Reserve","",$this->emailUser,true,false));
     }
 
     public function showBooks($category = "", $search = ""){
@@ -42,13 +76,18 @@ class User extends Template{
             $sentence .= " AND category='" . $category . "'";
         }
         elseif($search != "") {
-            $sentence .= $this->getSubSentenceSearch("AND", $search);
+            $sentence .=
+                "
+                   AND (LOWER(author) LIKE LOWER('%" . $search . "%')
+                   OR LOWER(title) LIKE LOWER('%" . $search . "%')
+                   OR LOWER(isbn) LIKE LOWER('%" . $search . "%'))
+                ";
         }
 
         $content = "";
 
         $filterData = $this->getArrayToResult($this->select("SELECT category FROM books GROUP BY category ORDER BY category"));
-        $content .= $this->styleFilterMenu("Select Category","All",$filterData,"ISBN Title Author...","showBooks");
+        $content .= $this->getFilterMenu("Select Category","All",$filterData,"ISBN Title Author...","showBooks");
 
         $books = $this->select($sentence);
 
@@ -261,7 +300,15 @@ class User extends Template{
 
         return $array;
     }
-    protected function styleFilterMenu($nameFilter, $filterDefault, $filterData, $placeHolderSearch, $method){
+    protected function getKeyToValue($array, $value){
+
+        foreach($array as $k => $v){
+            if($v == $value)
+                return $k;
+        }
+        return "";
+    }
+    protected function getFilterMenu($nameFilter, $filterDefault, $filterData, $placeHolderSearch, $method){
 
         $filter = "";
 

@@ -126,7 +126,16 @@ else {
 
             case "showReserves":
 
-                $user->showReserves();
+                $category = "";
+                $search   = "";
+
+                if(isset($_REQUEST['category']))
+                    $category = $_REQUEST['category'];
+
+                elseif(isset($_REQUEST['search']))
+                    $search = $_REQUEST['search'];
+
+                $user->showReserves($category,$search);
                 break;
 
             case "error":
