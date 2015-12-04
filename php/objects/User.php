@@ -15,18 +15,21 @@ class User extends Template{
 
 
     public function showReserves(){
+
         $_SESSION['menu']="Reserves";
+
+
+
         $reserves = $this->select(
             "
                 SELECT isbn AS  'ISBN', title AS  'Title', author AS  'Author', category AS  'Category', date_start AS  'Start', date_finish AS  'End', sent AS  'Sent', received AS  'Received'
                 FROM (reserves LEFT JOIN copybooks ON copybook = id)
                   LEFT JOIN books ON book = isbn
                 WHERE user =  '".$this->emailUser."'
-                ORDER BY date_finish DESC
             ");
         $this->close();
 
-        $this->setContent($this->styleBooksMenu().$this->getTable($reserves, true, true, "Reserve","",$this->emailUser,true,false));
+        $this->setContent($this->getTable($reserves, true, true, "Reserve","",$this->emailUser,true,false));
     }
 
     public function showBooks($category = "", $search = ""){
@@ -39,17 +42,14 @@ class User extends Template{
             $sentence .= " AND category='" . $category . "'";
         }
         elseif($search != "") {
-            $sentence .=
-                "
-                  AND (LOWER(author) LIKE LOWER('%" . $search . "%')
-                   OR LOWER(title) LIKE LOWER('%" . $search . "%')
-                   OR LOWER(isbn) LIKE LOWER('%" . $search . "%'))";
+            $sentence .= $this->getSubSentenceSearch("AND", $search);
         }
 
         $content = "";
 
+        $filterData = $this->getArrayToResult($this->select("SELECT category FROM books GROUP BY category ORDER BY category"));
+        $content .= $this->styleFilterMenu("Select Category","All",$filterData,"ISBN Title Author...","showBooks");
 
-        $content .= $this->styleBooksMenu();
         $books = $this->select($sentence);
 
         while($book = $books->fetch_assoc()){
@@ -247,6 +247,84 @@ class User extends Template{
         </table>
         ';
     }
+    protected function getArrayToResult($result){
+
+        $array = array();
+
+        while($p = $result->fetch_row())
+        {
+            foreach($p as $value)
+            {
+                array_push($array,$value);
+            }
+        }
+
+        return $array;
+    }
+    protected function styleFilterMenu($nameFilter, $filterDefault, $filterData, $placeHolderSearch, $method){
+
+        $filter = "";
+
+        foreach ($filterData as $data){
+            $filter .=
+                '
+                        <li>
+                            <a href="controller.php?method='.$method.'&category='.$data.$this->sid.'">
+                                '.$data.'
+                            </a>
+                        </li>
+                    ';
+        }
+
+
+        $filter .=
+            '
+                <li role="separator" class="divider">
+                <li>
+                    <a href="controller.php?method='.$method.'&category=*'.$this->sid.'">
+                        '.$filterDefault.'
+                    </a>
+                </li>
+            ';
+
+        return
+            '
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" id="options-books">
+                        <div class="btn-group sub-menu" id="btn-category">
+
+                            <button class="btn btn-default active btn-md dropdown-toggle" >
+                                '.$nameFilter.'
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu">
+
+                                '.$filter.'
+
+                            </ul>
+
+                        </div>
+
+
+                        <form action="controller.php?method='.$method.'" method="POST" id="books-search">
+
+                            <div class="input-group">
+
+                                <input type="search" name="search" class="form-control" placeholder="'.$placeHolderSearch.'" required="">
+                                <span class="input-group-addon icons"><i class="fa fa-search"></i></span>
+                            </div>
+                        </form>
+                    </div>
+                ';
+    }
+    protected function getSubSentenceSearch($sentenceType, $valueSearch){
+
+        return
+            "
+                  ".$sentenceType." (LOWER(author) LIKE LOWER('%" . $valueSearch . "%')
+                   OR LOWER(title) LIKE LOWER('%" . $valueSearch . "%')
+                   OR LOWER(isbn) LIKE LOWER('%" . $valueSearch . "%'))";
+
+    }
 
 
     private function styleBook($book){
@@ -309,67 +387,6 @@ class User extends Template{
                         </div>
                     </div>
             ';
-    }
-
-    private function styleBooksMenu(){
-
-        $categories = "";
-
-        $result = $this->select("SELECT category FROM books GROUP BY category ORDER BY category");
-
-
-        while ($category = $result->fetch_assoc()){
-            $categories .=
-                '
-                        <li>
-                            <a href="controller.php?method=showBooks&category='.$category['category'].$this->sid.'">
-                                '.$category['category'].'
-                            </a>
-                        </li>
-                    ';
-        }
-
-        $result->close();
-
-        $categories .=
-            '
-                <li role="separator" class="divider">
-                <li>
-                    <a href="controller.php?method=showBooks&category=*'.$this->sid.'">
-                        All
-                    </a>
-                </li>
-            ';
-
-        return
-            '
-                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" id="options-books">
-                        <div class="btn-group sub-menu" id="btn-category">
-
-                            <button class="btn btn-default active btn-md dropdown-toggle" >
-                                Select Category
-                                <span class="caret"></span>
-                            </button>
-                            <ul class="dropdown-menu">
-
-                                '.$categories.'
-
-                            </ul>
-
-                        </div>
-
-
-                        <form action="controller.php?method=showBooks" method="POST" id="books-search">
-
-                            <div class="input-group">
-
-                                <input type="search" name="search" class="form-control" placeholder="ISBN Title Author..." required="">
-                                <span class="input-group-addon icons"><i class="fa fa-search"></i></span>
-                            </div>
-                        </form>
-                    </div>
-                ';
-        $this->close();
     }
 
     private function styleBooks($book){
