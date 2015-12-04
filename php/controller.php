@@ -42,17 +42,17 @@ else {
         switch ($_SESSION['typeUser']) {
             case "user":
 
-                $user = new User($_SESSION['name'], $_SESSION['email'], $_SESSION['typeUser'], $_SESSION['home'], SID);
+                $user = new User($_SESSION['name'], $_SESSION['email'], $_SESSION['home'], SID);
                 break;
 
             case "librarian":
 
-                $user = new Librarian($_SESSION['name'], $_SESSION['email'], $_SESSION['typeUser'], $_SESSION['home'], SID);
+                $user = new Librarian($_SESSION['name'], $_SESSION['email'], $_SESSION['home'], SID);
                 break;
 
             case "admin":
 
-                $user = new Admin($_SESSION['name'], $_SESSION['email'], $_SESSION['typeUser'], $_SESSION['home'], SID);
+                $user = new Admin($_SESSION['name'], $_SESSION['email'], $_SESSION['home'], SID);
                 break;
         }
     }
@@ -143,7 +143,7 @@ else {
             case "user":
 
                 unset($_REQUEST['insert']);
-                $user->insertUser($_REQUEST);
+                (isset($_REQUEST['email']))?  $user->insertUser($_REQUEST) : null;
                 break;
         }
     }

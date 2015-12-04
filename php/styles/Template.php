@@ -10,7 +10,7 @@ class Template
      */
     protected $nameProject = "Alaior Library";
 
-    protected $typeUser, $nameUser, $emailUser, $home, $sid;
+    protected $nameUser, $emailUser, $home, $sid;
 
     protected $includeSection, $textButton, $linkButton, $linkUser, $linkTerms, $linkContact;
 
@@ -26,12 +26,11 @@ class Template
      * @param string $permision:         If is user, libraryan or Admin
      * @param string $currentOptionMenu: Actual section of menu
      */
-    function __construct($nameUser = "", $emailUser = "Anonimous", $typeUser = "", $home = "controller.php", $sid = "")
+    function __construct($nameUser = "", $emailUser = "Anonimous", $home = "controller.php", $sid = "")
     {
 
         $this->nameUser          = $nameUser;
         $this->emailUser         = $emailUser;
-        $this->typeUser          = $typeUser;
         $this->home              = $home;
         $this->sid               = htmlspecialchars($sid);
 
@@ -112,7 +111,7 @@ class Template
             <header class="navbar navbar-inverse">
 
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
-                    <a type="link" id="link-logo" href="'.$this->home.'">
+                    <a type="link" id="link-logo" href="'.$this->home.'" title="Go my home">
                         <h2 class="navbar-text">
                             ' . $this->nameProject . '
                         </h2>
@@ -120,7 +119,7 @@ class Template
                 </div>
 
                 <div class="col-lg-4 col-md-4 col-sm-4 hidden-xs hidden-phone text-center" id="nav-btn-home">
-                    <a class="btn btn-default navbar-btn" id="btn-home" href="'.$this->home.'">
+                    <a class="btn btn-default navbar-btn" id="btn-home" href="'.$this->home.'"  title="Go my home">
                         <span class="glyphicon glyphicon-home"></span>
                     </a>
                 </div>

@@ -3,9 +3,9 @@
 
 class Admin extends Librarian{
 
-    public function __construct($nameUser, $emailUser, $typeUser, $home, $sid)
+    public function __construct($nameUser, $emailUser, $home, $sid)
     {
-        parent::__construct($nameUser, $emailUser, $typeUser, $home, $sid);
+        parent::__construct($nameUser, $emailUser, $home, $sid);
     }
 
 
