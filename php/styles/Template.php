@@ -26,7 +26,7 @@ class Template
      * @param string $permision:         If is user, libraryan or Admin
      * @param string $currentOptionMenu: Actual section of menu
      */
-    function __construct($nameUser = "", $emailUser = "Anonimous", $home = "controller.php", $sid = "")
+    function __construct($nameUser, $emailUser, $home, $sid)
     {
 
         $this->nameUser          = $nameUser;
@@ -208,7 +208,7 @@ class Template
     /**
      * @param string $contentMenu
      */
-    protected function setContentMenu($contentMenu)
+    protected function setMenuContent($contentMenu)
     {
         $this->contentMenu =
             '
@@ -221,7 +221,7 @@ class Template
     /**
      * @param string $userMenuTop
      */
-    protected function setUserMenuTop($userMenuTop)
+    protected function setMenuTop($userMenuTop)
     {
         $this->userMenuTop =
         '

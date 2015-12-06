@@ -70,6 +70,8 @@ trait DBController{
     }
 
     protected function close(){
-        $this->connection->close();
+        if($this->connection == NULL) {
+            $this->connection->close();
+        }
     }
 }

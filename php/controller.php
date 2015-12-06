@@ -1,6 +1,6 @@
 <?php
 include_once "styles/Template.php";
-include_once "styles/CommonStyles.php";
+include_once "styles/usersCommonStyles.php";
 include_once "trait/DBController.php";
 include_once "objects/Anonimous.php";
 include_once "objects/User.php";
@@ -13,9 +13,8 @@ include_once "objects/Ajax.php";
 session_cache_limiter('nocache,private');
 session_start();
 
-if (!isset($_SESSION['email'], $_SESSION['typeUser'], $_SESSION['name'], $_SESSION['home']) && isset($_COOKIE['email'], $_COOKIE['pwd'])) {
-    if (isset($_REQUEST['method']) && $_REQUEST['method'] != "startSession")
-        header('Location: controller.php?method=startSession');
+if (!isset($_SESSION['email'], $_SESSION['typeUser'], $_SESSION['name'], $_SESSION['home'])) {
+    header('Location: ../index.php?uri='.$_SERVER['REQUEST_URI']);
 }
 
 
@@ -34,35 +33,20 @@ if (isset($_REQUEST['ajax'])) {
     }
 }
 else {
-    $user;
 
-    if (!isset($_SESSION['email'], $_SESSION['typeUser'], $_SESSION['name'], $_SESSION['home'])) {
-        $user = new Anonimous();
-    } else {
-        switch ($_SESSION['typeUser']) {
-            case "user":
-
-                $user = new User($_SESSION['name'], $_SESSION['email'], $_SESSION['home'], SID);
-                break;
-
-            case "librarian":
-
-                $user = new Librarian($_SESSION['name'], $_SESSION['email'], $_SESSION['home'], SID);
-                break;
-
-            case "admin":
-
-                $user = new Admin($_SESSION['name'], $_SESSION['email'], $_SESSION['home'], SID);
-                break;
-        }
-    }
+    $user  = new $_SESSION['typeUser']($_SESSION['name'], $_SESSION['email'], $_SESSION['home'], SID);
 
     if (isset($_REQUEST['method'])) {
         switch ($_REQUEST['method']) {
 
-            case "register":
+            case "showLogin":
 
-                $user->register();
+                $user->showLogin();
+                break;
+
+            case "showRegister":
+
+                $user->showRegister();
                 break;
 
             case "startSession":
@@ -86,9 +70,16 @@ else {
 
 
                     if ($user->startSession($email, $pwd, $remember)) {
+
+                        if(!isset($_SESSION['uri'])) {
+                            $uri = $_SESSION['uri'];
+                            unset($_SESSION['uri']);
+                            header('Location: ' . $uri);
+                        }
+
                         header('Location: ' . $_SESSION['home'] . htmlspecialchars(SID));
                     } else {
-                        $user->login("Incorrect E-mail or Password");
+                        $user->showLogin("Incorrect E-mail or Password");
                     }
                 }
                 break;

@@ -1,6 +1,6 @@
 <?php
 include_once "php/styles/Template.php";
-include_once "php/styles/CommonStyles.php";
+include_once "php/styles/usersCommonStyles.php";
 
     session_cache_limiter ('nocache,private');
     session_start();
