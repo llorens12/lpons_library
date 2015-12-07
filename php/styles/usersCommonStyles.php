@@ -269,15 +269,15 @@ class stylesUser{
 
                             <div class="hidden" id="personalized-reserve">
 
-                                <form action="#" method="post" onsubmit="return checkReserveDisponibility()">
+                                <form action="controller.php?insert=personalizedReserve&isbn='.$book["isbn"].'" method="post" onsubmit="return checkReserveDisponibility()">
 
                                     <div class="input-group" id="start-date-reserve-personalized">
                                         <span class="input-group-addon icons"><i class="fa fa-calendar-plus-o"></i></span>
-                                        <input type="date" class="form-control" placeholder="dd/mm/aaaa" name="date-start" id="date-start" required="">
+                                        <input type="date" class="form-control" placeholder="dd/mm/aaaa" name="date_start" id="date-start" required="">
                                     </div>
                                     <div class="input-group" id="finish-date-reserve-personalized">
                                         <span class="input-group-addon icons"><i class="fa fa-calendar-times-o"></i></span>
-                                        <input type="date" class="form-control" placeholder="dd/mm/aaaa" name="date-finish" id="date-finish" required="">
+                                        <input type="date" class="form-control" placeholder="dd/mm/aaaa" name="date_finish" id="date-finish" required="">
                                     </div>
 
                                     <label class="label label-danger hidden" id="label-error-personalized-reserve">The reserve is not available</label>
@@ -322,7 +322,7 @@ class stylesUser{
 
     }
 
-    public static function menuTop($nameUser){
+    public static function menuTop($nameUser, $sid){
         return
             '
             <span class="dropdown-toggle">
@@ -428,7 +428,7 @@ class stylesAnonimous{
             <div class="col-lg-3 col-md-6 col-sm-9 col-xs-12 col-centered box">
                 <label class="box-tittle"><h3>Register</h3></label>
 
-                <form class="container-box" accept-charset="UTF-8" action="controller.php?insert=user" method="POST" id="registerForm" onsubmit="return registerContent(event)">
+                <form class="container-box" accept-charset="UTF-8" action="controller.php?insert=user" method="POST" id="registerForm" onsubmit="return checkRegisterContent(event)">
 
                     <div id="error">
                     ' .$error. '

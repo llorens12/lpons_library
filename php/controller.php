@@ -8,6 +8,7 @@ include_once "objects/Librarian.php";
 include_once "objects/Admin.php";
 include_once "objects/Ajax.php";
 
+
 //register_shutdown_function('fatalErrorHandler');
 
 session_cache_limiter('nocache,private');
@@ -129,7 +130,7 @@ else {
                 $user->showReserves($category,$search);
                 break;
 
-            case "error":
+            case "showError":
 
                 (isset($_REQUEST['error'])) ?
 
@@ -150,6 +151,11 @@ else {
                 unset($_REQUEST['insert']);
                 (isset($_REQUEST['email']))?  $user->insertUser($_REQUEST) : null;
                 break;
+
+            case "personalizedReserve":
+
+                unset($_REQUEST['insert']);
+
         }
     }
     echo $user;
@@ -172,7 +178,7 @@ else {
         if(($error['type'] === E_ERROR) || ($error['type'] === E_USER_ERROR))
         {
 # Here we handle the error, displaying HTML, logging, ...
-            header('Location: controller.php?method=error&error=Permission denied'.htmlspecialchars(SID));
+            header('Location: controller.php?method=showError&error=Permission denied'.htmlspecialchars(SID));
         }
     }
 

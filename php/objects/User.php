@@ -207,6 +207,60 @@ class User extends Template{
     }
 
 
+    public function insertPersonalizedReserve($request){
+
+        $difference = $this->getDateDifference($request['date_start'], $request['date_finish']);
+
+        if($difference < 0){
+            $this->showError("Date start is less of date finish");
+            return false;
+        }
+
+        if($difference > $this->MAX_DAYS_RESERVE){
+
+        }
+
+
+
+
+
+        $this->insert("reserves","");
+    }
+
+    protected function reserveDisponibility($isbn, $copyBook, $dateStart,$dateFinish){
+
+        $where = "";
+        if($isbn != "")
+            $where = "book = ".$isbn;
+
+        elseif($copyBook != "")
+            $where = "copybook = ".$copyBook;
+
+        return $this->select
+        ('
+                select copybook
+                from reserves JOIN copybooks on copybook = id
+                where '.$where.' AND
+                copybook not in
+                (
+                    select copybook
+                    from reserves JOIN copybooks on copybook = id
+                    where ' . $where . ' AND
+                    (
+                        (' . $dateStart . ' < date_start AND ' . $dateFinish . ' > date_finish)
+                    OR
+                        ' . $dateStart . ' between date_start and date_finish
+                    OR
+                        ' . $dateFinish . ' between date_start AND date_finish
+                    )
+                )
+                ORDER BY status DEC
+        ');
+    }
+
+    protected function getDateDifference($dateStart, $dateFinish){
+        return str_replace("-", "", $dateFinish) - str_replace("-", "", $dateStart);
+    }
     protected function getArrayToResult($result){
 
         $array = array();
@@ -250,7 +304,8 @@ class User extends Template{
         (
             stylesUser::menuTop
             (
-                $this->nameUser
+                $this->nameUser,
+                $this->sid
             )
         );
 

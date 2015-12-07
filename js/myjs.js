@@ -38,22 +38,23 @@ $(document).ready(function()
 
 function checkReserveDisponibility(){
 
+    var valDateStart  = $("#date-start").val();
+    var valDateFinish = $("#date-finish").val();
 
 
-    var dataCheck = "ajax=reserveDisponibility&isbn="+$("#book-isbn").html()+"&dateStart="+$("#date-start").val()+"&dateFinish="+$("#date-finish").val();
-
-    console.log(dataCheck);
+    var dataCheck = "ajax=reserveDisponibility&isbn="+$("#book-isbn").html()+"&dateStart="+valDateStart+"&dateFinish="+valDateFinish;
 
     if(disponibilityAjax(dataCheck)){
         return true;
-    }else{
-        $("#label-error-personalized-reserve").removeClass("hidden");
-        return false;
     }
+
+    $("#label-error-personalized-reserve").removeClass("hidden");
+    return false;
+
 
 }
 
-function registerContent(event){
+function checkRegisterContent(event){
 
     var pwd = $('#pwd');
     var pwd1 = $('#pwd1');
