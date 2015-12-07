@@ -6,23 +6,9 @@
  * Time: 17:00
  */
 
-class p{
-    public function l($d){
-        echo "antes de llamarlo <br>";
+$actual = date('Y-m-d');
+$cant = +2;
 
+echo "actual = ".$actual."<br>";
 
-
-        function m(){
-            echo parent::d;
-        };
-
-
-
-        call_user_func("m");
-
-    }
-}
-
-$f = new p();
-
-$f->l("d");
+echo "actual + 2 dias = ".date('Y-m-d',strtotime($actual.$cant." days"));

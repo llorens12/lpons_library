@@ -145,7 +145,7 @@ class User extends Template{
 
        $books = $this->select($sentence);
 
-        while($book = $books->fetch_assoc()){
+        while($book = mysqli_fetch_assoc($books)){
             $content .= stylesUser::books
             (
                 $book,
@@ -184,12 +184,15 @@ class User extends Template{
 
             stylesUser::book
             (
-                $this->select
-                ("
-                    SELECT isbn, title, summary, category, author
-                    FROM books
-                    WHERE isbn = ".$isbn
-                )->fetch_assoc()
+                mysqli_fetch_assoc
+                (
+                    $this->select
+                    ("
+                        SELECT isbn, title, summary, category, author
+                        FROM books
+                        WHERE isbn = ".$isbn
+                    )
+                )
                 ,
                 $this->DEFAULT_DAYS_RESERVE
             )
@@ -206,66 +209,225 @@ class User extends Template{
         };
     }
 
-
-    public function insertPersonalizedReserve($request){
-
-        $difference = $this->getDateDifference($request['date_start'], $request['date_finish']);
-
-        if($difference < 0){
-            $this->showError("Date start is less of date finish");
-            return false;
+    public function setPersonalizedReserve($request)
+    {
+        $request['user'] = $_SESSION['email'];
+        if(!$this->insertPersonalizedReserve($request))
+        {
+            $this->showError("It hasn't been possible perform the reserve");
         }
-
-        if($difference > $this->MAX_DAYS_RESERVE){
-
-        }
-
-
-
-
-
-        $this->insert("reserves","");
     }
 
-    protected function reserveDisponibility($isbn, $copyBook, $dateStart,$dateFinish){
+    public function setDefaultReserve($request){
 
-        $where = "";
-        if($isbn != "")
-            $where = "book = ".$isbn;
+        $request['user'] = $_SESSION['email'];
+        if(!$this->insertDeffaultReserve($request))
+        {
+            $this->showError("It hasn't been possible perform the reserve");
+        }
 
-        elseif($copyBook != "")
-            $where = "copybook = ".$copyBook;
+    }
+
+
+
+    protected function insertDeffaultReserve($request){
+
+        $days_reserve = 0;
+        if(isset($request['days_reserve']))
+        {
+            $days_reserve = $request['days_reserve']-1;
+            unset($request['days_reserve']);
+        }
+        else
+            $days_reserve = $this->DEFAULT_DAYS_RESERVE-1;
+
+        $request['date_start'] = date('Y-m-d');
+        $request['date_finish']= date('Y-m-d', strtotime ('+'.$days_reserve.' day', strtotime($request['date_start'])));
+
+        /**
+         * if it's now possible, insert reserve
+         */
+
+        $copyBookAvailable = mysqli_fetch_assoc($this->getBookDisponibility($request['isbn'],$request['date_start'],$request['date_finish']))['id'];
+
+        if(count($copyBookAvailable) > 0)
+        {
+            unset($request['isbn']);
+            $request['copybook'] = $copyBookAvailable;
+            $this->insert("reserves",$request);
+            return true;
+        }
+        unset($copyBookAvailable);
+
+        /**
+         * Insert reserve as soon possible
+         */
+
+        $betterAvailability = array();          //Contains possible reserves between two reserves
+
+        $copyBooks = $this->getArrayToResult    //Get all copies of the isbn
+        (
+            $this->select
+            ("
+                SELECT id
+                FROM copybooks
+                WHERE book = '".$request['isbn']."'
+            ")
+        );
+
+
+        /**
+         * Travel all copies and all reserves of copies
+         */
+        foreach($copyBooks as $copy)
+        {
+            $sentinel = true;
+            $lastDate = "";
+            $reserves = $this->select
+            ("
+                SELECT date_start, date_finish
+                FROM reserves
+                WHERE
+                    copybook = '".$copy."'
+                AND
+                    date_finish > ".str_replace("-","",date('Y-m-d'))."
+                ORDER BY date_start
+            ");
+
+            while($reserve = mysqli_fetch_assoc($reserves) and $sentinel)
+            {
+                if($lastDate == "")
+                    $lastDate = date('Y-m-d', strtotime($reserve['date_finish'].' +1 days'));
+                else
+                {
+                    $actualDate = date('Y-m-d', strtotime($reserve['date_start'].' -1 days'));
+                    if($this->getDateDifference($lastDate, $actualDate) >= $days_reserve)
+                    {
+                        $betterAvailability[$copy] = $lastDate;
+                        $sentinel = false;
+                    }
+                    else
+                    {
+                        $lastDate = date('Y-m-d', strtotime($reserve['date_finish'].' +1 days'));
+                    }
+                }
+            }
+        }
+        unset($copyBooks);
+
+        /**
+         * Get the last reserve of the copies
+         */
+        $lastDateFinishReserves = $this->select
+        ("
+            SELECT copybook, MAX(date_finish) as date_finish
+            FROM reserves
+            JOIN copybooks ON copybook = id
+            WHERE book = '".$request['isbn']."'
+            GROUP BY copybook
+        ");
+
+        while($reserve = mysqli_fetch_assoc($lastDateFinishReserves))
+        {
+            if(!isset($betterAvailability[$reserve['copybook']]))
+            {
+                $betterAvailability[$reserve['copybook']] =  date('Y-m-d', strtotime($reserve['date_finish'].' +1 days'));
+            }
+        }
+
+        $betterReserve = array();
+
+        /**
+         *  Travel all possibles reserves and get the closest
+         */
+        foreach($betterAvailability as $copy => $better)
+        {
+            if(!isset($betterReserve['copybook']) || $this->getDateDifference($betterReserve['date_start'], $better) < 0)
+            {
+                $betterReserve['copybook'] = $copy;
+                $betterReserve['date_start'] = $better;
+            }
+        }
+
+        $request['copybook'] = $betterReserve['copybook'];
+        $request['date_start'] = $betterReserve['date_start'];
+        $request['date_finish']= date('Y-m-d', strtotime($betterReserve['date_start'].' + '.$days_reserve.' days'));
+
+        return $request;
+
+    }
+
+    protected function insertPersonalizedReserve($reserve)
+    {
+
+        $difStartCurrent = $this->getDateDifference(date('Y-m-d'), $reserve['date_start']);
+        if($difStartCurrent < 0)
+            $reserve['date_start'] = date('Y-m-d');
+
+
+        $difStartFinish = $this->getDateDifference($reserve['date_start'], $reserve['date_finish']);
+        if($difStartFinish < 0){
+            $this->insertDeffaultReserve($reserve);
+        }
+
+        if($difStartFinish > $this->MAX_DAYS_RESERVE)
+        {
+            $substract = $this->MAX_DAYS_RESERVE - $difStartFinish;
+            $reserve['date_finish'] = date('Y-m-d', strtotime($reserve['date_finish'].$substract.' days'));
+        }
+
+
+        $reserve['copybook'] = mysqli_fetch_assoc
+        (
+            $this->getBookDisponibility
+            (
+                $reserve['isbn'],
+                $reserve['date_start'],
+                $reserve['date_finish']
+            )
+        )['copybook'];
+
+        unset($reserve['isbn']);
+        return $this->insert("reserves",$reserve);
+
+    }
+
+    protected function getBookDisponibility($isbn, $dateStart,$dateFinish){
+
+        $dateFinish = str_replace("-","",$dateFinish);
+        $dateStart  = str_replace("-","",$dateStart);
 
         return $this->select
-        ('
-                select copybook
-                from reserves JOIN copybooks on copybook = id
-                where '.$where.' AND
-                copybook not in
+        ("
+                select id
+                from reserves RIGHT JOIN copybooks on copybook = id
+                where book = '".$isbn."' AND
+                id not in
                 (
                     select copybook
                     from reserves JOIN copybooks on copybook = id
-                    where ' . $where . ' AND
+                    where book = '". $isbn ."' AND
                     (
-                        (' . $dateStart . ' < date_start AND ' . $dateFinish . ' > date_finish)
+                        ('". $dateStart ."' < date_start AND '". $dateFinish ."' > date_finish)
                     OR
-                        ' . $dateStart . ' between date_start and date_finish
+                        '". $dateStart ."' between date_start and date_finish
                     OR
-                        ' . $dateFinish . ' between date_start AND date_finish
+                        '". $dateFinish ."' between date_start AND date_finish
                     )
                 )
-                ORDER BY status DEC
-        ');
+                order by status desc
+        ");
     }
 
     protected function getDateDifference($dateStart, $dateFinish){
         return str_replace("-", "", $dateFinish) - str_replace("-", "", $dateStart);
     }
+
     protected function getArrayToResult($result){
 
         $array = array();
 
-        while($p = $result->fetch_row())
+        while($p = mysqli_fetch_assoc($result))
         {
             foreach($p as $value)
             {
@@ -275,6 +437,7 @@ class User extends Template{
 
         return $array;
     }
+
     protected function getKeyToValue($array, $value){
 
         foreach($array as $k => $v){
@@ -283,6 +446,7 @@ class User extends Template{
         }
         return "";
     }
+
     protected function getQueryNamesFormat($array){
 
         $nameFormat = "";
