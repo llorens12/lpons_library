@@ -81,7 +81,7 @@ class stylesUser{
                 $contentTbody .=
                     '
                     <td>
-                        <a href="controller.php?delete=delete' . $typeObject . '&' . $valueLink . $sid.'" title="Delete" class="'.$stateDelete.'">
+                        <a href="controller.php?delete=setDelete' . $typeObject . '&' . $valueLink . $sid.'" title="Delete" class="'.$stateDelete.'">
                             <span class="glyphicon glyphicon-remove"></span>
                         </a>
                     </td>
@@ -166,8 +166,8 @@ class stylesUser{
         }
 
 
-        if(strlen($contentThead) <= 10){
-            return "<h1 style='width: 100%; text-align: center'>You have't realized any reserve</h1>";
+        if(mysqli_num_rows($data) == 0){
+            return "<h1 style='width: 100%; text-align: center'>Action not found</h1>";
         }
 
         $contentThead .= $theadOptions($edit, $drop, $info);
@@ -217,9 +217,10 @@ class stylesUser{
         return
             '
                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" id="options-books">
+                    <form action="controller.php?method='.$method.$sid.'" method="POST" >
                         <div class="btn-group sub-menu" id="btn-category">
 
-                            <button class="btn btn-default active btn-md dropdown-toggle" >
+                            <button class="btn btn-default active btn-md dropdown-toggle" name="btnCategory" value="'.$nameFilter.'">
                                 '.$nameFilter.'
                                 <span class="caret"></span>
                             </button>
@@ -232,9 +233,9 @@ class stylesUser{
                         </div>
 
 
-                        <form action="controller.php?method='.$method.$sid.'" method="POST" id="books-search">
 
-                            <div class="input-group">
+
+                            <div class="input-group" id="books-search">
 
                                 <input type="search" name="search" class="form-control" placeholder="'.$placeHolderSearch.'" required="">
                                 <span class="input-group-addon icons"><i class="fa fa-search"></i></span>
@@ -271,7 +272,7 @@ class stylesUser{
 
                             <div id="options-reserves">
 
-                                <a href="controller.php?insert=setDefaultReserve&isbn='.$book["isbn"].$sid.'" class="btn btn-primary" id="btn-reserve-20-days" title="Reserve as soon as possible">
+                                <a href="controller.php?insert=setInsertDefaultReserve&isbn='.$book["isbn"].$sid.'" class="btn btn-primary" id="btn-reserve-20-days" title="Reserve as soon as possible">
                                     Reserve '.$DEFAULT_DAYS_RESERVE.' days
                                 </a>
 
@@ -285,7 +286,7 @@ class stylesUser{
 
                             <div class="hidden" id="personalized-reserve">
 
-                                <form action="controller.php?insert=setPersonalizedReserve&isbn='.$book["isbn"].$sid.'" method="post" onsubmit="return checkReserveDisponibility()">
+                                <form action="controller.php?insert=setInsertPersonalizedReserve&isbn='.$book["isbn"].$sid.'" method="post" onsubmit="return checkReserveDisponibility()">
 
                                     <div class="input-group" id="start-date-reserve-personalized">
                                         <span class="input-group-addon icons"><i class="fa fa-calendar-plus-o"></i></span>
@@ -329,7 +330,7 @@ class stylesUser{
                                 <label class="label label-default">Author: '.$book["author"].'</label>
 
                             </div>
-                            <a href="controller.php?insert=setDefaultReserve&isbn='.$book["isbn"].$sid.'" class="btn btn-primary button-show-books" title="Reserve as soon as possible">Reserve '.$DEFAULT_DAYS_RESERVE.' days</a>
+                            <a href="controller.php?insert=setInsertDefaultReserve&isbn='.$book["isbn"].$sid.'" class="btn btn-primary button-show-books" title="Reserve as soon as possible">Reserve '.$DEFAULT_DAYS_RESERVE.' days</a>
                         </div>
                     </a>
                 </div>
@@ -395,6 +396,60 @@ class stylesUser{
             </div>
         ';
     }
+
+    public static function formEditReserves($reserve, $typeUser, $sid){
+
+        return
+        '
+            <div class="row row-centered container-form">
+
+                <form class="col-lg-12 col-md-12 col-sm-12 col-xs-12 content-form" action="controller.php?update=updateReserve&copybook='.$reserve['copybook'].'&firstDateReserve='.$reserve['date_start'].$sid.'">
+                    <div class="inputs-content-form">
+                        <h2>Edit reserve</h2>
+                        '.stylesUser::contentFormEditReserves($reserve, $typeUser).'
+                    </div>
+                    <div class="form-group btn-content-form">
+                        <button type="submit" class="btn btn-default active" title="Save">
+                            Save
+                        </button>
+                    </div>
+                </form>
+            </div>
+                    ';
+    }
+
+    public static function contentFormEditReserves($reserve, $typeUser){
+
+        ($typeUser == "user" && str_replace("-", "", $reserve['date_start']) < str_replace("-", "", date('Y-m-d')))? $dateStart = "disabled" : $dateStart ="";
+
+        return
+        '
+            <div class="input-group">
+                <span class="input-group-addon icons" title="ISBN"><i class="fa fa-barcode"></i></span>
+                <input type="text" class="form-control" value="'.$reserve['isbn'].'" disabled title="ISBN">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon icons" title="Title"><i class="fa fa-book"></i></span>
+                <input maxlength="50" type="text" class="form-control" value="'.$reserve['title'].'" disabled title="Title">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon icons" title="Author"><i class="fa fa-pencil"></i></span>
+                <input type="text" class="form-control" value="'.$reserve['author'].'" disabled title="Author">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon icons" title="Category"><i class="fa fa-hashtag"></i></span>
+                <input type="text" class="form-control" value="'.$reserve['category'].'" disabled title="Category">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon icons" title="Date Start"><i class="fa fa-calendar-plus-o"></i></span>
+                <input type="date" class="form-control" name="date-start" value="'.$reserve['date_start'].'" '.$dateStart.' title="Date Start">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon icons" title="Date Finish"><i class="fa fa-calendar-times-o"></i></span>
+                <input type="date" class="form-control" name="date-finish" value="'.$reserve['date_finish'].'" title="Date Finish">
+            </div>
+                    ';
+    }
 }
 
 class stylesAnonimous{
@@ -444,7 +499,7 @@ class stylesAnonimous{
             <div class="col-lg-3 col-md-6 col-sm-9 col-xs-12 col-centered box">
                 <label class="box-tittle"><h3>Register</h3></label>
 
-                <form class="container-box" accept-charset="UTF-8" action="controller.php?insert=user" method="POST" id="registerForm" onsubmit="return checkRegisterContent(event)">
+                <form class="container-box" accept-charset="UTF-8" action="controller.php?insert=insertUser" method="POST" id="registerForm" onsubmit="return checkRegisterContent(event)">
 
                     <div id="error">
                     ' .$error. '
@@ -526,7 +581,7 @@ class Registers
                 </div>
                 <div class="input-group">
                     <span class="input-group-addon icons"><i class="fa fa-hashtag"></i></span>
-                    <input type="text" class="form-control" placeholder="Category: Action, Adventure, Comedy..." name="summary" required="">
+                    <input type="text" class="form-control" placeholder="Category: Action, Adventure, Comedy..." name="category" required="">
                 </div>
                 <div class="input-group">
                     <span class="input-group-addon icons"><i class="fa fa-file-image-o"></i></span>

@@ -39,7 +39,7 @@ trait DBController{
         ");
     }
 
-    protected function update($table, $data, $primaryKey, $valuePrimaryKey)
+    protected function update($table, $data, $where)
     {
         $this->startConnection();
         $set="";
@@ -54,7 +54,7 @@ trait DBController{
         ("
             UPDATE {$table}
             SET    {$set}
-            WHERE  {$primaryKey} = {$valuePrimaryKey};
+            WHERE  {$where};
         ");
     }
 

@@ -89,6 +89,11 @@ else {
 
                 break;
 
+            case "showEditReserve":
+
+                $user->showEditReserve($_REQUEST);
+                break;
+
             case "logOut":
 
                 $user->logOut();
@@ -105,10 +110,13 @@ else {
                 $category = "";
                 $search   = "";
 
-                if(isset($_REQUEST['category']))
+                if(isset($_REQUEST['btnCategory']))
+                    $category = $_REQUEST['btnCategory'];
+
+                elseif(isset($_REQUEST['category']))
                     $category = $_REQUEST['category'];
 
-                elseif(isset($_REQUEST['search']))
+                if(isset($_REQUEST['search']))
                     $search = $_REQUEST['search'];
 
 
@@ -150,22 +158,31 @@ else {
 
         switch ($_REQUEST['insert']){
 
-            case "user":
+            case "insertUser":
 
                 unset($_REQUEST['insert']);
-                $user->insertUser($_REQUEST);
+                (!$user->insertUser($_REQUEST))?
+                    $user->showRegister("Register error")
+                    :
+                    header('Location: controller.php?method=showLogin'.htmlspecialchars(SID));
                 break;
 
-            case "setPersonalizedReserve":
+            case "setInsertPersonalizedReserve":
 
                 unset($_REQUEST['insert']);
-                ($user->setPersonalizedReserve($_REQUEST))? header('Location: controller.php?method=showReserves'.htmlspecialchars(SID)) : null;
+                ($user->setInsertPersonalizedReserve($_REQUEST))?
+                    header('Location: controller.php?method=showReserves'.htmlspecialchars(SID))
+                    :
+                    null;
                 break;
 
-            case "setDefaultReserve":
+            case "setInsertDefaultReserve":
 
                 unset($_REQUEST['insert']);
-                ($user->setDefaultReserve($_REQUEST))? header('Location: controller.php?method=showReserves'.htmlspecialchars(SID)) : null;;
+                ($user->setInsertDefaultReserve($_REQUEST))?
+                    header('Location: controller.php?method=showReserves'.htmlspecialchars(SID))
+                    :
+                    null;
                 break;
 
         }
@@ -173,10 +190,13 @@ else {
     elseif(isset($_REQUEST['delete'])){
         switch ($_REQUEST['delete']) {
 
-            case "deleteReserve":
+            case "setDeleteReserve":
 
-                unset($_REQUEST['deleteReserve']);
-                ($user->deleteReserve($_REQUEST))? header('Location: controller.php?method=showReserves'.htmlspecialchars(SID)) : null;;
+                unset($_REQUEST['delete']);
+                ($user->setDeleteReserve($_REQUEST))?
+                    header('Location: controller.php?method=showReserves'.htmlspecialchars(SID))
+                    :
+                    null;
                 break;
 
         }
@@ -194,13 +214,9 @@ else {
 
     function fatalErrorHandler()
     {
-# Getting last error
         $error = error_get_last();
-
-# Checking if last error is a fatal error
         if(($error['type'] === E_ERROR) || ($error['type'] === E_USER_ERROR))
         {
-# Here we handle the error, displaying HTML, logging, ...
             header('Location: '.$_SESSION['home'].htmlspecialchars(SID));
         }
     }

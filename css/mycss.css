@@ -37,7 +37,7 @@ header, footer {
 
 main {
     margin-top: 80px;
-    padding-bottom: 150px;
+    padding-bottom: 100px;
 
 }
 
@@ -56,7 +56,7 @@ section {
 
 footer{
     position: relative !important;
-    margin-top: -52px !important;
+    margin-top: -51px !important;
     clear: both;
 }
 
@@ -351,4 +351,43 @@ footer{
     pointer-events: none;
     cursor: default;
     opacity: 0.65;
+}
+
+.container-form{
+    text-align: center !important;
+}
+
+.content-form{
+    width: 50%;
+    margin: auto;
+    padding: 0;
+    float: none !important;
+    clear: both !important;
+}
+
+.inputs-content-form{
+    border: solid black 1px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.content-form h2{
+    font-weight: bold;
+    color: white;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    margin: 0;
+    padding-top: 3%;
+    padding-bottom: 3%;
+    background-color: black;
+}
+
+.btn-content-form{
+    width: 100%;
+    text-align: right !important;
+    margin-top: 3%;
+}
+
+.btn-content-form button{
+    margin-right: 3%;
 }

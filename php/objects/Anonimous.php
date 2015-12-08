@@ -70,10 +70,9 @@ class Anonimous extends Template{
         $request['registered']  = date('Y-m-d');
         $request['home']        = "showBooks";
 
-        ($this->insert("users",$request))? $this->showLogin() : $this->showRegister("Register error");
-
         $this->close();
 
+        return $this->insert("users",$request);
     }
 
     public function __toString()
