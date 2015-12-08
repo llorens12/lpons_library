@@ -15,7 +15,7 @@ class Anonimous extends Template{
 
         $this->includeSection = false;
         $this->textButton     = "Register";
-        $this->linkButton     = "controller.php?method=register";
+        $this->linkButton     = "controller.php?method=showRegister";
 
 
         $this->setContent(
@@ -27,7 +27,7 @@ class Anonimous extends Template{
     {
         $this->includeSection = false;
         $this->textButton     = "Log In";
-        $this->linkButton     = "controller.php";
+        $this->linkButton     = "controller.php?method=showLogin";
 
         $this->setContent(
             stylesAnonimous::contentRegister($error)
@@ -42,7 +42,7 @@ class Anonimous extends Template{
             $pwd = $_COOKIE['pwd'];
         }
 
-        $user = $this->select("SELECT * FROM users WHERE email = '{$email}' AND pwd = '{$pwd}';")->fetch_assoc();
+        $user = mysqli_fetch_assoc($this->select("SELECT * FROM users WHERE email = '{$email}' AND pwd = '{$pwd}';"));
         $this->close();
 
         if (count($user) != 0)
@@ -65,12 +65,12 @@ class Anonimous extends Template{
 
     public function insertUser($request)
     {
-        $request['pwd']     = md5($request['pwd']);
-        $request['typeUser'] = "user";
-        $request['registered'] = date('Y-m-d');
+        $request['pwd']         = md5($request['pwd']);
+        $request['typeUser']    = "user";
+        $request['registered']  = date('Y-m-d');
+        $request['home']        = "showBooks";
 
-
-        ($this->insert("users",$request))? $this->login() : $this->register("Register error");
+        ($this->insert("users",$request))? $this->showLogin() : $this->showRegister("Register error");
 
         $this->close();
 

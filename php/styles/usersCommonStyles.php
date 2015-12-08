@@ -2,7 +2,7 @@
 
 
 class stylesUser{
-    public static function table($data, $edit = false, $drop = false, $info = false, $typeObject = "", $primaryKey = "", $valuePrimaryKey = "", $reserveDelimiter = false, $MAX_DAYS_RESERVE = 0)
+    public static function table($data, $edit = false, $drop = false, $info = false, $typeObject = "", $primaryKeys, $reserveDelimiter = false, $MAX_DAYS_RESERVE = 0, $sid)
     {
         $contentThead   = "<th>#</th>";
         $objectNumber   = 1;
@@ -49,7 +49,7 @@ class stylesUser{
                 return $contentThead;
             };
 
-        $tbodyOptions = function ($edit,$drop, $info, $typeObject, $valueLink, $stateEdit, $stateDelete){
+        $tbodyOptions = function ($edit,$drop, $info, $typeObject, $valueLink, $stateEdit, $stateDelete, $sid){
 
             $contentTbody = "";
 
@@ -57,7 +57,7 @@ class stylesUser{
                 $contentTbody .=
                     '
                     <td>
-                        <a href="controller.php?method=showInfo' . $typeObject . '&primaryKey=' . $valueLink . '" title="Show more info">
+                        <a href="controller.php?method=showInfo' . $typeObject . '&' . $valueLink . $sid.'" title="Show more info">
                             <i class="fa fa-info-circle"></i>
                         </a>
                     </td>
@@ -69,7 +69,7 @@ class stylesUser{
                 $contentTbody .=
                     '
                     <td>
-                        <a href="controller.php?method=showEdit' . $typeObject . '&primaryKey=' . $valueLink . '" title="Edit" class="'.$stateEdit.'">
+                        <a href="controller.php?method=showEdit' . $typeObject . '&' . $valueLink . $sid.'" title="Edit" class="'.$stateEdit.'">
                             <span class="glyphicon glyphicon-edit"></span>
                         </a>
                     </td>
@@ -81,7 +81,7 @@ class stylesUser{
                 $contentTbody .=
                     '
                     <td>
-                        <a href="controller.php?delete=' . $typeObject . '&primaryKey=' . $valueLink . '" title="Delete" class="'.$stateDelete.'">
+                        <a href="controller.php?delete=delete' . $typeObject . '&' . $valueLink . $sid.'" title="Delete" class="'.$stateDelete.'">
                             <span class="glyphicon glyphicon-remove"></span>
                         </a>
                     </td>
@@ -96,12 +96,24 @@ class stylesUser{
             return $contentTbody;
         };
 
-        ($valuePrimaryKey == "")? $valueLink = $valuePrimaryKey : $valueLink = "";
+
+
 
 
         while ($object = $data->fetch_assoc())
         {
             $contentTr = "";
+            $recived = "";
+            $sent = "";
+
+
+            if($reserveDelimiter){
+                $recived = $object['Received'];
+                $sent = $object['Sent'];
+
+                unset($object['Received']);
+                unset($object['Sent']);
+            }
 
             foreach ($object as $column => $value)
             {
@@ -125,7 +137,7 @@ class stylesUser{
 
 
             ($reserveDelimiter
-            && is_null($object['Received'])
+            && is_null($recived)
             && date_create($object['Start'])->diff(date_create($object['End']))->format("d") < $MAX_DAYS_RESERVE )?
 
                 $stateEdit = ""
@@ -135,28 +147,30 @@ class stylesUser{
 
 
             ($reserveDelimiter
-            && is_null($object['Sent']) && is_null($object['Received'])
+            && is_null($sent) && is_null($recived)
             && date_create($object['Start'])->diff(date_create($object['End']))->format("d") < $MAX_DAYS_RESERVE )?
 
                 $stateDelete = ""
                     :
                 $stateDelete = "not-active";
 
+            $valueLink = "";
+            foreach($primaryKeys as $singleKey){
+                $valueLink .= $singleKey."=".$object[$singleKey]."&";
+            }
+            $valueLink = trim($valueLink, "&");
 
-            ($primaryKey != "")?
-
-                $valueLink = $primaryKey
-                    :
-                NULL;
-
-            $contentTbody .= $tbodyOptions($edit,$drop, $info, $typeObject, $valueLink, $stateEdit, $stateDelete);
+            $contentTbody .= $tbodyOptions($edit,$drop, $info, $typeObject, $valueLink, $stateEdit, $stateDelete, $sid);
 
             $objectNumber++;
         }
 
 
-        $contentThead .= $theadOptions($edit, $drop, $info);
+        if(strlen($contentThead) <= 10){
+            return "<h1 style='width: 100%; text-align: center'>You have't realized any reserve</h1>";
+        }
 
+        $contentThead .= $theadOptions($edit, $drop, $info);
 
         return '
         <table class="table table-striped">
@@ -230,7 +244,7 @@ class stylesUser{
                 ';
     }
 
-    public static function book($book, $DEFAULT_DAYS_RESERVE){
+    public static function book($book, $DEFAULT_DAYS_RESERVE, $sid){
         return
             '
                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" id="div-details-books">
@@ -257,7 +271,9 @@ class stylesUser{
 
                             <div id="options-reserves">
 
-                                <a class="btn btn-primary" id="btn-reserve-20-days" title="Reserve as soon as possible">Reserve '.$DEFAULT_DAYS_RESERVE.' days</a>
+                                <a href="controller.php?insert=setDefaultReserve&isbn='.$book["isbn"].$sid.'" class="btn btn-primary" id="btn-reserve-20-days" title="Reserve as soon as possible">
+                                    Reserve '.$DEFAULT_DAYS_RESERVE.' days
+                                </a>
 
                                 <button class="btn btn-default active" id="btn-personalized-reserve" title="Personalized my reserve">
                                     <span>Personalized reserve
@@ -269,7 +285,7 @@ class stylesUser{
 
                             <div class="hidden" id="personalized-reserve">
 
-                                <form action="controller.php?insert=personalizedReserve&isbn='.$book["isbn"].'" method="post" onsubmit="return checkReserveDisponibility()">
+                                <form action="controller.php?insert=setPersonalizedReserve&isbn='.$book["isbn"].$sid.'" method="post" onsubmit="return checkReserveDisponibility()">
 
                                     <div class="input-group" id="start-date-reserve-personalized">
                                         <span class="input-group-addon icons"><i class="fa fa-calendar-plus-o"></i></span>
@@ -292,13 +308,13 @@ class stylesUser{
             ';
     }
 
-    public static function books($book, $DEFAULT_DAYS_RESERVE){
+    public static function books($book, $DEFAULT_DAYS_RESERVE, $sid){
 
         return
             '
             <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 show-books">
                 <div>
-                    <a href="controller.php?method=showBook&isbn='.$book["isbn"].'" title="Show details">
+                    <a href="controller.php?method=showBook&isbn='.$book["isbn"].$sid.'" title="Show details">
                         <div class="img-show-books">
                             <img src="../img/books/'.$book["isbn"].'.jpg" alt="Img of '.$book["title"].'">
                         </div>
@@ -313,7 +329,7 @@ class stylesUser{
                                 <label class="label label-default">Author: '.$book["author"].'</label>
 
                             </div>
-                            <a href="#" class="btn btn-primary button-show-books" title="Reserve as soon as possible">Reserve '.$DEFAULT_DAYS_RESERVE.' days</a>
+                            <a href="controller.php?insert=setDefaultReserve&isbn='.$book["isbn"].$sid.'" class="btn btn-primary button-show-books" title="Reserve as soon as possible">Reserve '.$DEFAULT_DAYS_RESERVE.' days</a>
                         </div>
                     </a>
                 </div>

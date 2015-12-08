@@ -89,6 +89,7 @@ function disponibilityAjax(dataString){
         data: dataString,
         success: function(data)
         {
+            console.log(data);
             disponibility = (data == "true");
         }
     });

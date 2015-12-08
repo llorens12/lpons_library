@@ -47,7 +47,7 @@ class User extends Template{
 
 
         if ($category != "" && $category != "*") {
-            $sentence .= " ORDER BY '" . $this->getKeyToValue($filterData,$category) . "'";
+            $sentence .= " ORDER BY " . $category;
         }
 
         elseif($search != "")
@@ -65,6 +65,8 @@ class User extends Template{
                 )
             ";
         }
+
+        unset($filterData['sent'], $filterData['received']);
 
         $this->setContent(
             stylesUser::filterMenu
@@ -84,10 +86,10 @@ class User extends Template{
                 true,
                 false,
                 "Reserve",
-                "",
-                $this->emailUser,
+                ["ISBN","Start"],
                 true,
-                $this->MAX_DAYS_RESERVE
+                $this->MAX_DAYS_RESERVE,
+                $this->sid
             )
         );
     }
@@ -149,7 +151,8 @@ class User extends Template{
             $content .= stylesUser::books
             (
                 $book,
-                $this->DEFAULT_DAYS_RESERVE
+                $this->DEFAULT_DAYS_RESERVE,
+                $this->sid
             );
         }
 
@@ -165,7 +168,7 @@ class User extends Template{
         (
             stylesUser::filterMenu
             (
-                "Order by",
+                "Select Category",
                 "Default",
                 $this->getArrayToResult
                 (
@@ -194,7 +197,8 @@ class User extends Template{
                     )
                 )
                 ,
-                $this->DEFAULT_DAYS_RESERVE
+                $this->DEFAULT_DAYS_RESERVE,
+                $this->sid
             )
         );
     }
@@ -212,25 +216,82 @@ class User extends Template{
     public function setPersonalizedReserve($request)
     {
         $request['user'] = $_SESSION['email'];
-        if(!$this->insertPersonalizedReserve($request))
+
+        $returnament = $this->insertPersonalizedReserve($request);
+
+        if($returnament === true)
+        {
+            return true;
+        }
+        elseif($returnament === false)
         {
             $this->showError("It hasn't been possible perform the reserve");
         }
+        else
+            $this->showError($returnament);
+
+        return false;
     }
 
     public function setDefaultReserve($request){
 
         $request['user'] = $_SESSION['email'];
-        if(!$this->insertDeffaultReserve($request))
+
+        $returnament = $this->insertDeffaultReserve($request);
+
+        if($returnament === true)
+        {
+            return true;
+        }
+        elseif($returnament === false)
         {
             $this->showError("It hasn't been possible perform the reserve");
         }
+        else
+            $this->showError($returnament);
 
+        return false;
+    }
+
+    public function deleteReserve($request){
+
+        $copyBook = mysqli_fetch_assoc
+        (
+            $this->select
+            ('
+                SELECT id
+                FROM reserves
+                JOIN copybooks ON copybook = id
+                WHERE user =  "'.$_SESSION['email'].'"
+                AND book =  "'.$request['ISBN'].'"
+                AND date_start =  "'.$request['Start'].'"
+            ')
+        )['id'];
+
+        return $this->delete("reserves","copybook = '".$copyBook."' AND date_start = '".$request['Start']."'");
     }
 
 
 
     protected function insertDeffaultReserve($request){
+
+        $existsReserve = mysqli_fetch_assoc($this->select
+        ("
+            SELECT copybook
+            FROM reserves
+            JOIN copybooks ON copybook = id
+            WHERE
+                user =  '".$request['user']."'
+            AND
+                book =  '".$request['isbn']."'
+            AND
+                date_start > ".str_replace("-","",date('Y-m-d'))."
+         "));
+
+        if(count($existsReserve) > 0){
+            return "You have already reserved book";
+        }
+        unset($existsReserve);
 
         $days_reserve = 0;
         if(isset($request['days_reserve']))
@@ -352,13 +413,32 @@ class User extends Template{
         $request['copybook'] = $betterReserve['copybook'];
         $request['date_start'] = $betterReserve['date_start'];
         $request['date_finish']= date('Y-m-d', strtotime($betterReserve['date_start'].' + '.$days_reserve.' days'));
+        unset($request['isbn']);
 
-        return $request;
+        return $this->insert("reserves",$request);
 
     }
 
     protected function insertPersonalizedReserve($reserve)
     {
+
+        $existsReserve = mysqli_fetch_assoc($this->select
+        ("
+            SELECT copybook
+            FROM reserves
+            JOIN copybooks ON copybook = id
+            WHERE
+                user =  '".$reserve['user']."'
+            AND
+                book =  '".$reserve['isbn']."'
+            AND
+                date_start > ".str_replace("-","",date('Y-m-d'))."
+         "));
+
+        if(count($existsReserve) > 0){
+            return "You have already reserved book";
+        }
+        unset($existsReserve);
 
         $difStartCurrent = $this->getDateDifference(date('Y-m-d'), $reserve['date_start']);
         if($difStartCurrent < 0)
@@ -385,7 +465,7 @@ class User extends Template{
                 $reserve['date_start'],
                 $reserve['date_finish']
             )
-        )['copybook'];
+        )['id'];
 
         unset($reserve['isbn']);
         return $this->insert("reserves",$reserve);
@@ -399,23 +479,23 @@ class User extends Template{
 
         return $this->select
         ("
-                select id
-                from reserves RIGHT JOIN copybooks on copybook = id
-                where book = '".$isbn."' AND
-                id not in
+                SELECT id
+                FROM reserves RIGHT JOIN copybooks ON copybook = id
+                WHERE book = '".$isbn."' AND
+                id NOT IN
                 (
-                    select copybook
-                    from reserves JOIN copybooks on copybook = id
-                    where book = '". $isbn ."' AND
+                    SELECT copybook
+                    FROM reserves JOIN copybooks ON copybook = id
+                    WHERE book = '". $isbn ."' AND
                     (
                         ('". $dateStart ."' < date_start AND '". $dateFinish ."' > date_finish)
                     OR
-                        '". $dateStart ."' between date_start and date_finish
+                        '". $dateStart ."' BETWEEN date_start AND date_finish
                     OR
-                        '". $dateFinish ."' between date_start AND date_finish
+                        '". $dateFinish ."' BETWEEN date_start AND date_finish
                     )
                 )
-                order by status desc
+                ORDER BY status DESC
         ");
     }
 

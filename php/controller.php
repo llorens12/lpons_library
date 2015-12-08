@@ -8,15 +8,17 @@ include_once "objects/Librarian.php";
 include_once "objects/Admin.php";
 include_once "objects/Ajax.php";
 
-
-//register_shutdown_function('fatalErrorHandler');
-
 session_cache_limiter('nocache,private');
 session_start();
 
 if (!isset($_SESSION['email'], $_SESSION['typeUser'], $_SESSION['name'], $_SESSION['home'])) {
-    header('Location: ../index.php?uri='.$_SERVER['REQUEST_URI']);
+
+    header('Location: index.php?uri='.$_SERVER['REQUEST_URI']);
+
 }
+
+
+register_shutdown_function('fatalErrorHandler');
 
 
 if (isset($_REQUEST['ajax'])) {
@@ -25,12 +27,14 @@ if (isset($_REQUEST['ajax'])) {
     switch ($_REQUEST['ajax']) {
         case "emailDisponibility":
 
-            $email = "";
-            if (isset($_REQUEST['email'])) $email = $_REQUEST['email'];
-
-            $ajax->email($email);
+            $ajax->email($_REQUEST['email']);
             break;
 
+        case "reserveDisponibility":
+
+            unset($_REQUEST['ajax']);
+            $ajax->reserveDisponibility($_REQUEST);
+            break;
     }
 }
 else {
@@ -52,7 +56,7 @@ else {
 
             case "startSession":
 
-                if (isset($_REQUEST['email'], $_REQUEST['pwd']) || isset($_COOKIE['email'], $_COOKIE['pwd'])) {
+
                     $email = "";
                     $pwd = "";
                     $remember = false;
@@ -72,23 +76,23 @@ else {
 
                     if ($user->startSession($email, $pwd, $remember)) {
 
-                        if(!isset($_SESSION['uri'])) {
+                        if(isset($_SESSION['uri'])) {
                             $uri = $_SESSION['uri'];
                             unset($_SESSION['uri']);
-                            header('Location: ' . $uri);
+                            header('Location: ' . $uri.htmlspecialchars(SID));
                         }
 
                         header('Location: ' . $_SESSION['home'] . htmlspecialchars(SID));
                     } else {
                         $user->showLogin("Incorrect E-mail or Password");
                     }
-                }
+
                 break;
 
             case "logOut":
 
                 $user->logOut();
-                header('Location: controller.php');
+                header('Location: ../index.php');
                 break;
 
             case "showUsers":
@@ -113,7 +117,7 @@ else {
 
             case "showBook":
 
-                (isset($_REQUEST['isbn']))? $user->showBook($_REQUEST['isbn']) : NULL;
+                $user->showBook($_REQUEST['isbn']);
                 break;
 
             case "showReserves":
@@ -149,12 +153,31 @@ else {
             case "user":
 
                 unset($_REQUEST['insert']);
-                (isset($_REQUEST['email']))?  $user->insertUser($_REQUEST) : null;
+                $user->insertUser($_REQUEST);
                 break;
 
-            case "personalizedReserve":
+            case "setPersonalizedReserve":
 
                 unset($_REQUEST['insert']);
+                ($user->setPersonalizedReserve($_REQUEST))? header('Location: controller.php?method=showReserves'.htmlspecialchars(SID)) : null;
+                break;
+
+            case "setDefaultReserve":
+
+                unset($_REQUEST['insert']);
+                ($user->setDefaultReserve($_REQUEST))? header('Location: controller.php?method=showReserves'.htmlspecialchars(SID)) : null;;
+                break;
+
+        }
+    }
+    elseif(isset($_REQUEST['delete'])){
+        switch ($_REQUEST['delete']) {
+
+            case "deleteReserve":
+
+                unset($_REQUEST['deleteReserve']);
+                ($user->deleteReserve($_REQUEST))? header('Location: controller.php?method=showReserves'.htmlspecialchars(SID)) : null;;
+                break;
 
         }
     }
@@ -178,7 +201,7 @@ else {
         if(($error['type'] === E_ERROR) || ($error['type'] === E_USER_ERROR))
         {
 # Here we handle the error, displaying HTML, logging, ...
-            header('Location: controller.php?method=showError&error=Permission denied'.htmlspecialchars(SID));
+            header('Location: '.$_SESSION['home'].htmlspecialchars(SID));
         }
     }
 

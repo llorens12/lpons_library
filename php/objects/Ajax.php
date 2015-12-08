@@ -23,30 +23,34 @@ class Ajax
             echo "false";
     }
 
-    public function reserveDisponibility($isbn,$dateStart,$dateFinish){
+    public function reserveDisponibility($request){
+
+        $isbn       = $request['isbn'];
+        $dateStart  = $request['dateStart'];
+        $dateFinish = $request['dateFinish'];
 
         $dateFinish = str_replace("-","",$dateFinish);
         $dateStart  = str_replace("-","",$dateStart);
 
         $result =$this->select
         ("
-                select id
-                from reserves RIGHT JOIN copybooks on copybook = id
-                where book = '".$isbn."' AND
-                id not in
+                SELECT id
+                FROM reserves RIGHT JOIN copybooks ON copybook = id
+                WHERE book = '".$isbn."' AND
+                id NOT IN
                 (
-                    select copybook
-                    from reserves JOIN copybooks on copybook = id
-                    where book = '". $isbn ."' AND
+                    SELECT copybook
+                    FROM reserves JOIN copybooks ON copybook = id
+                    WHERE book = '". $isbn ."' AND
                     (
                         ('". $dateStart ."' < date_start AND '". $dateFinish ."' > date_finish)
                     OR
-                        '". $dateStart ."' between date_start and date_finish
+                        '". $dateStart ."' BETWEEN date_start AND date_finish
                     OR
-                        '". $dateFinish ."' between date_start AND date_finish
+                        '". $dateFinish ."' BETWEEN date_start AND date_finish
                     )
                 )
-                order by status desc
+                ORDER BY status DESC
         ");
         if(count(mysqli_fetch_assoc($result)) > 0)
         {
