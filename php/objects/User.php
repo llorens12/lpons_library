@@ -235,6 +235,7 @@ class User extends Template{
             (
                 $reserve,
                 $_SESSION['typeUser'],
+                (isset($request['error'])),
                 $this->sid
             )
         );
@@ -255,21 +256,14 @@ class User extends Template{
         $request['user'] = $_SESSION['email'];
 
 
-        $returnament = $this->insert
-        (
-            "reserves",
-            $this->getReserveToformatValid($request)
-        );
+        $returnament = $this->insertPersonalizedReserve($request);
 
         if($returnament)
         {
             return true;
         }
-        else
-        {
-            $this->showError("It hasn't been possible perform the reserve");
-        }
 
+        $this->showError("It hasn't been possible perform the reserve");
         return false;
     }
 
@@ -299,8 +293,34 @@ class User extends Template{
         return $this->deleteReserve($request);
     }
 
+    public function setUpdateReserve($request){
+
+        $request['email'] = $this->emailUser;
+        return $this->updateReserve($request);
+    }
 
 
+
+    protected function updateReserve($reserve){
+        $reserve = $this->getReserveToformatValid($reserve);
+
+        if($reserve == false){
+            return false;
+        }
+
+        $where =
+        "
+                user = '".$reserve['email']."'
+            AND
+                date_start = '".$reserve['firstDateReserve']."'
+            AND
+                copybook = '".$reserve['copyBook']."'
+        ";
+
+        unset($reserve['email'], $reserve['firstDateReserve'], $reserve['copyBook']);
+
+        return $this->update("reserves", $reserve, "");
+    }
 
     protected function deleteReserve($request){
 
@@ -340,10 +360,10 @@ class User extends Template{
         }
         unset($existsReserve);
 
-        $days_reserve = 0;
+
         if(isset($request['days_reserve']))
         {
-            $days_reserve = $request['days_reserve']-1;
+            $days_reserve = ($request['days_reserve']-1);
             unset($request['days_reserve']);
         }
         else
@@ -356,7 +376,7 @@ class User extends Template{
          * if it's now possible, insert reserve
          */
 
-        $copyBookAvailable = mysqli_fetch_assoc($this->getBookDisponibility($request['isbn'],$request['date_start'],$request['date_finish']))['id'];
+        $copyBookAvailable = mysqli_fetch_assoc($this->getBookDisponibility($request['isbn'], "",$request['date_start'],$request['date_finish']))['id'];
 
         if(count($copyBookAvailable) > 0)
         {
@@ -466,9 +486,8 @@ class User extends Template{
 
     }
 
-    protected function getReserveToformatValid($reserve)
+    protected function insertPersonalizedReserve($reserve)
     {
-
         $existsReserve = mysqli_fetch_assoc($this->select
         ("
             SELECT copybook
@@ -487,6 +506,30 @@ class User extends Template{
         }
         unset($existsReserve);
 
+
+        $reserve = $this->getReserveToformatValid($reserve);
+        if($reserve == false){
+            return false;
+        }
+
+        $reserve['copybook'] = mysqli_fetch_assoc
+        (
+            $this->getBookDisponibility
+            (
+                $reserve['isbn'],
+                "",
+                $reserve['date_start'],
+                $reserve['date_finish']
+            )
+        )['id'];
+
+        unset($reserve['isbn']);
+        return $this->insert("reserves", $reserve);
+    }
+
+    protected function getReserveToformatValid($reserve)
+    {
+
         $difStartCurrent = $this->getDateDifference(date('Y-m-d'), $reserve['date_start']);
         if($difStartCurrent < 0)
             $reserve['date_start'] = date('Y-m-d');
@@ -503,36 +546,33 @@ class User extends Template{
             $reserve['date_finish'] = date('Y-m-d', strtotime($reserve['date_finish'].$substract.' days'));
         }
 
-
-        $reserve['copybook'] = mysqli_fetch_assoc
-        (
-            $this->getBookDisponibility
-            (
-                $reserve['isbn'],
-                $reserve['date_start'],
-                $reserve['date_finish']
-            )
-        )['id'];
-
-        unset($reserve['isbn']);
         return $reserve;
     }
 
-    protected function getBookDisponibility($isbn, $dateStart,$dateFinish){
+    protected function getBookDisponibility($isbn, $copybook, $dateStart,$dateFinish){
 
         $dateFinish = str_replace("-","",$dateFinish);
         $dateStart  = str_replace("-","",$dateStart);
+
+        if($isbn != "")
+        {
+            $where = "book = '".$isbn."'";
+        }
+        else
+        {
+            $where = "copybook = '".$copybook."'";
+        }
 
         return $this->select
         ("
                 SELECT id
                 FROM reserves RIGHT JOIN copybooks ON copybook = id
-                WHERE book = '".$isbn."' AND
+                WHERE ".$where." AND
                 id NOT IN
                 (
                     SELECT copybook
                     FROM reserves JOIN copybooks ON copybook = id
-                    WHERE book = '". $isbn ."' AND
+                    WHERE ". $where ." AND
                     (
                         ('". $dateStart ."' < date_start AND '". $dateFinish ."' > date_finish)
                     OR

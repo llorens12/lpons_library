@@ -397,17 +397,25 @@ class stylesUser{
         ';
     }
 
-    public static function formEditReserves($reserve, $typeUser, $sid){
+    public static function formEditReserves($reserve, $typeUser, $error, $sid){
+
+        $hidden = "hidden";
+        if($error){
+            $hidden = "";
+        }
+
 
         return
         '
             <div class="row row-centered container-form">
 
-                <form class="col-lg-12 col-md-12 col-sm-12 col-xs-12 content-form" action="controller.php?update=updateReserve&copybook='.$reserve['copybook'].'&firstDateReserve='.$reserve['date_start'].$sid.'">
+                <form class="col-lg-12 col-md-12 col-sm-12 col-xs-12 content-form" action="controller.php?update=setUpdateReserve&copyBook='.$reserve['copybook'].'&firstDateReserve='.$reserve['date_start'].$sid.'">
                     <div class="inputs-content-form">
                         <h2>Edit reserve</h2>
                         '.stylesUser::contentFormEditReserves($reserve, $typeUser).'
                     </div>
+                    <label class="label label-danger '.$hidden.'" id="label-error-personalized-reserve">The reserve is not available</label>
+                    <br>
                     <div class="form-group btn-content-form">
                         <button type="submit" class="btn btn-default active" title="Save">
                             Save
@@ -442,11 +450,11 @@ class stylesUser{
             </div>
             <div class="input-group">
                 <span class="input-group-addon icons" title="Date Start"><i class="fa fa-calendar-plus-o"></i></span>
-                <input type="date" class="form-control" name="date-start" value="'.$reserve['date_start'].'" '.$dateStart.' title="Date Start">
+                <input type="date" class="form-control" name="date_start" value="'.$reserve['date_start'].'" '.$dateStart.' title="Date Start">
             </div>
             <div class="input-group">
                 <span class="input-group-addon icons" title="Date Finish"><i class="fa fa-calendar-times-o"></i></span>
-                <input type="date" class="form-control" name="date-finish" value="'.$reserve['date_finish'].'" title="Date Finish">
+                <input type="date" class="form-control" name="date_finish" value="'.$reserve['date_finish'].'" title="Date Finish">
             </div>
                     ';
     }
