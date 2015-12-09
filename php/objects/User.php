@@ -4,8 +4,8 @@ class User extends Template{
 
     use DBController;
 
-    protected $DEFAULT_DAYS_RESERVE = 30;
-    protected $MAX_DAYS_RESERVE     = 60;
+    protected $DEFAULT_DAYS_RESERVE = 20;
+    protected $MAX_DAYS_RESERVE     = 59;//The reserve is the 60 days because the 0 count
 
     public function __construct($nameUser, $emailUser, $home, $sid)
     {
@@ -248,7 +248,7 @@ class User extends Template{
 
     public function showMyProfile($error){
 
-        $this->myProfile(["showBooks" => "Books", "showReserves" => "My Reserves"], $error);
+        $this->myProfile($error);
     }
 
     public function logOut()
@@ -344,7 +344,7 @@ class User extends Template{
 
 
 
-    protected function myProfile($homeOptions, $error){
+    protected function myProfile($error){
 
         $_SESSION['menu'] = "";
 
@@ -361,7 +361,6 @@ class User extends Template{
                         WHERE email = '{$this->emailUser}'
                     ")
                 ),
-                $homeOptions,
                 $this->sid,
                 $error
             )
@@ -375,8 +374,8 @@ class User extends Template{
         if($difference < 0)
             return false;
 
-        if($difference > $this->MAX_DAYS_RESERVE){
-            $reserve['date_finish'] = date('Y-m-d', strtotime (($this->MAX_DAYS_RESERVE - $difference).' day', strtotime($reserve['date_finish'])));
+        if($difference > ($this->MAX_DAYS_RESERVE)){
+           $reserve['date_finish'] = date('Y-m-d', strtotime (($this->MAX_DAYS_RESERVE - $difference).' day', strtotime($reserve['date_finish'])));
         }
 
         $sentence =

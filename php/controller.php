@@ -205,7 +205,8 @@ else {
                 break;
 
         }
-    }elseif(isset($_REQUEST['update'])){
+    }
+    elseif(isset($_REQUEST['update'])){
         switch($_REQUEST['update']){
 
             case "setUpdateReserve":

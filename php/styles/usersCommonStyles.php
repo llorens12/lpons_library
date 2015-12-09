@@ -2,6 +2,7 @@
 
 
 class stylesUser{
+
     public static function table($data, $edit = false, $drop = false, $info = false, $typeObject = "", $primaryKeys, $reserveDelimiter = false, $MAX_DAYS_RESERVE = 0, $sid)
     {
         $contentThead   = "<th>#</th>";
@@ -357,33 +358,23 @@ class stylesUser{
 
     public static function menuContent($sid){
 
-        $books = "default";
-        $reserves = "default";
+        $Books = "default";
+        $Reserves = "default";
 
-        switch ($_SESSION['menu']) {
+        $$_SESSION['menu'] = "primary active";
 
-            case "Books":
-
-                $books = "primary active";
-                break;
-
-            case "Reserves":
-
-                $reserves = "primary active";
-                break;
-        }
 
         return
             '
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-                <a href="controller.php?method=showBooks'.$sid.'" class="btn btn-lg btn-'.$books.' btn-menu" title="Show books">
+                <a href="controller.php?method=showBooks'.$sid.'" class="btn btn-lg btn-'.$Books.' btn-menu" title="Show books">
                     Books
                 </a>
             </div>
 
 
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 border-left" title="Show my reserves">
-                <a href="controller.php?method=showReserves'.$sid.'" class="btn btn-'.$reserves.' btn-lg btn-menu" title="Show reserves">
+                <a href="controller.php?method=showReserves'.$sid.'" class="btn btn-'.$Reserves.' btn-lg btn-menu" title="Show reserves">
                     My Reserves
                 </a>
             </div>
@@ -452,8 +443,18 @@ class stylesUser{
                     ';
     }
 
-    public static function contentFormMyProfile($user, $optionsMenu, $sid, $error = ""){
+    public static function contentFormMyProfile($user, $sid, $error = ""){
+        $optionsMenu =
+            '
+            <option value="showBooks">Books</option>
+            <option value="showReserves">My Reserves</option>
+        ';
 
+        return stylesUser::formMyProfile($user, $sid, $error, $optionsMenu);
+
+    }
+
+    public static function formMyProfile($user, $sid, $error, $optionsMenu){
         $hidden = "hidden";
 
         if($error != ""){
@@ -467,7 +468,7 @@ class stylesUser{
                 <form class="col-lg-12 col-md-12 col-sm-12 col-xs-12 content-form" action="controller.php?update=setUpdateMyProfile'.$sid.'" method="POST">
                     <div class="inputs-content-form">
                         <h2>My Profile</h2>
-                        '.stylesUser::formMyProfile($user, $optionsMenu).'
+                        '.stylesUser::myProfile($user, $optionsMenu).'
                     </div>
                     <label class="label label-danger '.$hidden.'" id="label-error-personalized-reserve">The email is not aviable</label>
                     <br>
@@ -481,19 +482,7 @@ class stylesUser{
                     ';
     }
 
-    public static function formMyProfile($user, $optionsMenu){
-
-        $options = "";
-
-        foreach($optionsMenu as $key => $value){
-
-            if($key == $user['home'])
-            {
-                $options = '<option value="'.$key.'">'.$value.'</option>'.$options;
-            }
-            else
-                $options .= '<option value="'.$key.'">'.$value.'</option>';
-        }
+    public static function myProfile($user, $optionsHome){
 
         return
             stylesAnonimous::formRegister($user).'
@@ -502,11 +491,141 @@ class stylesUser{
             <div class="input-group">
                     <span class="input-group-addon glyphicon glyphicon-home icons"></span>
                     <select class="form-control" name="home">
-                        '.$options.'
+                        '.$optionsHome.'
                     </select>
             </div>
         ';
     }
+}
+
+class stylesLibrarian
+{
+
+    public static function menuTop($nameUser, $sid){
+        return stylesUser::menuTop($nameUser, $sid);
+    }
+
+    public static function menuContent($sid)
+    {
+        $Users = "default";
+        $Books = "default";
+        $Reserves = "default";
+
+        $$_SESSION['menu'] = "primary active";
+
+
+        return '
+            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                <div class="btn-group btn-menu sub-menu">
+                    <a class="btn btn-'.$Users.' btn-lg  dropdown-toggle" >
+                        Users
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="controller.php?method=showAllInformationUsers'.$sid.'">
+                                All info
+                            </a>
+                        </li>
+                        <li>
+                            <a href="controller.php?method=showAdministrateUsers'.$sid.'">
+                                Administrate
+                            </a>
+                        </li>
+                        <li>
+                            <a href="controller.php?method=showDefaulters'.$sid.'">
+                                Defaulters
+                            </a>
+                        </li>
+                        <li role="separator" class="divider"></li>
+                        <li>
+                            <a href="controller.php?method=showAddUser'.$sid.'">
+                                Add
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+
+            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                <div class="btn-group btn-menu sub-menu">
+                    <a class="btn btn'.$Books.' btn-lg  dropdown-toggle" >
+                        Books
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="controller.php?method=showBooks'.$sid.'">
+                                Show
+                            </a>
+                        </li>
+                        <li>
+                            <a href="controller.php?method=showTableBooks'.$sid.'">
+                                Table Info
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="controller.php?method=showAdministrateBooks'.$sid.'">
+                                Administrate
+                            </a>
+                        </li>
+                        <li role="separator" class="divider"></li>
+                        <li>
+                            <a href="controller.php?method=showAddBook'.$sid.'">
+                                Add
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                <div class="btn-group btn-menu sub-menu">
+                    <a class="btn btn'.$Reserves.' btn-lg  dropdown-toggle" >
+                        Reserves
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="controller.php?method=showAdministrateReserves'.$sid.'">
+                                Administrate
+                            </a>
+                        </li>
+                        <li>
+                            <a href="controller.php?method=showReserves'.$sid.'">
+                                My reserves
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            ';
+    }
+
+    public static function contentFormMyProfile($user, $sid, $error = ""){
+        $optionsMenu =
+        '
+          <optgroup label="Users">
+            <option value="showAllInformationUsers">All info</option>
+            <option value="showAdministrateUsers">Administrate</option>
+            <option value="showDefaulters">Defaulters</option>
+            <option value="showAddUser">Add</option>
+          </optgroup>
+
+          <optgroup label="Books">
+            <option value="showBooks">Show</option>
+            <option value="showTableBooks">Table Info</option>
+            <option value="showAdministrateBooks">Administrate</option>
+            <option value="showAddBook">Add</option>
+          </optgroup>
+        ';
+
+        return stylesUser::formMyProfile($user, $sid, $error, $optionsMenu);
+
+    }
+
 }
 
 class stylesAnonimous{
