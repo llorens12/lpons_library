@@ -4,7 +4,7 @@ class User extends Template{
 
     use DBController;
 
-    protected $DEFAULT_DAYS_RESERVE = 20;
+    protected $DEFAULT_DAYS_RESERVE = 30;
     protected $MAX_DAYS_RESERVE     = 60;
 
     public function __construct($nameUser, $emailUser, $home, $sid)
@@ -268,12 +268,17 @@ class User extends Template{
 
         $returnament = $this->insertPersonalizedReserve($request);
 
-        if($returnament)
+        if($returnament === true)
         {
             return true;
         }
+        elseif($returnament === false)
+        {
+            $this->showError("It hasn't been possible perform the reserve");
+        }
+        else
+            $this->showError($returnament);
 
-        $this->showError("It hasn't been possible perform the reserve");
         return false;
     }
 
@@ -365,10 +370,14 @@ class User extends Template{
 
     protected function updateReserve($reserve){
 
-        if($this->getDateDifference($reserve['date_start'],$reserve['date_finish']) < 0)
+        $difference = $this->getDateDifference($reserve['date_start'],$reserve['date_finish']);
+
+        if($difference < 0)
             return false;
 
-        $where = "copybook = '".$reserve['copyBook']."' AND (user != '".$reserve['email']."' AND date_start != '".$reserve['firstDateStart']."')";
+        if($difference > $this->MAX_DAYS_RESERVE){
+            $reserve['date_finish'] = date('Y-m-d', strtotime (($this->MAX_DAYS_RESERVE - $difference).' day', strtotime($reserve['date_finish'])));
+        }
 
         $sentence =
         "
@@ -389,7 +398,6 @@ class User extends Template{
         ";
 
         $select = $this->select($sentence);
-        print_r($select);
 
         if(mysqli_num_rows($select) != 0)
             return false;
@@ -438,7 +446,7 @@ class User extends Template{
             AND
                 book =  '".$request['isbn']."'
             AND
-                date_start > ".str_replace("-","",date('Y-m-d'))."
+                date_finish > ".str_replace("-","",date('Y-m-d'))."
          "));
 
         if(count($existsReserve) > 0){
@@ -584,11 +592,11 @@ class User extends Template{
             AND
                 book =  '".$reserve['isbn']."'
             AND
-                date_start > ".str_replace("-","",date('Y-m-d'))."
+                date_finish > ".str_replace("-","",date('Y-m-d'))."
          "));
 
         if(count($existsReserve) > 0){
-            return false;
+            return "You have already reserved book";
         }
         unset($existsReserve);
 
@@ -597,6 +605,8 @@ class User extends Template{
         if($reserve == false){
             return false;
         }
+
+
 
         $reserve['copybook'] = mysqli_fetch_assoc
         (
