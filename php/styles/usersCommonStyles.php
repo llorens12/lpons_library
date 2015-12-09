@@ -452,7 +452,14 @@ class stylesUser{
                     ';
     }
 
-    public static function contentFormMyProfile($user, $optionsMenu, $sid){
+    public static function contentFormMyProfile($user, $optionsMenu, $sid, $error = ""){
+
+        $hidden = "hidden";
+
+        if($error != ""){
+            $hidden = "";
+        }
+
         return
             '
             <div class="row row-centered container-form">
@@ -462,6 +469,8 @@ class stylesUser{
                         <h2>My Profile</h2>
                         '.stylesUser::formMyProfile($user, $optionsMenu).'
                     </div>
+                    <label class="label label-danger '.$hidden.'" id="label-error-personalized-reserve">The email is not aviable</label>
+                    <br>
                     <div class="form-group btn-content-form">
                         <button type="submit" class="btn btn-default active" title="Save">
                             Save
@@ -579,12 +588,10 @@ class stylesAnonimous{
         );
 
         $vars = $defaults;
-        $disabledEmail = "";
         $required = 'required=""';
 
         if($data != "") {
             $vars = $data;
-            $disabledEmail = "disabled";
             $required = "";
         }
 
@@ -600,7 +607,7 @@ class stylesAnonimous{
                 </div>
                 <div class="input-group">
                     <span class="input-group-addon icons"><i class="fa fa-at"></i></span>
-                    <input type="email" class="form-control" placeholder="example@example.com" name="email" id="email" required="" value="'.$vars['email'].'" '.$disabledEmail.'>
+                    <input type="email" class="form-control" placeholder="example@example.com" name="email" id="email" required="" value="'.$vars['email'].'">
                 </div>
                 <div class="input-group">
                     <span class="input-group-addon glyphicon glyphicon-earphone icons"></span>

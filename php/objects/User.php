@@ -246,9 +246,9 @@ class User extends Template{
         );
     }
 
-    public function showMyProfile(){
+    public function showMyProfile($error){
 
-        $this->myProfile(["showBooks" => "Books", "showReserves" => "My Reserves"]);
+        $this->myProfile(["showBooks" => "Books", "showReserves" => "My Reserves"], $error);
     }
 
     public function logOut()
@@ -311,7 +311,12 @@ class User extends Template{
 
     public function setUpdateMyProfile($request){
 
-        unset($request['email'], $request['typeUser'], $request['registered']);
+        unset($request['typeUser'], $request['registered']);
+
+
+        if($request['email'] == $this->emailUser){
+            unset($request['typeUser']);
+        }
 
         if(isset($request['pwd']) && ($request['pwd'] == "" || $request['pwd'] == " ")){
             unset($request['pwd']);
@@ -319,17 +324,22 @@ class User extends Template{
         else
             $request['pwd'] = md5($request['pwd']);
 
+        $_SESSION['name'] = $request['name'];
         $_SESSION['home'] = "controller.php?method=".$request['home'];
 
         $where = "email = '".$this->emailUser."'";
 
-        $this->update("users",$request,$where);
+        if($this->update("users",$request,$where)){
+            (isset($request['email']))? $_SESSION['email'] = $request['email'] : NULL;
+            return true;
+        }
 
+        return false;
     }
 
 
 
-    protected function myProfile($homeOptions){
+    protected function myProfile($homeOptions, $error){
 
         $_SESSION['menu'] = "";
 
@@ -347,7 +357,8 @@ class User extends Template{
                     ")
                 ),
                 $homeOptions,
-                $this->sid
+                $this->sid,
+                $error
             )
         );
     }
