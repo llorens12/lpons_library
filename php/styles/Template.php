@@ -12,7 +12,7 @@ class Template
 
     protected $nameUser, $emailUser, $home, $sid;
 
-    protected $includeSection, $textButton, $linkButton, $linkUser, $linkTerms, $linkContact;
+    protected $includeSection, $textButton, $linkButton, $linkTerms, $linkContact;
 
     private   $contentMenu = "";
     private   $userMenuTop = "";
@@ -41,7 +41,6 @@ class Template
 
 
 
-        $this->linkUser          = "#";
         $this->linkTerms         = "#";
         $this->linkContact       = "#";
 
@@ -185,7 +184,7 @@ class Template
             <footer class="navbar navbar-inverse text-center">
                 <p class="col-lg-4 col-md-4 col-sm-4 col-xs-12 navbar-text">
                     Signed in as
-                    <a href="' . $this->linkUser . '" class="navbar-link">
+                    <a href="controller.php?method=showMyProfile" class="navbar-link">
                         ' . $this->emailUser . '
                     </a>
                 </p>

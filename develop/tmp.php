@@ -8,5 +8,13 @@
 
 $p = array
 (
-    "isbn"
+    "m" => "this m",
+    "l" => "this l",
+    "j" => "this j"
 );
+
+foreach($p as $key => $value){
+    $$key = $value;
+}
+unset($p['pwd']);
+echo $m."<br>".$l."<br>".$j;

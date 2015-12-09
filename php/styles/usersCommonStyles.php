@@ -186,8 +186,6 @@ class stylesUser{
         ';
     }
 
-
-
     public static function filterMenu($nameFilter, $filterDefault, $filterData, $placeHolderSearch, $method, $sid){
 
         $filter = "";
@@ -348,15 +346,10 @@ class stylesUser{
             </span>
             <ul class="dropdown-menu">
                 <li>
-                    <a href="#">
+                    <a href="controller.php?method=showMyProfile'.$sid.'">
                         My profile
                     </a>
 
-                </li>
-                <li>
-                    <a href="#">
-                        Configuration
-                    </a>
                 </li>
             </ul>
         ';
@@ -391,13 +384,13 @@ class stylesUser{
 
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 border-left" title="Show my reserves">
                 <a href="controller.php?method=showReserves'.$sid.'" class="btn btn-'.$reserves.' btn-lg btn-menu" title="Show reserves">
-                    My reserves
+                    My Reserves
                 </a>
             </div>
         ';
     }
 
-    public static function formEditReserves($reserve, $typeUser, $error, $sid){
+    public static function contentFormEditReserves($reserve, $typeUser, $error, $sid){
 
         $hidden = "hidden";
         if($error){
@@ -409,10 +402,10 @@ class stylesUser{
         '
             <div class="row row-centered container-form">
 
-                <form class="col-lg-12 col-md-12 col-sm-12 col-xs-12 content-form" action="controller.php?update=setUpdateReserve&copyBook='.$reserve['copybook'].'&firstDateReserve='.$reserve['date_start'].$sid.'">
+                <form class="col-lg-12 col-md-12 col-sm-12 col-xs-12 content-form" action="controller.php?update=setUpdateReserve&copyBook='.$reserve['copybook'].'&firstDateStart='.$reserve['date_start'].$sid.'" method="POST">
                     <div class="inputs-content-form">
                         <h2>Edit reserve</h2>
-                        '.stylesUser::contentFormEditReserves($reserve, $typeUser).'
+                        '.stylesUser::formEditReserves($reserve, $typeUser).'
                     </div>
                     <label class="label label-danger '.$hidden.'" id="label-error-personalized-reserve">The reserve is not available</label>
                     <br>
@@ -426,9 +419,9 @@ class stylesUser{
                     ';
     }
 
-    public static function contentFormEditReserves($reserve, $typeUser){
+    public static function formEditReserves($reserve, $typeUser){
 
-        ($typeUser == "user" && str_replace("-", "", $reserve['date_start']) < str_replace("-", "", date('Y-m-d')))? $dateStart = "disabled" : $dateStart ="";
+        ($typeUser == "user" && !is_null($reserve['sent']))? $dateStart = "disabled" : $dateStart ="";
 
         return
         '
@@ -457,6 +450,53 @@ class stylesUser{
                 <input type="date" class="form-control" name="date_finish" value="'.$reserve['date_finish'].'" title="Date Finish">
             </div>
                     ';
+    }
+
+    public static function contentFormMyProfile($user, $optionsMenu, $sid){
+        return
+            '
+            <div class="row row-centered container-form">
+
+                <form class="col-lg-12 col-md-12 col-sm-12 col-xs-12 content-form" action="controller.php?update=setUpdateMyProfile'.$sid.'" method="POST">
+                    <div class="inputs-content-form">
+                        <h2>My Profile</h2>
+                        '.stylesUser::formMyProfile($user, $optionsMenu).'
+                    </div>
+                    <div class="form-group btn-content-form">
+                        <button type="submit" class="btn btn-default active" title="Save">
+                            Save
+                        </button>
+                    </div>
+                </form>
+            </div>
+                    ';
+    }
+
+    public static function formMyProfile($user, $optionsMenu){
+
+        $options = "";
+
+        foreach($optionsMenu as $key => $value){
+
+            if($key == $user['home'])
+            {
+                $options = '<option value="'.$key.'">'.$value.'</option>'.$options;
+            }
+            else
+                $options .= '<option value="'.$key.'">'.$value.'</option>';
+        }
+
+        return
+            stylesAnonimous::formRegister($user).'
+
+
+            <div class="input-group">
+                    <span class="input-group-addon glyphicon glyphicon-home icons"></span>
+                    <select class="form-control" name="home">
+                        '.$options.'
+                    </select>
+            </div>
+        ';
     }
 }
 
@@ -528,28 +568,47 @@ class stylesAnonimous{
         ';
     }
 
-    public static function formRegister(){
+    public static function formRegister($data = ""){
+
+        $defaults = array
+        (
+            "name" => "",
+            "surname" => "",
+            "email" => "",
+            "telephone" => "",
+        );
+
+        $vars = $defaults;
+        $disabledEmail = "";
+        $required = 'required=""';
+
+        if($data != "") {
+            $vars = $data;
+            $disabledEmail = "disabled";
+            $required = "";
+        }
+
         return
             '
                 <div class="input-group">
                     <span class="input-group-addon glyphicon glyphicon-user icons"></span>
-                    <input type="text" class="form-control" placeholder="Name" name="name" required="">
+                    <input type="text" class="form-control" placeholder="Name" name="name" required="" value="'.$vars['name'].'">
                 </div>
                 <div class="input-group">
                     <span class="input-group-addon icons"><i class="fa fa-users"></i></span>
-                    <input type="text" class="form-control" placeholder="Surname" name="surname" required="">
+                    <input type="text" class="form-control" placeholder="Surname" name="surname" required="" value="'.$vars['surname'].'">
                 </div>
                 <div class="input-group">
                     <span class="input-group-addon icons"><i class="fa fa-at"></i></span>
-                    <input type="email" class="form-control" placeholder="example@example.com" name="email" id="email" required="">
+                    <input type="email" class="form-control" placeholder="example@example.com" name="email" id="email" required="" value="'.$vars['email'].'" '.$disabledEmail.'>
                 </div>
                 <div class="input-group">
                     <span class="input-group-addon glyphicon glyphicon-earphone icons"></span>
-                    <input type="tel" class="form-control" placeholder="XXX-XX-XX-XX" pattern="[0-9]{3}-[0-9]{2}-[0-9]{2}-[0-9]{2}" name="telephone" required="">
+                    <input type="tel" class="form-control" placeholder="XXX-XX-XX-XX" pattern="[0-9]{3}-[0-9]{2}-[0-9]{2}-[0-9]{2}" name="telephone" required="" value="'.$vars['telephone'].'">
                 </div>
                 <div class="input-group">
                     <span class="input-group-addon icons"><i class="fa fa-key"></i></span>
-                    <input type="password" class="form-control" placeholder="Password" name="pwd" id="pwd" required="">
+                    <input type="password" class="form-control" placeholder="Password" name="pwd" id="pwd" '.$required.'>
                 </div>
             ';
     }

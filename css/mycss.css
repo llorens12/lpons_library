@@ -88,6 +88,7 @@ footer{
 .icons {
     max-width: 39px !important;
     min-width: 39px !important;
+    margin: 0;
 }
 
 #btn-home {
@@ -366,6 +367,7 @@ footer{
 }
 
 .inputs-content-form{
+    padding-bottom: 1px;
     border: solid black 1px;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;

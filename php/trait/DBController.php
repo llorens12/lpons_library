@@ -45,7 +45,7 @@ trait DBController{
         $set="";
 
         foreach($data as $column => $value){
-            $set .= $column."=".$value.", ";
+            $set .= $column."='".$value."', ";
         }
 
         $set = trim($set, ", ");

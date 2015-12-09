@@ -142,6 +142,11 @@ else {
                 $user->showReserves($category,$search);
                 break;
 
+            case "showMyProfile":
+
+                $user->showMyProfile();
+                break;
+
             case "showError":
 
                 (isset($_REQUEST['error'])) ?
@@ -199,6 +204,32 @@ else {
                     null;
                 break;
 
+        }
+    }elseif(isset($_REQUEST['update'])){
+        switch($_REQUEST['update']){
+
+            case "setUpdateReserve":
+
+                unset($_REQUEST['update']);
+                if($user->setUpdateReserve($_REQUEST))
+                {
+                    header('Location: controller.php?method=showReserves'. htmlspecialchars(SID));
+
+                }else {
+                    if(strpos($_SERVER['HTTP_REFERER'], "&error="))
+                        header('Location: '.$_SERVER['HTTP_REFERER'].htmlspecialchars(SID));
+
+                    else
+                        header('Location: '.$_SERVER['HTTP_REFERER'].'&error=""'.htmlspecialchars(SID));
+                }
+                break;
+
+            case "setUpdateMyProfile":
+
+                unset($_REQUEST['update']);
+                $user->setUpdateMyProfile($_REQUEST);
+                header('Location: '.$_SERVER['HTTP_REFERER'].htmlspecialchars(SID));
+                break;
         }
     }
     echo $user;

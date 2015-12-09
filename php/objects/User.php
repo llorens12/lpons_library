@@ -212,18 +212,23 @@ class User extends Template{
 
         $_SESSION['menu'] = "Reserves";
 
+        if(!isset($request['email']))
+            $email = $this->emailUser;
+
+        else
+            $email = $request['email'];
 
         $reserve = mysqli_fetch_assoc
         (
             $this->select
             ("
-                SELECT isbn, title, author, category, date_start, date_finish, copybook
+                SELECT isbn, title, author, category, date_start, date_finish, copybook, sent
                 FROM (
                 reserves
                 JOIN copybooks ON copybook = id
                 )
                 JOIN books ON book = isbn
-                WHERE user =  '".$this->emailUser."'
+                WHERE user =  '".$email."'
                 AND book =  '".$request['ISBN']."'
                 AND date_start =  '".$request['Start']."'
              ")
@@ -231,7 +236,7 @@ class User extends Template{
 
         $this->setContent
         (
-            stylesUser::formEditReserves
+            stylesUser::contentFormEditReserves
             (
                 $reserve,
                 $_SESSION['typeUser'],
@@ -239,6 +244,11 @@ class User extends Template{
                 $this->sid
             )
         );
+    }
+
+    public function showMyProfile(){
+
+        $this->myProfile(["showBooks" => "Books", "showReserves" => "My Reserves"]);
     }
 
     public function logOut()
@@ -299,27 +309,92 @@ class User extends Template{
         return $this->updateReserve($request);
     }
 
+    public function setUpdateMyProfile($request){
 
+        unset($request['email'], $request['typeUser'], $request['registered']);
+
+        if(isset($request['pwd']) && ($request['pwd'] == "" || $request['pwd'] == " ")){
+            unset($request['pwd']);
+        }
+        else
+            $request['pwd'] = md5($request['pwd']);
+
+        $_SESSION['home'] = "controller.php?method=".$request['home'];
+
+        $where = "email = '".$this->emailUser."'";
+
+        $this->update("users",$request,$where);
+
+    }
+
+
+
+    protected function myProfile($homeOptions){
+
+        $_SESSION['menu'] = "";
+
+        $this->setContent
+        (
+            stylesUser::contentFormMyProfile
+            (
+                mysqli_fetch_assoc
+                (
+                    $this->select
+                    ("
+                        SELECT email, name, surname, telephone, home
+                        FROM users
+                        WHERE email = '{$this->emailUser}'
+                    ")
+                ),
+                $homeOptions,
+                $this->sid
+            )
+        );
+    }
 
     protected function updateReserve($reserve){
-        $reserve = $this->getReserveToformatValid($reserve);
 
-        if($reserve == false){
+        if($this->getDateDifference($reserve['date_start'],$reserve['date_finish']) < 0)
             return false;
-        }
+
+        $where = "copybook = '".$reserve['copyBook']."' AND (user != '".$reserve['email']."' AND date_start != '".$reserve['firstDateStart']."')";
+
+        $sentence =
+        "
+            SELECT date_start
+            FROM reserves
+            WHERE
+                copybook = '".$reserve['copyBook']."'
+            AND
+                date_start != '".$reserve['firstDateStart']."'
+            AND
+                (
+                    ('". $reserve['date_start'] ."' < date_start AND '". $reserve['date_finish'] ."' > date_finish)
+                OR
+                    '". $reserve['date_start'] ."' BETWEEN date_start AND date_finish
+                OR
+                    '". $reserve['date_finish'] ."' BETWEEN date_start AND date_finish
+                )
+        ";
+
+        $select = $this->select($sentence);
+        print_r($select);
+
+        if(mysqli_num_rows($select) != 0)
+            return false;
 
         $where =
         "
                 user = '".$reserve['email']."'
             AND
-                date_start = '".$reserve['firstDateReserve']."'
+                date_start = '".$reserve['firstDateStart']."'
             AND
                 copybook = '".$reserve['copyBook']."'
         ";
 
-        unset($reserve['email'], $reserve['firstDateReserve'], $reserve['copyBook']);
+        unset($reserve['email'], $reserve['firstDateStart'], $reserve['copyBook']);
 
-        return $this->update("reserves", $reserve, "");
+        return $this->update("reserves", $reserve, $where);
     }
 
     protected function deleteReserve($request){
@@ -376,7 +451,7 @@ class User extends Template{
          * if it's now possible, insert reserve
          */
 
-        $copyBookAvailable = mysqli_fetch_assoc($this->getBookDisponibility($request['isbn'], "",$request['date_start'],$request['date_finish']))['id'];
+        $copyBookAvailable = mysqli_fetch_assoc($this->getBookDisponibility($request['isbn'], $request['date_start'],$request['date_finish']))['id'];
 
         if(count($copyBookAvailable) > 0)
         {
@@ -517,7 +592,6 @@ class User extends Template{
             $this->getBookDisponibility
             (
                 $reserve['isbn'],
-                "",
                 $reserve['date_start'],
                 $reserve['date_finish']
             )
@@ -549,30 +623,22 @@ class User extends Template{
         return $reserve;
     }
 
-    protected function getBookDisponibility($isbn, $copybook, $dateStart,$dateFinish){
+    protected function getBookDisponibility($isbn, $dateStart, $dateFinish){
 
         $dateFinish = str_replace("-","",$dateFinish);
         $dateStart  = str_replace("-","",$dateStart);
 
-        if($isbn != "")
-        {
-            $where = "book = '".$isbn."'";
-        }
-        else
-        {
-            $where = "copybook = '".$copybook."'";
-        }
 
         return $this->select
         ("
                 SELECT id
                 FROM reserves RIGHT JOIN copybooks ON copybook = id
-                WHERE ".$where." AND
+                WHERE book = '".$isbn."' AND
                 id NOT IN
                 (
                     SELECT copybook
                     FROM reserves JOIN copybooks ON copybook = id
-                    WHERE ". $where ." AND
+                    WHERE book = '".$isbn."' AND
                     (
                         ('". $dateStart ."' < date_start AND '". $dateFinish ."' > date_finish)
                     OR
