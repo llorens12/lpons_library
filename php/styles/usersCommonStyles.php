@@ -199,6 +199,8 @@ class stylesUser{
         $filter = "";
 
         foreach ($filterData as $data){
+
+            $data = trim($data,"'");
             $filter .=
                 '
                         <li>
@@ -486,14 +488,15 @@ class stylesUser{
         $Librarian =
             '
           <optgroup label="Users">
-            <option value="showAdministrateUsers">Administrate</option>
             <option value="showDefaulters">Defaulters</option>
+            <option value="showAdministrateUsers">Administrate</option>
             <option value="showAddUser">Add</option>
           </optgroup>
 
           <optgroup label="Books">
             <option value="showBooks">Show</option>
-            <option value="showTableBooks">Table Info</option>
+            <option value="showTableBooks">Info Books</option>
+            <option value="showTableCopies">Info Copies</option>
             <option value="showAdministrateBooks">Administrate</option>
             <option value="showAddBook">Add</option>
           </optgroup>
@@ -549,22 +552,22 @@ class stylesLibrarian
         return '
             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
                 <div class="btn-group btn-menu sub-menu">
-                    <a href="controller.php?method=showAdministrateUsers'.$sid.'" class="btn btn-'.$Users.' btn-lg  dropdown-toggle" >
+                    <a href="controller.php?method=showDefaulters'.$sid.'" class="btn btn-'.$Users.' btn-lg  dropdown-toggle" >
                         Users
                         <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li>
-                            <a href="controller.php?method=showAdministrateUsers'.$sid.'">
-                                Administrate
-                            </a>
-                        </li>
                         <li>
                             <a href="controller.php?method=showDefaulters'.$sid.'">
                                 Defaulters
                             </a>
                         </li>
                         <li role="separator" class="divider"></li>
+                        <li>
+                            <a href="controller.php?method=showAdministrateUsers'.$sid.'">
+                                Administrate
+                            </a>
+                        </li>
                         <li>
                             <a href="controller.php?method=showAddUser'.$sid.'">
                                 Add
@@ -588,15 +591,20 @@ class stylesLibrarian
                         </li>
                         <li>
                             <a href="controller.php?method=showTableBooks'.$sid.'">
-                                Table Info
+                                Info Books
                             </a>
                         </li>
+                        <li>
+                            <a href="controller.php?method=showTableCopies'.$sid.'">
+                                Info Copies
+                            </a>
+                        </li>
+                        <li role="separator" class="divider"></li>
                         <li>
                             <a href="controller.php?method=showAdministrateBooks'.$sid.'">
                                 Administrate
                             </a>
                         </li>
-                        <li role="separator" class="divider"></li>
                         <li>
                             <a href="controller.php?method=showAddBook'.$sid.'">
                                 Add
@@ -618,12 +626,12 @@ class stylesLibrarian
                                 My reserves
                             </a>
                         </li>
+                        <li role="separator" class="divider"></li>
                         <li>
                             <a href="controller.php?method=showAdministrateReserves'.$sid.'">
                                 Administrate
                             </a>
                         </li>
-                        <li role="separator" class="divider"></li>
                         <li>
                             <a href="controller.php?method=showAddReserves'.$sid.'">
                                 Add

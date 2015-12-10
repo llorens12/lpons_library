@@ -14,6 +14,8 @@ trait DBController{
 
     protected function select($sentence)
     {
+
+        echo $sentence;
         $this->startConnection();
         return $this->connection->query($sentence);
     }

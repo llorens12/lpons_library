@@ -156,6 +156,35 @@ else {
                 $user->showDefaulters($category,$search);
                 break;
 
+            case "showTableBooks":
+
+                $category = "";
+                $search   = "";
+
+                if(isset($_REQUEST['category']))
+                    $category = $_REQUEST['category'];
+
+                if(isset($_REQUEST['search']))
+                    $search = $_REQUEST['search'];
+
+                $user->showTableBooks($category,$search);
+                break;
+
+
+            case "showTableCopies":
+
+                $category = "";
+                $search   = "";
+
+                if(isset($_REQUEST['category']))
+                    $category = $_REQUEST['category'];
+
+                if(isset($_REQUEST['search']))
+                    $search = $_REQUEST['search'];
+
+                $user->showTableCopies($category,$search);
+                break;
+
             case "showAdministrateUsers":
 
                 $category = "";

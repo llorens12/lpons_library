@@ -30,7 +30,7 @@ class Librarian extends User{
 
 
         if ($category != "" && $category != "*") {
-            $sentence .= " ORDER BY " . $category;
+            $sentence .= " ORDER BY `" . $category."` DESC";
         }
 
         elseif($search != "")
@@ -70,35 +70,40 @@ class Librarian extends User{
 
         $filterData = array
         (
-            "name"          => "Name",
-            "surname"       => "Surname",
-            "email"         => "Email",
-            "telephone"     => "Telephone",
-            "registered"    => "Registered"
+            "name"          => "'Name'",
+            "surname"       => "'Surname'",
+            "email"         => "'Email'",
+            "telephone"     => "'Telephone'",
+            "isbn"          => "'ISBN'",
+            "id"            => "'ID Copy'",
+            "title"         => "'Title'",
+            "sent"          => "'Date Send'",
+            "date_finish"   => "'Teoric Received'",
+            'trim("-" FROM (date_finish - curdate()))' => "'Days Elapsed'"
         );
 
 
         $sentence =
             "
                 SELECT ".$this->getQueryNamesFormat($filterData)."
-                FROM reserves JOIN users on user = email
+                FROM ((reserves JOIN users ON user = email) JOIN copybooks ON copybook = id) JOIN books ON book = isbn
                 WHERE
-                    date_finish < '".date('Y-m-d')."'
+                    date_finish < curdate()
                 AND
-                    sent is not null
+                    sent IS NOT null
                 AND
-                    received is null
+                    received IS null
             ";
 
-
-        if ($category != "" && $category != "*") {
-            $sentence .= " ORDER BY " . $category;
-        }
-
-        elseif($search != "")
+        if($search != "")
         {
             $sentence .=  $this->getSearchLikeFormat($filterData, $search);
         }
+        elseif ($category != "" && $category != "*") {
+            $sentence .= " ORDER BY `" . $category."` DESC";
+        }
+        else
+            $sentence .= " ORDER BY `Days Elapsed` ASC";
 
 
         $this->setContent(
@@ -146,7 +151,114 @@ class Librarian extends User{
         );
     }
 
-    public function showTableBooks(){}
+    public function showTableCopies($category = "", $search = ""){
+        $_SESSION['menu'] = "Books";
+
+        $filterData = array
+        (
+            "id"              => "'ID Copy'",
+            "isbn"            => "'ISBN'",
+            "title"           => "'Title'",
+            "author"          => "'Author'",
+            "category"        => "'Category'",
+            "status"          => "'Status'",
+            "COUNT(copybook)" => "'Total Reserved'",
+            'IF(((curdate() between date_start AND date_finish) AND sent IS NOT null AND received IS null),"Yes","No")' => "'Sent?'"
+        );
+
+
+        $sentence =
+            "
+                SELECT ".$this->getQueryNamesFormat($filterData)."
+                FROM (copybooks LEFT JOIN books ON book = isbn) LEFT JOIN reserves ON copybook = id
+            ";
+
+        if($search != "")
+        {
+            $sentence .=  $this->getSearchLikeFormat($filterData, $search, "WHERE");
+        }
+
+        $sentence .= " GROUP BY id";
+
+        if ($category != "" && $category != "*") {
+            $sentence .= " ORDER BY `" . $category."` DESC";
+        }
+        else
+            $sentence .= " ORDER BY `ISBN`";
+
+
+        $this->setContent(
+            stylesUser::filterMenu
+            (
+                "Order by",
+                "Default",
+                $filterData,
+                "Search...",
+                "showTableCopies",
+                $this->sid
+            ).
+
+            stylesUser::table
+            (
+                $this->select($sentence)
+            )
+        );
+    }
+
+    public function showTableBooks($category = "", $search = ""){
+        $_SESSION['menu'] = "Books";
+
+        $filterData = array
+        (
+            "isbn"                           => "ISBN",
+            "title"                          => "Title",
+            "author"                         => "Author",
+            "category"                       => "Category",
+            "COUNT(copybook)"                => "'Total Reserved'",
+            "COUNT(DISTINCT id)"             => "'Copies'",
+            "sum(DISTINCT IF(((curdate() between date_start AND date_finish) AND sent IS NOT null),1,0))" => "'Sent'",
+            "((COUNT(DISTINCT id))-(sum(DISTINCT if(((curdate() between date_start AND date_finish) and sent is not null),1,0))))" => "'Not Sent'",
+            'SUM(DISTINCT IF(status = "New",1,0))'    => "'New'",
+            'SUM(DISTINCT IF(status = "Good", 1, 0))' => "'Good'",
+            'SUM(DISTINCT IF(status = "Bad", 1, 0))'  => "'Bad'"
+        );
+
+
+        $sentence =
+            "
+                SELECT ".$this->getQueryNamesFormat($filterData)."
+                FROM (copybooks LEFT JOIN books ON book = isbn) LEFT JOIN reserves ON copybook = id
+            ";
+
+        if($search != "")
+        {
+            $sentence .=  $this->getSearchLikeFormat($filterData, $search, "WHERE");
+        }
+
+        $sentence .= " GROUP BY book";
+
+        if ($category != "" && $category != "*") {
+            $sentence .= " ORDER BY `" . $category."` DESC";
+        }
+
+
+        $this->setContent(
+            stylesUser::filterMenu
+            (
+                "Order by",
+                "Default",
+                $filterData,
+                "Search...",
+                "showTableBooks",
+                $this->sid
+            ).
+
+            stylesUser::table
+            (
+                $this->select($sentence)
+            )
+        );
+    }
 
     public function showAdministrateBooks(){}
 
@@ -220,23 +332,6 @@ class Librarian extends User{
 
     }
 
-
-
-
-    protected function getSearchLikeFormat($filterData, $search){
-
-        $sentence =  " AND ( ";
-
-        foreach($filterData as $key =>$value){
-            $sentence .= " LOWER(".$key.")   LIKE LOWER('%" . $search . "%') OR";
-        }
-
-        $sentence = trim($sentence, "OR");
-
-        $sentence .= ")";
-
-        return $sentence;
-    }
 
     public function __toString()
     {

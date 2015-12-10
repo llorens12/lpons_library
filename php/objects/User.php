@@ -45,28 +45,18 @@ class User extends Template{
                 WHERE user =  '".$this->emailUser."'
             ";
 
+        unset($filterData['sent'], $filterData['received']);
 
         if ($category != "" && $category != "*") {
-            $sentence .= " ORDER BY " . $category;
+            $sentence .= " ORDER BY `" . $category."` DESC";
         }
 
         elseif($search != "")
         {
-            $sentence .=
-            "
-                AND
-                (    LOWER(author)   LIKE LOWER('%" . $search . "%')
-                OR   LOWER(title)    LIKE LOWER('%" . $search . "%')
-                OR   LOWER(isbn)     LIKE LOWER('%" . $search . "%')
-                OR   date_start      =           '" . $search . "'
-                OR   date_finish     =           '" . $search . "'
-                OR   sent            =           '" . $search . "'
-                OR   received        =           '" . $search . "'
-                )
-            ";
+            $sentence .=  $this->getSearchLikeFormat($filterData, $search);
         }
 
-        unset($filterData['sent'], $filterData['received']);
+
 
         $this->setContent(
             stylesUser::filterMenu
@@ -711,6 +701,25 @@ class User extends Template{
 
         $nameFormat = trim($nameFormat,", ");
         return $nameFormat;
+    }
+
+    protected function getSearchLikeFormat($filterData, $search, $type = "AND"){
+
+        $sentence =  " ".$type." ( ";
+
+        foreach($filterData as $key =>$value){
+            if(strpos($key,'(') || strpos($key,'()'))
+                $sentence .= " LOWER(".$value.")   LIKE LOWER('%" . $search . "%') OR";
+
+            else
+                $sentence .= " LOWER(".$key.")   LIKE LOWER('%" . $search . "%') OR";
+        }
+
+        $sentence = trim($sentence, "OR");
+
+        $sentence .= ")";
+
+        return $sentence;
     }
 
 
