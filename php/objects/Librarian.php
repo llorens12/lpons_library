@@ -56,7 +56,7 @@ class Librarian extends User{
                 true,
                 true,
                 false,
-                "Users",
+                "User",
                 ["Email"],
                 false,
                 0,
@@ -78,6 +78,51 @@ class Librarian extends User{
     public function showAdministrateReserves(){}
 
     public function showAddReserves(){}
+
+
+    public function showEditUser($error){
+        $_SESSION['menu'] = "Users";
+
+        $user = mysqli_fetch_assoc
+        (
+            $this->select
+            ("
+                SELECT email, name, surname, telephone, home, typeUser
+                FROM users
+                WHERE email != '{$this->emailUser}' AND typeUser = 'User'
+            ")
+        );
+
+        $this->setContent
+        (
+            stylesUser::contentAdministrateUser
+            (
+                $user,
+                $this->sid,
+                $error,
+                "setUpdateUser&previousEmail=".$user['email']
+            )
+        );
+    }
+
+    public function setUpdateUser($request){
+
+        unset($request['typeUser'], $request['registered']);
+
+
+        if(isset($request['pwd']) && ($request['pwd'] == "" || $request['pwd'] == " ")){
+            unset($request['pwd']);
+        }
+        else
+            $request['pwd'] = md5($request['pwd']);
+
+
+        $where = "email = '".$request['previousEmail']."'";
+        unset($request['previousEmail']);
+
+
+        return ($this->update("users",$request,$where));
+    }
 
 
 

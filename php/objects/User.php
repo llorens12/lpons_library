@@ -350,7 +350,7 @@ class User extends Template{
 
         $this->setContent
         (
-            stylesUser::contentFormMyProfile
+            stylesUser::contentAdministrateUser
             (
                 mysqli_fetch_assoc
                 (
@@ -362,7 +362,8 @@ class User extends Template{
                     ")
                 ),
                 $this->sid,
-                $error
+                $error,
+                "setUpdateMyProfile"
             )
         );
     }

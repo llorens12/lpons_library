@@ -443,7 +443,7 @@ class stylesUser{
                     ';
     }
 
-    public static function contentFormMyProfile($user, $sid, $error = ""){
+    public static function contentAdministrateUser($user, $sid, $error, $methodUpdate){
 
         $hidden = "hidden";
 
@@ -455,10 +455,10 @@ class stylesUser{
             '
             <div class="row row-centered container-form">
 
-                <form class="col-lg-12 col-md-12 col-sm-12 col-xs-12 content-form" action="controller.php?update=setUpdateMyProfile'.$sid.'" method="POST">
+                <form class="col-lg-12 col-md-12 col-sm-12 col-xs-12 content-form" action="controller.php?update='.$methodUpdate.$sid.'" method="POST">
                     <div class="inputs-content-form">
                         <h2>My Profile</h2>
-                        '.stylesUser::myProfile($user).'
+                        '.stylesUser::formAdministrateUser($user).'
                     </div>
                     <label class="label label-danger '.$hidden.'" id="label-error-personalized-reserve">The email is not aviable</label>
                     <br>
@@ -472,7 +472,7 @@ class stylesUser{
                     ';
     }
 
-    public static function myProfile($currentUser){
+    public static function formAdministrateUser($currentUser){
 
         $User =
             '

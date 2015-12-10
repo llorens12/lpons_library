@@ -162,6 +162,11 @@ else {
                 $user->showMyProfile((isset($_REQUEST['error']))? "error" : "");
                 break;
 
+            case "showEditUser":
+
+                $user->showEditUser((isset($_REQUEST['error']))? "error" : "");
+                break;
+
             case "showError":
 
                 (isset($_REQUEST['error'])) ?
@@ -247,6 +252,24 @@ else {
                 if($user->setUpdateMyProfile($_REQUEST))
                 {
                     header('Location: controller.php?method=showMyProfile'. htmlspecialchars(SID));
+
+                }
+                else
+                {
+                    if(strpos($_SERVER['HTTP_REFERER'], "&error="))
+                        header('Location: '.$_SERVER['HTTP_REFERER'].htmlspecialchars(SID));
+
+                    else
+                        header('Location: '.$_SERVER['HTTP_REFERER'].'&error=""'.htmlspecialchars(SID));
+                }
+                break;
+
+            case "setUpdateUser":
+
+                unset($_REQUEST['update']);
+                if($user->setUpdateUser($_REQUEST))
+                {
+                    header('Location: controller.php?method=showAdministrateUsers'. htmlspecialchars(SID));
 
                 }
                 else
