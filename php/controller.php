@@ -142,6 +142,20 @@ else {
                 $user->showReserves($category,$search);
                 break;
 
+            case "showDefaulters":
+
+                $category = "";
+                $search   = "";
+
+                if(isset($_REQUEST['category']))
+                    $category = $_REQUEST['category'];
+
+                if(isset($_REQUEST['search']))
+                    $search = $_REQUEST['search'];
+
+                $user->showDefaulters($category,$search);
+                break;
+
             case "showAdministrateUsers":
 
                 $category = "";
@@ -165,6 +179,11 @@ else {
             case "showEditUser":
 
                 $user->showEditUser((isset($_REQUEST['error']))? "error" : "");
+                break;
+
+            case "showAddUser":
+
+                $user->showAddUser();
                 break;
 
             case "showError":
@@ -210,6 +229,13 @@ else {
                     null;
                 break;
 
+            case "setInsertUser":
+
+                unset($_REQUEST['insert']);
+                $user->setInsertUser($_REQUEST);
+                header('Location: controller.php?method=showAdministrateUsers'.htmlspecialchars(SID));
+                break;
+
         }
     }
     elseif(isset($_REQUEST['delete'])){
@@ -222,6 +248,12 @@ else {
                     header('Location: controller.php?method=showReserves'.htmlspecialchars(SID))
                     :
                     null;
+                break;
+
+            case "setDeleteUser":
+
+                $user->setDeleteUser($_REQUEST['Email']);
+                header('Location: '.$_SERVER['HTTP_REFERER'].htmlspecialchars(SID));
                 break;
 
         }

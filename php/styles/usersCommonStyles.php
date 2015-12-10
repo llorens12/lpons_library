@@ -443,7 +443,7 @@ class stylesUser{
                     ';
     }
 
-    public static function contentAdministrateUser($user, $sid, $error, $methodUpdate){
+    public static function contentAdministrateUser($user, $sid, $error, $sentenceType, $sentence){
 
         $hidden = "hidden";
 
@@ -455,7 +455,7 @@ class stylesUser{
             '
             <div class="row row-centered container-form">
 
-                <form class="col-lg-12 col-md-12 col-sm-12 col-xs-12 content-form" action="controller.php?update='.$methodUpdate.$sid.'" method="POST">
+                <form class="col-lg-12 col-md-12 col-sm-12 col-xs-12 content-form" action="controller.php?'.$sentenceType.'='.$sentence.$sid.'" method="POST">
                     <div class="inputs-content-form">
                         <h2>My Profile</h2>
                         '.stylesUser::formAdministrateUser($user).'

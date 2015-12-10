@@ -65,9 +65,86 @@ class Librarian extends User{
         );
     }
 
-    public function showDefaulters(){}
+    public function showDefaulters($category = "", $search = ""){
+        $_SESSION['menu'] = "Users";
 
-    public function showAddUser(){}
+        $filterData = array
+        (
+            "name"          => "Name",
+            "surname"       => "Surname",
+            "email"         => "Email",
+            "telephone"     => "Telephone",
+            "registered"    => "Registered"
+        );
+
+
+        $sentence =
+            "
+                SELECT ".$this->getQueryNamesFormat($filterData)."
+                FROM reserves JOIN users on user = email
+                WHERE
+                    date_finish < '".date('Y-m-d')."'
+                AND
+                    sent is not null
+                AND
+                    received is null
+            ";
+
+
+        if ($category != "" && $category != "*") {
+            $sentence .= " ORDER BY " . $category;
+        }
+
+        elseif($search != "")
+        {
+            $sentence .=  $this->getSearchLikeFormat($filterData, $search);
+        }
+
+
+        $this->setContent(
+            stylesUser::filterMenu
+            (
+                "Order by",
+                "Default",
+                $filterData,
+                "Search...",
+                "showDefaulters",
+                $this->sid
+            ).
+
+            stylesUser::table
+            (
+                $this->select($sentence)
+            )
+        );
+    }
+
+    public function showAddUser()
+    {
+        $_SESSION['menu'] = "Users";
+
+        $user = array
+        (
+            "name"      => "",
+            "surname"   => "",
+            "email"     => "",
+            "telephone" => "",
+            "home"      => "NULL",
+            "typeUser"  => "User"
+        );
+
+        $this->setContent
+        (
+            stylesUser::contentAdministrateUser
+            (
+                $user,
+                $this->sid,
+                "",
+                "insert",
+                "setInsertUser"
+            )
+        );
+    }
 
     public function showTableBooks(){}
 
@@ -79,6 +156,17 @@ class Librarian extends User{
 
     public function showAddReserves(){}
 
+
+    public function setInsertUser($request){
+
+        unset($request['typeUser'], $request['registered']);
+
+        $request['registered'] = date('Y-m-d');
+        $request['typeUser'] = "User";
+        $request['pwd'] = md5($request['pwd']);
+
+        return $this->insert("users",$request);
+    }
 
     public function showEditUser($error){
         $_SESSION['menu'] = "Users";
@@ -100,6 +188,7 @@ class Librarian extends User{
                 $user,
                 $this->sid,
                 $error,
+                "update",
                 "setUpdateUser&previousEmail=".$user['email']
             )
         );
@@ -123,6 +212,14 @@ class Librarian extends User{
 
         return ($this->update("users",$request,$where));
     }
+
+    public function setDeleteUser($email){
+
+        if($email != $this->emailUser)
+           $this->delete("users","email = '".$email."'");
+
+    }
+
 
 
 
@@ -164,7 +261,7 @@ class Librarian extends User{
 
         ($this->getContent() == "")?
 
-            $this->showError("ERROR: action not found")
+            $this->showError("ERROR: This option is empty")
             :
             NULL;
 

@@ -363,6 +363,7 @@ class User extends Template{
                 ),
                 $this->sid,
                 $error,
+                "update",
                 "setUpdateMyProfile"
             )
         );

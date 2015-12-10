@@ -39,9 +39,39 @@ $(document).ready(function()
                 $("#form-filter-menu").submit();
             }
         });
+
+        $('#email').blur(function(evt){
+
+            var email = $('#email');
+            var verification= "ajax=emailDisponibility&email="+email.val();
+
+
+            if(!disponibilityAjax(verification)) {
+
+                email.attr("placeholder","This email is not available").val("").parent().addClass("has-error");
+            }else{
+                email.parent().removeClass("has-error");
+            }
+        });
+
     }
 
 );
+
+function checkRegisterContent(event){
+
+    var pwd = $('#pwd');
+    var pwd1 = $('#pwd1');
+
+    if(pwd.val() !== pwd1.val() || pwd.val() == ""){
+        $('#error').html('<h5><span class="label label-danger">Incorrect fields</span></h5>');
+        pwd.val("").parent().addClass("has-error");
+        pwd1.val("").parent().addClass("has-error");
+
+        return false;
+    }
+    return true;
+}
 
 
 function checkReserveDisponibility(){
@@ -62,24 +92,7 @@ function checkReserveDisponibility(){
 
 }
 
-function checkRegisterContent(event){
 
-    var pwd = $('#pwd');
-    var pwd1 = $('#pwd1');
-    var email = $('#email');
-    var verification= "ajax=emailDisponibility&email="+email.val();
-
-
-    if(!disponibilityAjax(verification) || pwd.val() !== pwd1.val() || pwd.val() == ""){
-        $('#error').html('<h5><span class="label label-danger">Incorrect fields</span></h5>');
-        pwd.val("").parent().addClass("has-error");
-        pwd1.val("").parent().addClass("has-error");
-        email.val("").parent().addClass("has-error");
-
-        return false;
-    }
-    return true;
-}
 
 
 function disponibilityAjax(dataString){
@@ -97,7 +110,6 @@ function disponibilityAjax(dataString){
         data: dataString,
         success: function(data)
         {
-            console.log(data);
             disponibility = (data == "true");
         }
     });
