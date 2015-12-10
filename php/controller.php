@@ -18,7 +18,7 @@ if (!isset($_SESSION['email'], $_SESSION['typeUser'], $_SESSION['name'], $_SESSI
 }
 
 
-register_shutdown_function('fatalErrorHandler');
+//register_shutdown_function('fatalErrorHandler');
 
 
 if (isset($_REQUEST['ajax'])) {
@@ -136,10 +136,25 @@ else {
                 if(isset($_REQUEST['category']))
                     $category = $_REQUEST['category'];
 
-                elseif(isset($_REQUEST['search']))
+                if(isset($_REQUEST['search']))
                     $search = $_REQUEST['search'];
 
                 $user->showReserves($category,$search);
+                break;
+
+            case "showAdministrateUsers":
+
+                $category = "";
+                $search   = "";
+
+                if(isset($_REQUEST['category']))
+                    $category = $_REQUEST['category'];
+
+                if(isset($_REQUEST['search'])) {
+                    $search = $_REQUEST['search'];
+                }
+
+                $user->showAdministrateUsers($category,$search);
                 break;
 
             case "showMyProfile":

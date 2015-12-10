@@ -66,7 +66,7 @@ class Anonimous extends Template{
     public function insertUser($request)
     {
         $request['pwd']         = md5($request['pwd']);
-        $request['typeUser']    = "user";
+        $request['typeUser']    = "User";
         $request['registered']  = date('Y-m-d');
         $request['home']        = "showBooks";
 

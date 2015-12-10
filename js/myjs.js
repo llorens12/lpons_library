@@ -31,6 +31,14 @@ $(document).ready(function()
             }
 
         });
+
+        $("#search").keypress(function(e)
+        {
+            if(e.which == 13)
+            {
+                $("#form-filter-menu").submit();
+            }
+        });
     }
 
 );

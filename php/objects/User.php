@@ -356,7 +356,7 @@ class User extends Template{
                 (
                     $this->select
                     ("
-                        SELECT email, name, surname, telephone, home
+                        SELECT email, name, surname, telephone, home, typeUser
                         FROM users
                         WHERE email = '{$this->emailUser}'
                     ")

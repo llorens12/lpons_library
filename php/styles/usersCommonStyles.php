@@ -3,7 +3,7 @@
 
 class stylesUser{
 
-    public static function table($data, $edit = false, $drop = false, $info = false, $typeObject = "", $primaryKeys, $reserveDelimiter = false, $MAX_DAYS_RESERVE = 0, $sid)
+    public static function table($data, $edit = false, $drop = false, $info = false, $typeObject = "", $primaryKeys = "", $reserveDelimiter = false, $MAX_DAYS_RESERVE = 0, $sid = "")
     {
         $contentThead   = "<th>#</th>";
         $objectNumber   = 1;
@@ -89,19 +89,11 @@ class stylesUser{
                 ';
             }
 
-            $contentTbody .=
-                '
-                  </tr>
-                ';
-
             return $contentTbody;
         };
 
 
-
-
-
-        while ($object = $data->fetch_assoc())
+        while ($object = mysqli_fetch_assoc($data))
         {
             $contentTr = "";
             $recived = "";
@@ -137,31 +129,46 @@ class stylesUser{
                 . $contentTr;
 
 
-            ($reserveDelimiter
+            if($reserveDelimiter
             && is_null($recived)
-            && date_create($object['Start'])->diff(date_create($object['End']))->format("d") < $MAX_DAYS_RESERVE )?
-
-                $stateEdit = ""
-                    :
+            && date_create($object['Start'])->diff(date_create($object['End']))->format("d") < $MAX_DAYS_RESERVE )
+            {
+                $stateEdit = "";
+            }
+            elseif($reserveDelimiter)
+            {
                 $stateEdit = "not-active";
+            }
 
-
-
-            ($reserveDelimiter
+            if($reserveDelimiter
             && is_null($sent) && is_null($recived)
-            && date_create($object['Start'])->diff(date_create($object['End']))->format("d") < $MAX_DAYS_RESERVE )?
-
-                $stateDelete = ""
-                    :
+            && date_create($object['Start'])->diff(date_create($object['End']))->format("d") < $MAX_DAYS_RESERVE )
+            {
+                $stateDelete = "";
+            }
+            elseif($reserveDelimiter)
+            {
                 $stateDelete = "not-active";
+            }
 
             $valueLink = "";
-            foreach($primaryKeys as $singleKey){
-                $valueLink .= $singleKey."=".$object[$singleKey]."&";
+
+            if(is_array($primaryKeys)) {
+
+
+                foreach ($primaryKeys as $singleKey) {
+                    $valueLink .= $singleKey . "=" . $object[$singleKey] . "&";
+                }
+                $valueLink = trim($valueLink, "&");
             }
-            $valueLink = trim($valueLink, "&");
 
             $contentTbody .= $tbodyOptions($edit,$drop, $info, $typeObject, $valueLink, $stateEdit, $stateDelete, $sid);
+
+
+            $contentTbody .=
+                '
+                  </tr>
+                ';
 
             $objectNumber++;
         }
@@ -216,9 +223,8 @@ class stylesUser{
         return
             '
                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" id="options-books">
-                    <form action="controller.php?method='.$method.$sid.'" method="POST" >
+                    <form id="form-filter-menu" action="controller.php?method='.$method.$sid.'" method="POST" >
                         <div class="btn-group sub-menu" id="btn-category">
-
                             <button class="btn btn-default active btn-md dropdown-toggle" name="btnCategory" value="'.$nameFilter.'">
                                 '.$nameFilter.'
                                 <span class="caret"></span>
@@ -228,15 +234,9 @@ class stylesUser{
                                 '.$filter.'
 
                             </ul>
-
                         </div>
-
-
-
-
                             <div class="input-group" id="books-search">
-
-                                <input type="search" name="search" class="form-control" placeholder="'.$placeHolderSearch.'" required="">
+                                <input type="search" id="search" class="form-control" placeholder="'.$placeHolderSearch.'" required="" name="search" />
                                 <span class="input-group-addon icons"><i class="fa fa-search"></i></span>
                             </div>
                         </form>
@@ -444,17 +444,7 @@ class stylesUser{
     }
 
     public static function contentFormMyProfile($user, $sid, $error = ""){
-        $optionsMenu =
-            '
-            <option value="showBooks">Books</option>
-            <option value="showReserves">My Reserves</option>
-        ';
 
-        return stylesUser::formMyProfile($user, $sid, $error, $optionsMenu);
-
-    }
-
-    public static function formMyProfile($user, $sid, $error, $optionsMenu){
         $hidden = "hidden";
 
         if($error != ""){
@@ -468,7 +458,7 @@ class stylesUser{
                 <form class="col-lg-12 col-md-12 col-sm-12 col-xs-12 content-form" action="controller.php?update=setUpdateMyProfile'.$sid.'" method="POST">
                     <div class="inputs-content-form">
                         <h2>My Profile</h2>
-                        '.stylesUser::myProfile($user, $optionsMenu).'
+                        '.stylesUser::myProfile($user).'
                     </div>
                     <label class="label label-danger '.$hidden.'" id="label-error-personalized-reserve">The email is not aviable</label>
                     <br>
@@ -482,10 +472,52 @@ class stylesUser{
                     ';
     }
 
-    public static function myProfile($user, $optionsHome){
+    public static function myProfile($currentUser){
+
+        $User =
+            '
+            <option value="showBooks">Books</option>
+            <option value="showReserves">My Reserves</option>
+        ';
+
+        $User = str_replace($currentUser['home'].'"', $currentUser['home'].'" selected', $User);
+
+
+        $Librarian =
+            '
+          <optgroup label="Users">
+            <option value="showAdministrateUsers">Administrate</option>
+            <option value="showDefaulters">Defaulters</option>
+            <option value="showAddUser">Add</option>
+          </optgroup>
+
+          <optgroup label="Books">
+            <option value="showBooks">Show</option>
+            <option value="showTableBooks">Table Info</option>
+            <option value="showAdministrateBooks">Administrate</option>
+            <option value="showAddBook">Add</option>
+          </optgroup>
+
+          <optgroup label="Reserves">
+            <option value="showReserves">My Reserves</option>
+            <option value="showAdministrateReserves">Administrate</option>
+            <option value="showAddReserves">Add</option>
+          </optgroup>
+
+
+        ';
+
+
+        $Librarian = str_replace($currentUser['home'].'"', $currentUser['home'].'" selected', $Librarian);
+
+        if($currentUser['typeUser'] == "Admin")
+            $optionsHome = $Librarian;
+
+        else
+            $optionsHome = $$currentUser['typeUser'];
 
         return
-            stylesAnonimous::formRegister($user).'
+            stylesAnonimous::formRegister($currentUser).'
 
 
             <div class="input-group">
@@ -517,16 +549,11 @@ class stylesLibrarian
         return '
             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
                 <div class="btn-group btn-menu sub-menu">
-                    <a class="btn btn-'.$Users.' btn-lg  dropdown-toggle" >
+                    <a href="controller.php?method=showAdministrateUsers'.$sid.'" class="btn btn-'.$Users.' btn-lg  dropdown-toggle" >
                         Users
                         <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li>
-                            <a href="controller.php?method=showAllInformationUsers'.$sid.'">
-                                All info
-                            </a>
-                        </li>
                         <li>
                             <a href="controller.php?method=showAdministrateUsers'.$sid.'">
                                 Administrate
@@ -547,10 +574,9 @@ class stylesLibrarian
                 </div>
             </div>
 
-
             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
                 <div class="btn-group btn-menu sub-menu">
-                    <a class="btn btn'.$Books.' btn-lg  dropdown-toggle" >
+                    <a  href="controller.php?method=showBooks'.$sid.'" class="btn btn-'.$Books.' btn-lg  dropdown-toggle" >
                         Books
                         <span class="caret"></span>
                     </a>
@@ -565,7 +591,6 @@ class stylesLibrarian
                                 Table Info
                             </a>
                         </li>
-
                         <li>
                             <a href="controller.php?method=showAdministrateBooks'.$sid.'">
                                 Administrate
@@ -583,47 +608,31 @@ class stylesLibrarian
 
             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
                 <div class="btn-group btn-menu sub-menu">
-                    <a class="btn btn'.$Reserves.' btn-lg  dropdown-toggle" >
+                    <a href="controller.php?method=showReserves'.$sid.'" class="btn btn-'.$Reserves.' btn-lg  dropdown-toggle" >
                         Reserves
                         <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
+                         <li>
+                            <a href="controller.php?method=showReserves'.$sid.'">
+                                My reserves
+                            </a>
+                        </li>
                         <li>
                             <a href="controller.php?method=showAdministrateReserves'.$sid.'">
                                 Administrate
                             </a>
                         </li>
+                        <li role="separator" class="divider"></li>
                         <li>
-                            <a href="controller.php?method=showReserves'.$sid.'">
-                                My reserves
+                            <a href="controller.php?method=showAddReserves'.$sid.'">
+                                Add
                             </a>
                         </li>
                     </ul>
                 </div>
             </div>
             ';
-    }
-
-    public static function contentFormMyProfile($user, $sid, $error = ""){
-        $optionsMenu =
-        '
-          <optgroup label="Users">
-            <option value="showAllInformationUsers">All info</option>
-            <option value="showAdministrateUsers">Administrate</option>
-            <option value="showDefaulters">Defaulters</option>
-            <option value="showAddUser">Add</option>
-          </optgroup>
-
-          <optgroup label="Books">
-            <option value="showBooks">Show</option>
-            <option value="showTableBooks">Table Info</option>
-            <option value="showAdministrateBooks">Administrate</option>
-            <option value="showAddBook">Add</option>
-          </optgroup>
-        ';
-
-        return stylesUser::formMyProfile($user, $sid, $error, $optionsMenu);
-
     }
 
 }
