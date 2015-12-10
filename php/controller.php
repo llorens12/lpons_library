@@ -170,7 +170,6 @@ else {
                 $user->showTableBooks($category,$search);
                 break;
 
-
             case "showTableCopies":
 
                 $category = "";
@@ -200,6 +199,21 @@ else {
                 $user->showAdministrateUsers($category,$search);
                 break;
 
+            case "showAdministrateBooks":
+
+                $category = "";
+                $search   = "";
+
+                if(isset($_REQUEST['category']))
+                    $category = $_REQUEST['category'];
+
+                if(isset($_REQUEST['search'])) {
+                    $search = $_REQUEST['search'];
+                }
+
+                $user->showAdministrateBooks($category,$search);
+                break;
+
             case "showMyProfile":
 
                 $user->showMyProfile((isset($_REQUEST['error']))? "error" : "");
@@ -207,12 +221,21 @@ else {
 
             case "showEditUser":
 
-                $user->showEditUser((isset($_REQUEST['error']))? "error" : "");
+                $user->showEditUser($_REQUEST);
+                break;
+
+            case "showEditBook":
+                $user->showEditBook($_REQUEST);
                 break;
 
             case "showAddUser":
 
                 $user->showAddUser();
+                break;
+
+            case "showAddCopy":
+
+                $user->showAddCopy($_REQUEST['ISBN']);
                 break;
 
             case "showError":
@@ -262,7 +285,14 @@ else {
 
                 unset($_REQUEST['insert']);
                 $user->setInsertUser($_REQUEST);
-                header('Location: controller.php?method=showAdministrateUsers'.htmlspecialchars(SID));
+                header('Location: controller.php?method=showAdministrateUsers&search='.$_REQUEST['email'].htmlspecialchars(SID));
+                break;
+
+            case "setInsertBook":
+
+                unset($_REQUEST['insert']);
+                $user->setInsertBook($_REQUEST);
+                header('Location: controller.php?method=showAdministrateBooks&search='.$_REQUEST['isbn'].htmlspecialchars(SID));
                 break;
 
         }
@@ -285,6 +315,11 @@ else {
                 header('Location: '.$_SERVER['HTTP_REFERER'].htmlspecialchars(SID));
                 break;
 
+            case "setDeleteBook":
+
+                $user->setDeleteBook($_REQUEST['ISBN']);
+                header('Location: '.$_SERVER['HTTP_REFERER'].htmlspecialchars(SID));
+                break;
         }
     }
     elseif(isset($_REQUEST['update'])){

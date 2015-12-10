@@ -340,7 +340,7 @@ class User extends Template{
 
         $this->setContent
         (
-            stylesUser::contentAdministrateUser
+            stylesUser::contentForm
             (
                 mysqli_fetch_assoc
                 (

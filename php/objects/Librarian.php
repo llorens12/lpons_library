@@ -140,9 +140,10 @@ class Librarian extends User{
 
         $this->setContent
         (
-            stylesUser::contentAdministrateUser
+            stylesUser::contentForm
             (
-                $user,
+                "New User",
+                stylesUser::formAdministrateUser($user),
                 $this->sid,
                 "",
                 "insert",
@@ -260,14 +261,104 @@ class Librarian extends User{
         );
     }
 
-    public function showAdministrateBooks(){}
+    public function showAdministrateBooks($category = "", $search = ""){
+        $_SESSION['menu'] = "Books";
 
-    public function showAddBook(){}
+        $filterData = array
+        (
+            "isbn"                           => "ISBN",
+            "title"                          => "Title",
+            "author"                         => "Author",
+            "description"                    => "Description",
+            "category"                       => "Category"
+        );
+
+
+        $sentence =
+            "
+                SELECT ".$this->getQueryNamesFormat($filterData)."
+                FROM books
+            ";
+
+        if($search != "")
+        {
+            $sentence .=  $this->getSearchLikeFormat($filterData, $search, "WHERE");
+        }
+
+
+        if ($category != "" && $category != "*") {
+            $sentence .= " ORDER BY `" . $category."` DESC";
+        }
+
+
+        $this->setContent(
+            stylesUser::filterMenu
+            (
+                "Order by",
+                "Default",
+                $filterData,
+                "Search...",
+                "showAdministrateBooks",
+                $this->sid
+            ).
+
+            stylesUser::table
+            (
+                $this->select($sentence),
+                true,
+                true,
+                true,
+                "Book",
+                ["ISBN"],
+                false,
+                0,
+                $this->sid
+            )
+        );
+    }
+
+    public function showAddBook(){
+        $this->setContent
+        (
+            stylesUser::contentForm
+            (
+                "Add Book",
+                stylesLibrarian::formBook(),
+                $this->sid,
+                "",
+                "insert",
+                "setInsertBook"
+            )
+        );
+    }
+
+    public function showAddCopy($isbn){
+        $this->setContent
+        (
+            stylesUser::contentForm
+            (
+                "Add Book",
+                stylesLibrarian::formCopy($isbn),
+                $this->sid,
+                "",
+                "insert",
+                "setInsertCopy"
+            )
+        );
+    }
 
     public function showAdministrateReserves(){}
 
     public function showAddReserves(){}
 
+
+    public function setInsertCopy($copy){
+        return $this->insert("copybooks",$copy);
+    }
+
+    public function setInsertBook($request){
+
+    }
 
     public function setInsertUser($request){
 
@@ -280,8 +371,55 @@ class Librarian extends User{
         return $this->insert("users",$request);
     }
 
-    public function showEditUser($error){
+    public function showEditBook($request){
+        $_SESSION['menu'] = "Books";
+
+        $email = "";
+        $error = "";
+
+        if(isset($request['ISBN']))
+            $email = $request['ISBN'];
+
+        if(isset($request['error']))
+            $error = $request['error'];
+
+
+        $book = mysqli_fetch_assoc
+        (
+            $this->select
+            ("
+                SELECT *
+                FROM books
+                WHERE isbn = '".$email."'
+            ")
+        );
+
+        $this->setContent
+        (
+            stylesUser::contentForm
+            (
+                "Edit ".$book['title'],
+                stylesLibrarian::formBook($book),
+                $this->sid,
+                $error,
+                "update",
+                "setUpdateBook"
+            )
+        );
+    }
+
+    public function showEditUser($request){
         $_SESSION['menu'] = "Users";
+
+        $email = "";
+        $error = "";
+
+        if(isset($request['Email']))
+            $email = $request['Email'];
+
+        if(isset($request['error']))
+            $error = $request['error'];
+
 
         $user = mysqli_fetch_assoc
         (
@@ -289,15 +427,16 @@ class Librarian extends User{
             ("
                 SELECT email, name, surname, telephone, home, typeUser
                 FROM users
-                WHERE email != '{$this->emailUser}' AND typeUser = 'User'
+                WHERE email = '".$email."' AND typeUser = 'User'
             ")
         );
 
         $this->setContent
         (
-            stylesUser::contentAdministrateUser
+            stylesUser::contentForm
             (
-                $user,
+                "Edit ".$user['name'],
+                stylesUser::formAdministrateUser($user),
                 $this->sid,
                 $error,
                 "update",

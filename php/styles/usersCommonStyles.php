@@ -3,7 +3,7 @@
 
 class stylesUser{
 
-    public static function table($data, $edit = false, $drop = false, $info = false, $typeObject = "", $primaryKeys = "", $reserveDelimiter = false, $MAX_DAYS_RESERVE = 0, $sid = "")
+    public static function table($data, $edit = false, $drop = false, $add = false, $typeObject = "", $primaryKeys = "", $reserveDelimiter = false, $MAX_DAYS_RESERVE = 0, $sid = "")
     {
         $contentThead   = "<th>#</th>";
         $objectNumber   = 1;
@@ -15,16 +15,16 @@ class stylesUser{
 
 
 
-        $theadOptions = function ($edit,$drop, $info)
+        $theadOptions = function ($edit, $drop, $add)
             {
 
                 $contentThead = "";
 
-                if($info){
+                if($add){
                     $contentThead .=
                         "
                     <th>
-                        Info
+                        Add
                     </th>
                 ";
                 }
@@ -50,16 +50,16 @@ class stylesUser{
                 return $contentThead;
             };
 
-        $tbodyOptions = function ($edit,$drop, $info, $typeObject, $valueLink, $stateEdit, $stateDelete, $sid){
+        $tbodyOptions = function ($edit, $drop, $add, $typeObject, $valueLink, $stateEdit, $stateDelete, $sid){
 
             $contentTbody = "";
 
-            if($info){
+            if($add){
                 $contentTbody .=
                     '
                     <td>
-                        <a href="controller.php?method=showInfo' . $typeObject . '&' . $valueLink . $sid.'" title="Show more info">
-                            <i class="fa fa-info-circle"></i>
+                        <a href="controller.php?method=showAddCopy&' . $valueLink . $sid.'" title="Add new copy">
+                            <i class="fa fa-plus"></i>
                         </a>
                     </td>
                 ';
@@ -162,7 +162,7 @@ class stylesUser{
                 $valueLink = trim($valueLink, "&");
             }
 
-            $contentTbody .= $tbodyOptions($edit,$drop, $info, $typeObject, $valueLink, $stateEdit, $stateDelete, $sid);
+            $contentTbody .= $tbodyOptions($edit,$drop, $add, $typeObject, $valueLink, $stateEdit, $stateDelete, $sid);
 
 
             $contentTbody .=
@@ -178,7 +178,7 @@ class stylesUser{
             return "<h1 style='width: 100%; text-align: center'>Action not found</h1>";
         }
 
-        $contentThead .= $theadOptions($edit, $drop, $info);
+        $contentThead .= $theadOptions($edit, $drop, $add);
 
         return '
         <table class="table table-striped">
@@ -445,7 +445,7 @@ class stylesUser{
                     ';
     }
 
-    public static function contentAdministrateUser($user, $sid, $error, $sentenceType, $sentence){
+    public static function contentForm($title, $form, $sid, $error, $sentenceType, $sentence){
 
         $hidden = "hidden";
 
@@ -459,8 +459,8 @@ class stylesUser{
 
                 <form class="col-lg-12 col-md-12 col-sm-12 col-xs-12 content-form" action="controller.php?'.$sentenceType.'='.$sentence.$sid.'" method="POST">
                     <div class="inputs-content-form">
-                        <h2>My Profile</h2>
-                        '.stylesUser::formAdministrateUser($user).'
+                        <h2>'.$title.'</h2>
+                        '.$form.'
                     </div>
                     <label class="label label-danger '.$hidden.'" id="label-error-personalized-reserve">The email is not aviable</label>
                     <br>
@@ -643,6 +643,84 @@ class stylesLibrarian
             ';
     }
 
+    public static function formBook($data = ""){
+        $defaults = array
+        (
+            "isbn"          => "",
+            "title"         => "",
+            "description"   => "",
+            "summary"       => "",
+            "category"      => "",
+        );
+
+        if($data != "")
+        {
+            $vars = $data;
+            $required = "";
+        }
+        else
+        {
+            $vars = $defaults;
+            $required = 'required=""';
+        }
+
+        return
+        '
+            <div class="input-group">
+                <span class="input-group-addon icons" title="ISBN"><i class="fa fa-barcode"></i></span>
+                <input type="text" class="form-control" placeholder="ISBN" name="isbn" required="" title="ISBN" value="'.$vars['isbn'].'">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon icons" title="Title"><i class="fa fa-book"></i></span>
+                <input maxlength="50" type="text" class="form-control" placeholder="Title" name="title" required="" title="Title" value="'.$vars['title'].'">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon icons" title="Description"><i class="fa fa-text-height"></i></span>
+                <textarea maxlength="250" rows="2" class="form-control" placeholder="Desctiption..." name="description" required="" title="Description" >'.$vars['description'].'</textarea>
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon icons" title="Summary"><i class="fa fa-text-height"></i></span>
+                <textarea maxlength="3000" rows="5" class="form-control" placeholder="Summary..." name="summary" required="" title="Summary">'.$vars['summary'].'</textarea>
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon icons" title="Category"><i class="fa fa-hashtag"></i></span>
+                <input type="text" class="form-control" placeholder="Category: Action, Adventure, Comedy..." name="category" required="" title="Category" value="'.$vars['category'].'">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon icons" title="Cover"><i class="fa fa-file-image-o"></i></span>
+                <input type="file" class="form-control" name="img" '.$required.' title="Cover">
+            </div>
+        ';
+    }
+
+    public static function formCopy($data){
+
+        $New = "";
+        $Good = "";
+        $Bad = "";
+
+        if(isset($data['state'])){
+            $$data['status'] = "selected";
+        }
+
+
+        return
+        '
+            <div class="input-group">
+                <span class="input-group-addon icons" title="ISBN"><i class="fa fa-barcode"></i></span>
+                <input type="text" class="form-control" placeholder="ISBN" name="book" required="" title="ISBN" value="'.$data['isbn'].'" disabled>
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon icons" title="State"><i class="fa fa-clock-o"></i></span>
+                <select class="form-control" name="state" title="State">
+                    <option value="New" '.$New.'>New</option>
+                    <option value="Good" '.$Good.'>Good</option>
+                    <option value="Bad" '.$Bad.'>Bad</option>
+                </select>
+            </div>
+        ';
+    }
+
 }
 
 class stylesAnonimous{
@@ -717,18 +795,21 @@ class stylesAnonimous{
 
         $defaults = array
         (
-            "name" => "",
-            "surname" => "",
-            "email" => "",
+            "name"      => "",
+            "surname"   => "",
+            "email"     => "",
             "telephone" => "",
         );
 
-        $vars = $defaults;
-        $required = 'required=""';
-
-        if($data != "") {
+        if($data != "")
+        {
             $vars = $data;
             $required = "";
+        }
+        else
+        {
+            $vars = $defaults;
+            $required = 'required=""';
         }
 
         return
