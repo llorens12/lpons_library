@@ -13,7 +13,7 @@ session_start();
 
 if (!isset($_SESSION['email'], $_SESSION['typeUser'], $_SESSION['name'], $_SESSION['home'])) {
 
-    header('Location: index.php?uri='.$_SERVER['REQUEST_URI']);
+    header('Location: index.php');
 
 }
 
@@ -41,8 +41,13 @@ else {
 
     $user  = new $_SESSION['typeUser']($_SESSION['name'], $_SESSION['email'], $_SESSION['home'], SID);
 
-    if (isset($_REQUEST['method'])) {
-        switch ($_REQUEST['method']) {
+    if (isset($_REQUEST['method']))
+    {
+        $method = $_REQUEST['method'];
+        unset($_REQUEST['method']);
+
+        switch ($method)
+        {
 
             case "showLogin":
 
@@ -56,42 +61,14 @@ else {
 
             case "startSession":
 
+                if ($user->startSession($_REQUEST)) {
 
-                    $email = "";
-                    $pwd = "";
-                    $remember = false;
-
-                    if (isset($_REQUEST['email'], $_REQUEST['pwd'])) {
-                        $email = $_REQUEST['email'];
-                        $pwd = md5($_REQUEST['pwd']);
-                    } elseif (isset($_COOKIE['email'], $_COOKIE['pwd'])) {
-                        $email = $_COOKIE['email'];
-                        $pwd = $_COOKIE['pwd'];
-                    }
-
-                    if (isset($_REQUEST['rememberMe'])) {
-                        $remember = true;
-                    }
-
-
-                    if ($user->startSession($email, $pwd, $remember)) {
-
-                        if(isset($_SESSION['uri'])) {
-                            $uri = $_SESSION['uri'];
-                            unset($_SESSION['uri']);
-                            header('Location: ' . $uri.htmlspecialchars(SID));
-                        }
-
-                        header('Location: ' . $_SESSION['home'] . htmlspecialchars(SID));
-                    } else {
-                        $user->showLogin("Incorrect E-mail or Password");
-                    }
-
-                break;
-
-            case "showEditReserve":
-
-                $user->showEditReserve($_REQUEST);
+                    header('Location: ' . $_SESSION['home'] . htmlspecialchars(SID));
+                }
+                else
+                {
+                    $user->showLogin("Incorrect E-mail or Password");
+                }
                 break;
 
             case "logOut":
@@ -100,9 +77,14 @@ else {
                 header('Location: ../index.php');
                 break;
 
-            case "showUsers":
 
-                $user->showUsers();
+
+
+
+
+            case "showBook":
+
+                $user->showBook($_REQUEST['isbn']);
                 break;
 
             case "showBooks":
@@ -123,11 +105,6 @@ else {
                 $user->showBooks($category,$search);
                 break;
 
-            case "showBook":
-
-                $user->showBook($_REQUEST['isbn']);
-                break;
-
             case "showReserves":
 
                 $category = "";
@@ -142,7 +119,25 @@ else {
                 $user->showReserves($category,$search);
                 break;
 
-            case "showDefaulters":
+            case "showMyProfile":
+
+                $user->showMyProfile((isset($_REQUEST['error']))? "error" : "");
+                break;
+
+
+
+            case "showEditReserve":
+
+                $user->showEditReserve($_REQUEST);
+                break;
+
+
+
+
+
+            case "showTableUsers":
+
+            case "showTableDefaulters":
 
                 $category = "";
                 $search   = "";
@@ -153,7 +148,7 @@ else {
                 if(isset($_REQUEST['search']))
                     $search = $_REQUEST['search'];
 
-                $user->showDefaulters($category,$search);
+                $user->showTableDefaulters($category,$search);
                 break;
 
             case "showTableBooks":
@@ -183,6 +178,10 @@ else {
 
                 $user->showTableCopies($category,$search);
                 break;
+
+            case "showTableUsersReserves":
+
+
 
             case "showAdministrateUsers":
 
@@ -214,10 +213,30 @@ else {
                 $user->showAdministrateBooks($category,$search);
                 break;
 
-            case "showMyProfile":
+            case "showAdministrateCopies":
 
-                $user->showMyProfile((isset($_REQUEST['error']))? "error" : "");
+            case "showAdministrateUsersReserves":
+
+
+
+            case "showAddUser":
+
+                $user->showAddUser();
                 break;
+
+            case "showAddBook":
+
+                $user->showAddBook();
+                break;
+
+            case "showAddCopy":
+
+                $user->showAddCopy($_REQUEST);
+                break;
+
+            case "showAddReserves":
+
+
 
             case "showEditUser":
 
@@ -228,15 +247,13 @@ else {
                 $user->showEditBook($_REQUEST);
                 break;
 
-            case "showAddUser":
+            case "showEditCopy":
 
-                $user->showAddUser();
-                break;
+            case "showEditUserReserves":
 
-            case "showAddCopy":
 
-                $user->showAddCopy($_REQUEST['ISBN']);
-                break;
+
+
 
             case "showError":
 
@@ -250,87 +267,76 @@ else {
 
         }
     }
-    elseif(isset($_REQUEST['insert'])){
+    elseif(isset($_REQUEST['insert']))
+    {
+        $insert = $_REQUEST['insert'];
+        unset($_REQUEST['insert']);
 
-        switch ($_REQUEST['insert']){
+        switch ($insert)
+        {
 
             case "insertUser":
 
-                unset($_REQUEST['insert']);
                 (!$user->insertUser($_REQUEST))?
                     $user->showRegister("Register error")
                     :
                     header('Location: controller.php?method=showLogin'.htmlspecialchars(SID));
                 break;
 
-            case "setInsertPersonalizedReserve":
 
-                unset($_REQUEST['insert']);
-                ($user->setInsertPersonalizedReserve($_REQUEST))?
-                    header('Location: controller.php?method=showReserves'.htmlspecialchars(SID))
-                    :
-                    null;
-                break;
 
             case "setInsertDefaultReserve":
 
-                unset($_REQUEST['insert']);
-                ($user->setInsertDefaultReserve($_REQUEST))?
-                    header('Location: controller.php?method=showReserves'.htmlspecialchars(SID))
-                    :
-                    null;
+                $user->setInsertDefaultReserve($_REQUEST);
+                header('Location: controller.php?method=showReserves'.htmlspecialchars(SID))
                 break;
+
+            case "setInsertPersonalizedReserve":
+
+                $user->setInsertPersonalizedReserve($_REQUEST);
+                header('Location: controller.php?method=showReserves'.htmlspecialchars(SID))
+                break;
+
+
+
 
             case "setInsertUser":
 
-                unset($_REQUEST['insert']);
                 $user->setInsertUser($_REQUEST);
                 header('Location: controller.php?method=showAdministrateUsers&search='.$_REQUEST['email'].htmlspecialchars(SID));
                 break;
 
             case "setInsertBook":
 
-                unset($_REQUEST['insert']);
                 $user->setInsertBook($_REQUEST);
                 header('Location: controller.php?method=showAdministrateBooks&search='.$_REQUEST['isbn'].htmlspecialchars(SID));
                 break;
 
+            case "setInsertCopy":
+
+                $user->setInsertCopy($_REQUEST);
+                header('Location: controller.php?method=showAdministrateCopies&search='.$_REQUEST['isbn'].htmlspecialchars(SID));
+                break;
+
+            case "setInsertUserReserve":
+
+
+
         }
     }
-    elseif(isset($_REQUEST['delete'])){
-        switch ($_REQUEST['delete']) {
+    elseif(isset($_REQUEST['update']))
+    {
+        $update = $_REQUEST['update'];
+        unset($_REQUEST['update']);
 
-            case "setDeleteReserve":
-
-                unset($_REQUEST['delete']);
-                ($user->setDeleteReserve($_REQUEST))?
-                    header('Location: controller.php?method=showReserves'.htmlspecialchars(SID))
-                    :
-                    null;
-                break;
-
-            case "setDeleteUser":
-
-                $user->setDeleteUser($_REQUEST['Email']);
-                header('Location: '.$_SERVER['HTTP_REFERER'].htmlspecialchars(SID));
-                break;
-
-            case "setDeleteBook":
-
-                $user->setDeleteBook($_REQUEST['ISBN']);
-                header('Location: '.$_SERVER['HTTP_REFERER'].htmlspecialchars(SID));
-                break;
-        }
-    }
-    elseif(isset($_REQUEST['update'])){
-        switch($_REQUEST['update']){
+        switch($update)
+        {
 
             case "setUpdateReserve":
 
-                unset($_REQUEST['update']);
                 if($user->setUpdateReserve($_REQUEST))
                 {
-                    header('Location: controller.php?method=showReserves'. htmlspecialchars(SID));
+                    header('Location: controller.php?method=showReserves&search='.$_REQUEST['isbn']. htmlspecialchars(SID));
                 }
                 else
                 {
@@ -360,12 +366,15 @@ else {
                 }
                 break;
 
+
+
+
             case "setUpdateUser":
 
                 unset($_REQUEST['update']);
                 if($user->setUpdateUser($_REQUEST))
                 {
-                    header('Location: controller.php?method=showAdministrateUsers'. htmlspecialchars(SID));
+                    header('Location: controller.php?method=showTableUsers&search='.$_REQUEST['Email']. htmlspecialchars(SID));
 
                 }
                 else
@@ -376,6 +385,54 @@ else {
                     else
                         header('Location: '.$_SERVER['HTTP_REFERER'].'&error=""'.htmlspecialchars(SID));
                 }
+                break;
+
+            case "setUpdateBook":
+
+            case "setUpdateCopy":
+
+            case "setUpdateUserReserve":
+
+
+        }
+    }
+    elseif(isset($_REQUEST['delete']))
+    {
+        $delete = $_REQUEST['delete'];
+        unset($_REQUEST['delete']);
+
+        switch ($delete) {
+
+            case "setDeleteReserve":
+
+                $user->setDeleteReserve($_REQUEST);
+                header('Location: controller.php?method=showReserves'.htmlspecialchars(SID));
+                break;
+
+
+
+            case "setDeleteUser":
+
+                $user->setDeleteUser($_REQUEST['Email']);
+                header('Location: controller.php?method=showAdministrateUsers'.htmlspecialchars(SID));
+                break;
+
+            case "setDeleteBook":
+
+                $user->setDeleteBook($_REQUEST['ISBN']);
+                header('Location: controller.php?method=showAdministrateBooks'.htmlspecialchars(SID));
+                break;
+
+            case "setDeleteCopy":
+
+                $user->setDeleteCopy($_REQUEST['id']);
+                header('Location: controller.php?method=showAdministrateCopies'.htmlspecialchars(SID));
+                break;
+
+            case "setDeleteUserReserve":
+
+                $user->setDeleteUserReserve($_REQUEST);
+                header('Location: controller.php?method=showAdministrateUsersReserves'.htmlspecialchars(SID));
                 break;
         }
     }

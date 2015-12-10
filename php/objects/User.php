@@ -14,71 +14,46 @@ class User extends Template{
 
 
 
-    public function showReserves($category = "",$search = "")
+
+    public function showBook($isbn)
     {
-        $_SESSION['menu'] = "Reserves";
 
-        $filterData = array
+        $_SESSION['menu']="Books";
+
+        $this->setContent
         (
-            "isbn"          => "ISBN",
-            "title"         => "Title",
-            "author"        => "Author",
-            "category"      => "Category",
-            "date_start"    => "Start",
-            "date_finish"   => "End",
-            "sent"          => "Sent",
-            "received"      => "Received"
-        );
-
-
-        $sentence =
-            "
-                SELECT ".$this->getQueryNamesFormat($filterData)."
-                FROM
-                (
-                    reserves
-                    LEFT JOIN copybooks
-                    ON copybook = id
-                )
-                LEFT JOIN books
-                ON book = isbn
-                WHERE user =  '".$this->emailUser."'
-            ";
-
-        unset($filterData['sent'], $filterData['received']);
-
-        if ($category != "" && $category != "*") {
-            $sentence .= " ORDER BY `" . $category."` DESC";
-        }
-
-        elseif($search != "")
-        {
-            $sentence .=  $this->getSearchLikeFormat($filterData, $search);
-        }
-
-
-
-        $this->setContent(
             stylesUser::filterMenu
             (
-                "Order by",
+                "Select Category",
                 "Default",
-                $filterData,
+                $this->getArrayToResult
+                (
+                    $this->select
+                    ("
+                        SELECT category
+                        FROM books
+                        GROUP BY category
+                        ORDER BY category
+                    ")
+                ),
                 "Search...",
-                "showReserves",
+                "showBooks",
                 $this->sid
             ).
 
-            stylesUser::table
+            stylesUser::book
             (
-                $this->select($sentence),
-                true,
-                true,
-                false,
-                "Reserve",
-                ["ISBN","Start"],
-                true,
-                $this->MAX_DAYS_RESERVE,
+                mysqli_fetch_assoc
+                (
+                    $this->select
+                    ("
+                        SELECT isbn, title, summary, category, author
+                        FROM books
+                        WHERE isbn = ".$isbn
+                    )
+                )
+                ,
+                $this->DEFAULT_DAYS_RESERVE,
                 $this->sid
             )
         );
@@ -154,49 +129,82 @@ class User extends Template{
         $this->setContent($content);
     }
 
-    public function showBook($isbn)
+    public function showReserves($category = "",$search = "")
     {
+        $_SESSION['menu'] = "Reserves";
 
-        $_SESSION['menu']="Books";
-
-        $this->setContent
+        $filterData = array
         (
+            "isbn"          => "ISBN",
+            "title"         => "Title",
+            "author"        => "Author",
+            "category"      => "Category",
+            "date_start"    => "Start",
+            "date_finish"   => "End",
+            "sent"          => "Sent",
+            "received"      => "Received"
+        );
+
+
+        $sentence =
+            "
+                SELECT ".$this->getQueryNamesFormat($filterData)."
+                FROM
+                (
+                    reserves
+                    LEFT JOIN copybooks
+                    ON copybook = id
+                )
+                LEFT JOIN books
+                ON book = isbn
+                WHERE user =  '".$this->emailUser."'
+            ";
+
+        unset($filterData['sent'], $filterData['received']);
+
+        if ($category != "" && $category != "*") {
+            $sentence .= " ORDER BY `" . $category."` DESC";
+        }
+
+        elseif($search != "")
+        {
+            $sentence .=  $this->getSearchLikeFormat($filterData, $search);
+        }
+
+
+
+        $this->setContent(
             stylesUser::filterMenu
             (
-                "Select Category",
+                "Order by",
                 "Default",
-                $this->getArrayToResult
-                (
-                    $this->select
-                    ("
-                        SELECT category
-                        FROM books
-                        GROUP BY category
-                        ORDER BY category
-                    ")
-                ),
+                $filterData,
                 "Search...",
-                "showBooks",
+                "showReserves",
                 $this->sid
             ).
 
-            stylesUser::book
+            stylesUser::table
             (
-                mysqli_fetch_assoc
-                (
-                    $this->select
-                    ("
-                        SELECT isbn, title, summary, category, author
-                        FROM books
-                        WHERE isbn = ".$isbn
-                    )
-                )
-                ,
-                $this->DEFAULT_DAYS_RESERVE,
+                $this->select($sentence),
+                true,
+                true,
+                false,
+                "Reserve",
+                ["ISBN","Start"],
+                true,
+                $this->MAX_DAYS_RESERVE,
                 $this->sid
             )
         );
     }
+
+    public function showMyProfile($error){
+
+        $this->myProfile($error);
+    }
+
+
 
     public function showEditReserve($request){
 
@@ -218,9 +226,12 @@ class User extends Template{
                 JOIN copybooks ON copybook = id
                 )
                 JOIN books ON book = isbn
-                WHERE user =  '".$email."'
-                AND book =  '".$request['ISBN']."'
-                AND date_start =  '".$request['Start']."'
+                WHERE
+                user =  '".$email."'
+                    AND
+                book =  '".$request['ISBN']."'
+                    AND
+                date_start =  '".$request['Start']."'
              ")
         );
 
@@ -236,19 +247,26 @@ class User extends Template{
         );
     }
 
-    public function showMyProfile($error){
 
-        $this->myProfile($error);
-    }
 
-    public function logOut()
-    {
-        session_destroy();
+    public function setInsertDefaultReserve($request){
 
-        if(isset($_COOKIE['email'], $_COOKIE['pwd'])){
-            setcookie("email", "", 0, "/");
-            setcookie("pwd"  , "", 0, "/");
-        };
+        $request['user'] = $_SESSION['email'];
+
+        $returnament = $this->insertDeffaultReserve($request);
+
+        if($returnament === true)
+        {
+            return true;
+        }
+        elseif($returnament === false)
+        {
+            $this->showError("It hasn't been possible perform the reserve");
+        }
+        else
+            $this->showError($returnament);
+
+        return false;
     }
 
     public function setInsertPersonalizedReserve($request)
@@ -272,31 +290,7 @@ class User extends Template{
         return false;
     }
 
-    public function setInsertDefaultReserve($request){
 
-        $request['user'] = $_SESSION['email'];
-
-        $returnament = $this->insertDeffaultReserve($request);
-
-        if($returnament === true)
-        {
-            return true;
-        }
-        elseif($returnament === false)
-        {
-            $this->showError("It hasn't been possible perform the reserve");
-        }
-        else
-            $this->showError($returnament);
-
-        return false;
-    }
-
-    public function setDeleteReserve($request){
-        $request['email'] = $this->emailUser;
-
-        return $this->deleteReserve($request);
-    }
 
     public function setUpdateReserve($request){
 
@@ -308,10 +302,6 @@ class User extends Template{
 
         unset($request['typeUser'], $request['registered']);
 
-
-        if($request['email'] == $this->emailUser){
-            unset($request['typeUser']);
-        }
 
         if(isset($request['pwd']) && ($request['pwd'] == "" || $request['pwd'] == " ")){
             unset($request['pwd']);
@@ -330,6 +320,27 @@ class User extends Template{
         }
 
         return false;
+    }
+
+
+
+    public function setDeleteReserve($request){
+        $request['email'] = $this->emailUser;
+
+        return $this->deleteReserve($request);
+    }
+
+
+
+
+    public function logOut()
+    {
+        session_destroy();
+
+        if(isset($_COOKIE['email'], $_COOKIE['pwd'])){
+            setcookie("email", "", 0, "/");
+            setcookie("pwd"  , "", 0, "/");
+        };
     }
 
 
@@ -612,6 +623,9 @@ class User extends Template{
         unset($reserve['isbn']);
         return $this->insert("reserves", $reserve);
     }
+
+
+
 
     protected function getReserveToformatValid($reserve)
     {

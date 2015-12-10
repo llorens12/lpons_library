@@ -449,7 +449,7 @@ class stylesUser{
 
         $hidden = "hidden";
 
-        if($error != ""){
+        if($error){
             $hidden = "";
         }
 
@@ -488,23 +488,26 @@ class stylesUser{
         $Librarian =
             '
           <optgroup label="Users">
-            <option value="showDefaulters">Defaulters</option>
-            <option value="showAdministrateUsers">Administrate</option>
-            <option value="showAddUser">Add</option>
+            <option value="showTableUsers">Info Users</option>
+            <option value="showTableDefaulters">Info Defaulters</option>
+            <option value="showAdministrateUsers">Administrate Users</option>
+            <option value="showAddUser">Add User</option>
           </optgroup>
 
           <optgroup label="Books">
-            <option value="showBooks">Show</option>
+            <option value="showBooks">Show Books</option>
             <option value="showTableBooks">Info Books</option>
             <option value="showTableCopies">Info Copies</option>
-            <option value="showAdministrateBooks">Administrate</option>
-            <option value="showAddBook">Add</option>
+            <option value="showAdministrateBooks">Administrate Books</option>
+            <option value="showAdministrateCopies">Administrate Copies</option>
+            <option value="showAddBook">Add Book</option>
           </optgroup>
 
           <optgroup label="Reserves">
             <option value="showReserves">My Reserves</option>
-            <option value="showAdministrateReserves">Administrate</option>
-            <option value="showAddReserves">Add</option>
+            <option value="showTableUsersReserves">Info Reserves</option>
+            <option value="showAdministrateReserves">Administrate Reserves</option>
+            <option value="showAddReserves">Add Reserve</option>
           </optgroup>
 
 
@@ -558,19 +561,24 @@ class stylesLibrarian
                     </a>
                     <ul class="dropdown-menu">
                         <li>
-                            <a href="controller.php?method=showDefaulters'.$sid.'">
-                                Defaulters
+                            <a href="controller.php?method=showTableUsers'.$sid.'">
+                                Info Users
+                            </a>
+                        </li>
+                        <li>
+                            <a href="controller.php?method=showTableDefaulters'.$sid.'">
+                                Info Defaulters
                             </a>
                         </li>
                         <li role="separator" class="divider"></li>
                         <li>
                             <a href="controller.php?method=showAdministrateUsers'.$sid.'">
-                                Administrate
+                                Administrate Users
                             </a>
                         </li>
                         <li>
                             <a href="controller.php?method=showAddUser'.$sid.'">
-                                Add
+                                Add User
                             </a>
                         </li>
                     </ul>
@@ -586,7 +594,7 @@ class stylesLibrarian
                     <ul class="dropdown-menu">
                         <li>
                             <a href="controller.php?method=showBooks'.$sid.'">
-                                Show
+                                Show Books
                             </a>
                         </li>
                         <li>
@@ -602,12 +610,17 @@ class stylesLibrarian
                         <li role="separator" class="divider"></li>
                         <li>
                             <a href="controller.php?method=showAdministrateBooks'.$sid.'">
-                                Administrate
+                                Administrate Books
+                            </a>
+                        </li>
+                        <li>
+                            <a href="controller.php?method=showAdministrateCopies'.$sid.'">
+                                Administrate Copies
                             </a>
                         </li>
                         <li>
                             <a href="controller.php?method=showAddBook'.$sid.'">
-                                Add
+                                Add Book
                             </a>
                         </li>
                     </ul>
@@ -626,15 +639,20 @@ class stylesLibrarian
                                 My reserves
                             </a>
                         </li>
+                        <li>
+                            <a href="controller.php?method=showTableUsersReserves'.$sid.'">
+                                Info Reserves
+                            </a>
+                        </li>
                         <li role="separator" class="divider"></li>
                         <li>
-                            <a href="controller.php?method=showAdministrateReserves'.$sid.'">
-                                Administrate
+                            <a href="controller.php?method=showAdministrateUsersReserves'.$sid.'">
+                                Administrate Reserves
                             </a>
                         </li>
                         <li>
                             <a href="controller.php?method=showAddReserves'.$sid.'">
-                                Add
+                                Add Reserve
                             </a>
                         </li>
                     </ul>
@@ -711,8 +729,8 @@ class stylesLibrarian
                 <input type="text" class="form-control" placeholder="ISBN" name="book" required="" title="ISBN" value="'.$data['isbn'].'" disabled>
             </div>
             <div class="input-group">
-                <span class="input-group-addon icons" title="State"><i class="fa fa-clock-o"></i></span>
-                <select class="form-control" name="state" title="State">
+                <span class="input-group-addon icons" title="Status"><i class="fa fa-clock-o"></i></span>
+                <select class="form-control" name="status" title="Status">
                     <option value="New" '.$New.'>New</option>
                     <option value="Good" '.$Good.'>Good</option>
                     <option value="Bad" '.$Bad.'>Bad</option>

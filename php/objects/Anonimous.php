@@ -11,6 +11,9 @@ class Anonimous extends Template{
         parent::__construct($nameUser, $emailUser, $home, $sid);
     }
 
+
+
+
     public function showLogin($error = ""){
 
         $this->includeSection = false;
@@ -34,15 +37,21 @@ class Anonimous extends Template{
         );
     }
 
-    public function startSession($email, $pwd, $remember)
+
+    public function startSession($request)
     {
         if (isset($_COOKIE['email'], $_COOKIE['pwd']))
         {
             $email = $_COOKIE['email'];
-            $pwd = $_COOKIE['pwd'];
+            $pwd   = $_COOKIE['pwd'];
+        }
+        else
+        {
+            $email = $request['email'];
+            $pwd   = $request['pwd'];
         }
 
-        $user = mysqli_fetch_assoc($this->select("SELECT * FROM users WHERE email = '{$email}' AND pwd = '{$pwd}';"));
+        $user = mysqli_fetch_assoc($this->select("SELECT * FROM users WHERE email = '".$email."' AND pwd = '".$pwd."'"));
         $this->close();
 
         if (count($user) != 0)
@@ -53,7 +62,8 @@ class Anonimous extends Template{
             $_SESSION['home'] = "controller.php?method=".$user['home'];
 
 
-            if ($remember) {
+            if (isset($request['rememberMe']))
+            {
                 setcookie("email", $user['email'], time() + 7776000, "/");
                 setcookie("pwd", $user['pwd'], time() + 7776000, "/");
             }
@@ -74,6 +84,8 @@ class Anonimous extends Template{
 
         return $this->insert("users",$request);
     }
+
+
 
     public function __toString()
     {

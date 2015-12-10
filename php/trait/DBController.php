@@ -34,6 +34,12 @@ trait DBController{
         $columns = trim($columns, ", ");
         $valuesColumns = trim($valuesColumns, ", ");
 
+        echo "
+            INSERT INTO {$table} ({$columns})
+            VALUES ({$valuesColumns});
+        ";
+
+
         return $this->connection->query
         ("
             INSERT INTO {$table} ({$columns})
@@ -52,6 +58,11 @@ trait DBController{
 
         $set = trim($set, ", ");
 
+        echo "
+            UPDATE {$table}
+            SET    {$set}
+            WHERE  {$where};
+        ";
         return $this->connection->query
         ("
             UPDATE {$table}
