@@ -190,6 +190,7 @@ class User extends Template{
                 true,
                 true,
                 false,
+                "",
                 "Reserve",
                 ["ISBN","Start"],
                 true,
@@ -349,19 +350,22 @@ class User extends Template{
 
         $_SESSION['menu'] = "";
 
-        $this->setContent
+        $currentUser = mysqli_fetch_assoc
         (
-            stylesUser::contentForm
-            (
-                mysqli_fetch_assoc
-                (
-                    $this->select
-                    ("
+            $this->select
+            ("
                         SELECT email, name, surname, telephone, home, typeUser
                         FROM users
                         WHERE email = '{$this->emailUser}'
                     ")
-                ),
+        );
+
+        $this->setContent
+        (
+            stylesUser::contentForm
+            (
+                "My Profile",
+                stylesUser::formAdministrateUser($currentUser),
                 $this->sid,
                 $error,
                 "update",
@@ -717,7 +721,10 @@ class User extends Template{
         return $nameFormat;
     }
 
-    protected function getSearchLikeFormat($filterData, $search, $type = "AND"){
+    protected function getSearchLikeFormat($filterData, $search, $type = ""){
+
+        if($type == "")
+            $type = "AND";
 
         $sentence =  " ".$type." ( ";
 

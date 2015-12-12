@@ -15,7 +15,7 @@ trait DBController{
     protected function select($sentence)
     {
 
-        echo $sentence;
+        //echo $sentence;
         $this->startConnection();
         return $this->connection->query($sentence);
     }
@@ -74,6 +74,11 @@ trait DBController{
     protected function delete($table, $where)
     {
         $this->startConnection();
+
+        echo "
+            DELETE FROM {$table}
+            WHERE  {$where};
+        ";
 
         return $this->connection->query
         ("

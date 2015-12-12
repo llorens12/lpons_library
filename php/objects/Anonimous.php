@@ -48,7 +48,7 @@ class Anonimous extends Template{
         else
         {
             $email = $request['email'];
-            $pwd   = $request['pwd'];
+            $pwd   = md5($request['pwd']);
         }
 
         $user = mysqli_fetch_assoc($this->select("SELECT * FROM users WHERE email = '".$email."' AND pwd = '".$pwd."'"));
@@ -64,8 +64,8 @@ class Anonimous extends Template{
 
             if (isset($request['rememberMe']))
             {
-                setcookie("email", $user['email'], time() + 7776000, "/");
-                setcookie("pwd", $user['pwd'], time() + 7776000, "/");
+                setcookie("email", $email, time() + 7776000, "/");
+                setcookie("pwd", $pwd['pwd'], time() + 7776000, "/");
             }
 
             return true;

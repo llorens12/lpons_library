@@ -40,17 +40,34 @@ $(document).ready(function()
             }
         });
 
-        $('#email').blur(function(evt){
 
-            var email = $('#email');
-            var verification= "ajax=emailDisponibility&email="+email.val();
+        var email = $('#email').val();
+
+        $('#email').blur(function(){
+
+            if($(this).val() != email && !disponibilityAjax("ajax=emailDisponibility&email="+$(this).val()))
+            {
+                $(this).attr("placeholder","This email is not available").val("").parent().addClass("has-error");
+            }
+            else
+            {
+                $(this).parent().removeClass("has-error");
+            }
+        });
 
 
-            if(!disponibilityAjax(verification)) {
+        var isbn = $('#isbn-form').val();
 
-                email.attr("placeholder","This email is not available").val("").parent().addClass("has-error");
-            }else{
-                email.parent().removeClass("has-error");
+        $('#isbn-form').blur(function(){
+
+
+            if($(this).val() != isbn && !disponibilityAjax("ajax=book&isbn="+$(this).val()))
+            {
+                $(this).attr("placeholder","This ISBN is not available").val("").parent().addClass("has-error");
+            }
+            else
+            {
+                $(this).parent().removeClass("has-error");
             }
         });
 
@@ -79,8 +96,7 @@ function checkReserveDisponibility(){
     var valDateStart  = $("#date-start").val();
     var valDateFinish = $("#date-finish").val();
 
-
-    var dataCheck = "ajax=reserveDisponibility&isbn="+$("#book-isbn").html()+"&dateStart="+valDateStart+"&dateFinish="+valDateFinish;
+    var dataCheck = "ajax=reserveDisponibility&isbn="+$('#personalized-reserve').children('form').attr('isbn')+"&dateStart="+valDateStart+"&dateFinish="+valDateFinish;
 
     if(disponibilityAjax(dataCheck)){
         return true;

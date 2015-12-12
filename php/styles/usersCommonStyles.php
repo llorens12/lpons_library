@@ -3,7 +3,7 @@
 
 class stylesUser{
 
-    public static function table($data, $edit = false, $drop = false, $add = false, $typeObject = "", $primaryKeys = "", $reserveDelimiter = false, $MAX_DAYS_RESERVE = 0, $sid = "")
+    public static function table($data, $edit = false, $drop = false, $add = false, $objectAdd = "", $typeObject = "", $primaryKeys = "", $reserveDelimiter = false, $MAX_DAYS_RESERVE = 0, $sid = "")
     {
         $contentThead   = "<th>#</th>";
         $objectNumber   = 1;
@@ -13,6 +13,10 @@ class stylesUser{
         $stateDelete    = "";
         $valueLink      = "";
 
+
+
+        if($typeObject == "")
+            $typeObject = "This";
 
 
         $theadOptions = function ($edit, $drop, $add)
@@ -50,7 +54,7 @@ class stylesUser{
                 return $contentThead;
             };
 
-        $tbodyOptions = function ($edit, $drop, $add, $typeObject, $valueLink, $stateEdit, $stateDelete, $sid){
+        $tbodyOptions = function ($edit, $drop, $add, $objectAdd, $typeObject, $valueLink, $stateEdit, $stateDelete, $sid){
 
             $contentTbody = "";
 
@@ -58,7 +62,7 @@ class stylesUser{
                 $contentTbody .=
                     '
                     <td>
-                        <a href="controller.php?method=showAddCopy&' . $valueLink . $sid.'" title="Add new copy">
+                        <a href="controller.php?method=showAdd'.$objectAdd.'&' . $valueLink . $sid.'" title="Add new '.$objectAdd.'">
                             <i class="fa fa-plus"></i>
                         </a>
                     </td>
@@ -92,6 +96,10 @@ class stylesUser{
             return $contentTbody;
         };
 
+
+        if(mysqli_num_rows($data) == 0){
+            return "<h1 style='width: 100%; text-align: center'>".$typeObject." is empty</h1>";
+        }
 
         while ($object = mysqli_fetch_assoc($data))
         {
@@ -157,12 +165,12 @@ class stylesUser{
 
 
                 foreach ($primaryKeys as $singleKey) {
-                    $valueLink .= $singleKey . "=" . $object[$singleKey] . "&";
+                    $valueLink .= str_replace(' ', '', $singleKey) . "=" . $object[$singleKey] . "&";
                 }
                 $valueLink = trim($valueLink, "&");
             }
 
-            $contentTbody .= $tbodyOptions($edit,$drop, $add, $typeObject, $valueLink, $stateEdit, $stateDelete, $sid);
+            $contentTbody .= $tbodyOptions($edit,$drop, $add, $objectAdd, $typeObject, $valueLink, $stateEdit, $stateDelete, $sid);
 
 
             $contentTbody .=
@@ -173,10 +181,6 @@ class stylesUser{
             $objectNumber++;
         }
 
-
-        if(mysqli_num_rows($data) == 0){
-            return "<h1 style='width: 100%; text-align: center'>Action not found</h1>";
-        }
 
         $contentThead .= $theadOptions($edit, $drop, $add);
 
@@ -195,6 +199,12 @@ class stylesUser{
     }
 
     public static function filterMenu($nameFilter, $filterDefault, $filterData, $placeHolderSearch, $method, $sid){
+
+        if($nameFilter == "Order by")
+            $valueButtonFilter = "";
+
+        else
+            $valueButtonFilter = $nameFilter;
 
         $filter = "";
 
@@ -227,7 +237,7 @@ class stylesUser{
                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" id="options-books">
                     <form id="form-filter-menu" action="controller.php?method='.$method.$sid.'" method="POST" >
                         <div class="btn-group sub-menu" id="btn-category">
-                            <button class="btn btn-default active btn-md dropdown-toggle" name="btnCategory" value="'.$nameFilter.'">
+                            <button class="btn btn-default active btn-md dropdown-toggle" name="btnCategory" value="'.$valueButtonFilter.'">
                                 '.$nameFilter.'
                                 <span class="caret"></span>
                             </button>
@@ -263,6 +273,7 @@ class stylesUser{
 
                         </div>
 
+
                         <div id="text-details-books">
 
 
@@ -271,43 +282,53 @@ class stylesUser{
 
                             <p>'.$book["summary"].'</p>
 
-                            <div id="options-reserves">
 
-                                <a href="controller.php?insert=setInsertDefaultReserve&isbn='.$book["isbn"].$sid.'" class="btn btn-primary" id="btn-reserve-20-days" title="Reserve as soon as possible">
-                                    Reserve '.$DEFAULT_DAYS_RESERVE.' days
-                                </a>
+                        '.stylesUser::optionsReserve("controller.php?insert=setInsertDefaultReserve&isbn=".$book["isbn"].$sid.'"', $DEFAULT_DAYS_RESERVE." days", $book["isbn"], $sid).'
 
-                                <button class="btn btn-default active" id="btn-personalized-reserve" title="Personalized my reserve">
-                                    <span>Personalized reserve
-                                        <span class="caret"></span>
-                                    </span>
-                                </button>
-
-                            </div>
-
-                            <div class="hidden" id="personalized-reserve">
-
-                                <form action="controller.php?insert=setInsertPersonalizedReserve&isbn='.$book["isbn"].$sid.'" method="post" onsubmit="return checkReserveDisponibility()">
-
-                                    <div class="input-group" id="start-date-reserve-personalized">
-                                        <span class="input-group-addon icons"><i class="fa fa-calendar-plus-o"></i></span>
-                                        <input type="date" class="form-control" placeholder="dd/mm/aaaa" name="date_start" id="date-start" required="">
-                                    </div>
-                                    <div class="input-group" id="finish-date-reserve-personalized">
-                                        <span class="input-group-addon icons"><i class="fa fa-calendar-times-o"></i></span>
-                                        <input type="date" class="form-control" placeholder="dd/mm/aaaa" name="date_finish" id="date-finish" required="">
-                                    </div>
-
-                                    <label class="label label-danger hidden" id="label-error-personalized-reserve">The reserve is not available</label>
-                                    <br>
-                                    <button type="submit" class="btn btn-default">Reserve</button>
-                                </form>
-
-                            </div>
 
                         </div>
                     </div>
             ';
+    }
+
+    public static function optionsReserve($href, $textBtnReserve, $isbn, $sid){
+        return
+        '
+            <div id="options-reserves">
+
+                <a href="'.$href.'" class="btn btn-primary" id="btn-reserve-20-days" title="Set reserve">
+                Reserve '.$textBtnReserve.'
+                </a>
+
+                <button class="btn btn-default active" id="btn-personalized-reserve" title="Personalized my reserve">
+                    <span>Personalized reserve
+                        <span class="caret"></span>
+                    </span>
+                </button>
+
+            </div>
+
+            <div class="hidden" id="personalized-reserve">
+
+                <form isbn="'.$isbn.'" action="controller.php?insert=setInsertPersonalizedReserve&isbn='.$isbn.$sid.'" method="post" onsubmit="return checkReserveDisponibility()">
+
+                <div class="input-group" id="start-date-reserve-personalized">
+                    <span class="input-group-addon icons"><i class="fa fa-calendar-plus-o"></i></span>
+                    <input type="date" class="form-control" placeholder="dd/mm/aaaa" name="date_start" id="date-start" required="">
+                </div>
+                <div class="input-group" id="finish-date-reserve-personalized">
+                    <span class="input-group-addon icons"><i class="fa fa-calendar-times-o"></i></span>
+                    <input type="date" class="form-control" placeholder="dd/mm/aaaa" name="date_finish" id="date-finish"
+                           required="">
+                </div>
+
+                <label class="label label-danger hidden" id="label-error-personalized-reserve">The reserve is not available</label>
+                <br>
+                <button type="submit" class="btn btn-default">Reserve</button>
+                </form>
+
+            </div>
+        ';
     }
 
     public static function books($book, $DEFAULT_DAYS_RESERVE, $sid){
@@ -505,9 +526,7 @@ class stylesUser{
 
           <optgroup label="Reserves">
             <option value="showReserves">My Reserves</option>
-            <option value="showTableUsersReserves">Info Reserves</option>
             <option value="showAdministrateReserves">Administrate Reserves</option>
-            <option value="showAddReserves">Add Reserve</option>
           </optgroup>
 
 
@@ -639,20 +658,10 @@ class stylesLibrarian
                                 My reserves
                             </a>
                         </li>
-                        <li>
-                            <a href="controller.php?method=showTableUsersReserves'.$sid.'">
-                                Info Reserves
-                            </a>
-                        </li>
                         <li role="separator" class="divider"></li>
                         <li>
                             <a href="controller.php?method=showAdministrateUsersReserves'.$sid.'">
                                 Administrate Reserves
-                            </a>
-                        </li>
-                        <li>
-                            <a href="controller.php?method=showAddReserves'.$sid.'">
-                                Add Reserve
                             </a>
                         </li>
                     </ul>
@@ -686,7 +695,7 @@ class stylesLibrarian
         '
             <div class="input-group">
                 <span class="input-group-addon icons" title="ISBN"><i class="fa fa-barcode"></i></span>
-                <input type="text" class="form-control" placeholder="ISBN" name="isbn" required="" title="ISBN" value="'.$vars['isbn'].'">
+                <input type="text" class="form-control" placeholder="ISBN" name="isbn" id="isbn-form" required="" title="ISBN" value="'.$vars['isbn'].'">
             </div>
             <div class="input-group">
                 <span class="input-group-addon icons" title="Title"><i class="fa fa-book"></i></span>
@@ -713,16 +722,28 @@ class stylesLibrarian
 
     public static function formCopy($data){
 
-        $New = "";
+        $New  = "";
         $Good = "";
-        $Bad = "";
+        $Bad  = "";
+        $formId = "";
 
-        if(isset($data['state'])){
+        if(isset($data['status'])){
             $$data['status'] = "selected";
         }
 
 
+        if(isset($data['id']))
+            $formId .=
+            '
+            <div class="input-group">
+                <span class="input-group-addon icons" title="ID Copy"><i class="fa fa-hashtag"></i></span>
+                <input type="text" class="form-control" placeholder="ID Copy"   title="ID Copy" value="'.$data['id'].'" disabled>
+            </div>
+            ';
+
+
         return
+        $formId.
         '
             <div class="input-group">
                 <span class="input-group-addon icons" title="ISBN"><i class="fa fa-barcode"></i></span>
@@ -919,11 +940,11 @@ class Registers
                 </div>
                 <div class="input-group">
                     <span class="input-group-addon icons"><i class="fa fa-calendar-plus-o"></i></span>
-                    <input type="date" class="form-control" placeholder="dd/mm/aaaa" name="date-start"  required="">
+                    <input type="date" class="form-control" placeholder="dd/mm/aaaa" name="date_start"  required="">
                 </div>
                 <div class="input-group">
                     <span class="input-group-addon icons"><i class="fa fa-calendar-times-o"></i></span>
-                    <input type="date" class="form-control" placeholder="dd/mm/aaaa" name="date-finish" required="">
+                    <input type="date" class="form-control" placeholder="dd/mm/aaaa" name="date_finish" required="">
                 </div>
                 <div class="input-group">
                     <span class="input-group-addon icons"><i class="fa fa-paper-plane"></i></span>
@@ -934,124 +955,17 @@ class Registers
                         </label>
                     </div>
                 </div>
+                <div class="input-group">
+                    <span class="input-group-addon icons"><i class="fa fa-paper-plane"></i></span>
+                    <div class="checkbox form-control" >
+                        <label>
+                            <input type="checkbox" name="received" value="true">
+                            Received?
+                        </label>
+                    </div>
+                </div>
         ';
     }
 }
 
 
-class Menus
-{
-
-
-    static function userConfig($nameUser)
-    {
-        return '
-            <div class="btn-group  sub-menu" id="nameUser">
-                <span class="dropdown-toggle" >
-                    ' . $nameUser . '
-                    <span class="caret"></span>
-                </span>
-                <ul class="dropdown-menu">
-                    <li>
-                        <a href="#">
-                            My profile
-                        </a>
-
-                    </li>
-                    <li>
-                        <a href="#">
-                            Configuration
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
-        ';
-    }
-
-    static function menuUser()
-    {
-
-    }
-
-    static function menuLibrarian()
-    {
-        return '
-            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
-                <a href="#" class="btn btn-lg btn-primary btn-menu">
-                    Users
-                </a>
-            </div>
-
-
-            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 border-left border-right">
-                <a href="#" class="btn btn-default btn-lg btn-menu">
-                    Books
-                </a>
-            </div>
-
-            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
-                <div class="btn-group btn-menu sub-menu">
-                    <a class="btn btn-default btn-lg  dropdown-toggle" >
-                        Reserves
-                        <span class="caret"></span>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a href="#">
-                                Action
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                Another
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                Something
-                            </a>
-                        </li>
-                        <li role="separator" class="divider">
-
-                        </li>
-                        <li>
-                            <a href="#">
-                                Separated
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            ';
-    }
-
-    static function menuAdministrator()
-    {
-        return '
-            <div class="row text-center content-menu" id="navigation">
-
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 ">
-                    <button type="button" class="btn btn-primary">
-                        Users
-                    </button>
-                </div>
-
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 ">
-                    <button type="button" class="btn btn-default">
-                        Books
-                    </button>
-                </div>
-
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 ">
-                    <button type="button" class="btn btn-default">
-                        Reserves
-                    </button>
-                </div>
-
-            </div>
-
-        ';
-
-    }
-}

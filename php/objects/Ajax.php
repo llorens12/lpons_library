@@ -10,55 +10,71 @@ class Ajax
         (
             $this->select
             ("
-                select *
-                from users
-                WHERE email='".$email."'
+                SELECT *
+                FROM users
+                WHERE email='" . $email . "'
             ")
         );
         $this->close();
 
-        if(count($answer) == 0)
+        if (count($answer) == 0)
             echo "true";
         else
             echo "false";
     }
 
-    public function reserveDisponibility($request){
+    public function reserveDisponibility($request)
+    {
 
-        $isbn       = $request['isbn'];
-        $dateStart  = $request['dateStart'];
-        $dateFinish = $request['dateFinish'];
+        $isbn = $request['isbn'];
 
-        $dateFinish = str_replace("-","",$dateFinish);
-        $dateStart  = str_replace("-","",$dateStart);
+        $dateFinish = str_replace("-", "", $request['dateFinish']);
+        $dateStart = str_replace("-", "", $request['dateStart']);
 
-        $result =$this->select
+        $result = $this->select
         ("
                 SELECT id
                 FROM reserves RIGHT JOIN copybooks ON copybook = id
-                WHERE book = '".$isbn."' AND
+                WHERE book = '" . $isbn . "' AND
                 id NOT IN
                 (
                     SELECT copybook
                     FROM reserves JOIN copybooks ON copybook = id
-                    WHERE book = '". $isbn ."' AND
+                    WHERE book = '" . $isbn . "' AND
                     (
-                        ('". $dateStart ."' < date_start AND '". $dateFinish ."' > date_finish)
+                        ('" . $dateStart . "' < date_start AND '" . $dateFinish . "' > date_finish)
                     OR
-                        '". $dateStart ."' BETWEEN date_start AND date_finish
+                        '" . $dateStart . "' BETWEEN date_start AND date_finish
                     OR
-                        '". $dateFinish ."' BETWEEN date_start AND date_finish
+                        '" . $dateFinish . "' BETWEEN date_start AND date_finish
                     )
                 )
                 ORDER BY status DESC
         ");
-        if(count(mysqli_fetch_assoc($result)) > 0)
-        {
+        if (count(mysqli_fetch_assoc($result)) > 0) {
             echo "true";
-        }
-        else
-        {
+        } else {
             echo "false";
         }
+    }
+
+
+    public function book($request)
+    {
+        $answer = mysqli_fetch_assoc
+        (
+            $this->select
+            ("
+                SELECT title
+                FROM books
+                WHERE isbn='" . $request['isbn'] . "'
+            ")
+        );
+        $this->close();
+
+        if (count($answer) == 0)
+            echo "true";
+        else
+            echo "false";
     }
 }

@@ -10,9 +10,75 @@ class Librarian extends User{
 
 
 
-    public function showTableUsers(){}
+    public function showTableUsers($category = "", $search = "")
+    {
+        $_SESSION['menu'] = "Users";
 
-    public function showTableDefaulters($category = "", $search = ""){
+        $filterData = array
+        (
+            "name"          => "'Name'",
+            "surname"       => "'Surname'",
+            "email"         => "'Email'",
+            "telephone"     => "'Telephone'",
+            "registered"    => "'Registered'",
+            "COUNT(user)"   => "'Total Reserves'",
+            "SUM(IF((curdate() < date_finish), 1, 0))" => "'After Reserves'",
+            "SUM(if(((curdate() between date_start AND date_finish) AND sent IS NOT null), 1, 0))" => "'Books in House'",
+            "SUM(IF(received > date_finish, 1, 0))" => "'Total Delays'",
+            "IF((SUM(IF((date_finish < curdate() AND sent IS NOT null AND received IS null), 1, 0)) != 0), 'Yes', 'No')" => "'Defaulter?'"
+        );
+
+
+        $sentence =
+            "
+                SELECT ".$this->getQueryNamesFormat($filterData)."
+                FROM users LEFT JOIN reserves on email = user
+            ";
+
+        $where = "";
+
+        if($_SESSION != 'Admin')
+        {
+            $sentence .= "WHERE typeUser = 'User'";
+        }
+        else
+            $where = "WHERE";
+
+
+
+        if($search != "")
+        {
+            $sentence .=  $this->getSearchLikeFormat($filterData, $search, $where);
+        }
+
+        $sentence .= " GROUP BY `email`";
+
+        if ($category != "" && $category != "*")
+        {
+            $sentence .= " ORDER BY `" . $category."`";
+        }
+
+
+        $this->setContent(
+            stylesUser::filterMenu
+            (
+                "Order by",
+                "Default",
+                $filterData,
+                "Search...",
+                "showTableUsers",
+                $this->sid
+            ).
+
+            stylesUser::table
+            (
+                $this->select($sentence)
+            )
+        );
+    }
+
+    public function showTableDefaulters($category = "", $search = "")
+    {
         $_SESSION['menu'] = "Users";
 
         $filterData = array
@@ -33,7 +99,7 @@ class Librarian extends User{
         $sentence =
             "
                 SELECT ".$this->getQueryNamesFormat($filterData)."
-                FROM ((reserves JOIN users ON user = email) JOIN copybooks ON copybook = id) JOIN books ON book = isbn
+                FROM ((reserves JOIN copybooks ON copybook = id) JOIN books ON book = isbn) JOIN users ON user = email
                 WHERE
                     date_finish < curdate()
                 AND
@@ -42,11 +108,20 @@ class Librarian extends User{
                     received IS null
             ";
 
+
+        if($_SESSION != 'Admin')
+        {
+            $sentence .= "AND typeUser = 'User'";
+        }
+
+
         if($search != "")
         {
             $sentence .=  $this->getSearchLikeFormat($filterData, $search);
         }
-        elseif ($category != "" && $category != "*") {
+
+        if ($category != "" && $category != "*")
+        {
             $sentence .= " ORDER BY `" . $category."` DESC";
         }
         else
@@ -76,10 +151,10 @@ class Librarian extends User{
 
         $filterData = array
         (
-            "isbn"                           => "ISBN",
-            "title"                          => "Title",
-            "author"                         => "Author",
-            "category"                       => "Category",
+            "isbn"                           => "'ISBN'",
+            "title"                          => "'Title'",
+            "author"                         => "'Author'",
+            "category"                       => "'Category'",
             "COUNT(copybook)"                => "'Total Reserved'",
             "COUNT(DISTINCT id)"             => "'Copies'",
             "sum(DISTINCT IF(((curdate() between date_start AND date_finish) AND sent IS NOT null),1,0))" => "'Sent'",
@@ -103,7 +178,8 @@ class Librarian extends User{
 
         $sentence .= " GROUP BY book";
 
-        if ($category != "" && $category != "*") {
+        if ($category != "" && $category != "*")
+        {
             $sentence .= " ORDER BY `" . $category."` DESC";
         }
 
@@ -126,13 +202,14 @@ class Librarian extends User{
         );
     }
 
-    public function showTableCopies($category = "", $search = ""){
+    public function showTableCopies($category = "", $search = "")
+    {
         $_SESSION['menu'] = "Books";
 
         $filterData = array
         (
-            "id"              => "'ID Copy'",
             "isbn"            => "'ISBN'",
+            "id"              => "'ID Copy'",
             "title"           => "'Title'",
             "author"          => "'Author'",
             "category"        => "'Category'",
@@ -155,7 +232,8 @@ class Librarian extends User{
 
         $sentence .= " GROUP BY id";
 
-        if ($category != "" && $category != "*") {
+        if ($category != "" && $category != "*")
+        {
             $sentence .= " ORDER BY `" . $category."` DESC";
         }
         else
@@ -180,21 +258,21 @@ class Librarian extends User{
         );
     }
 
-    public function showTableUsersReserves(){}
 
 
 
-    public function showAdministrateUsers($category = "", $search = ""){
+    public function showAdministrateUsers($category = "", $search = "")
+    {
         $_SESSION['menu'] = "Users";
 
         $filterData = array
         (
-            "name"          => "Name",
-            "surname"       => "Surname",
-            "email"         => "Email",
-            "telephone"     => "Telephone",
-            "registered"    => "Registered",
-            "home"          => "Home"
+            "name"          => "'Name'",
+            "surname"       => "'Surname'",
+            "email"         => "'Email'",
+            "telephone"     => "'Telephone'",
+            "registered"    => "'Registered'",
+            "home"          => "'Home'"
         );
 
 
@@ -202,17 +280,27 @@ class Librarian extends User{
             "
                 SELECT ".$this->getQueryNamesFormat($filterData)."
                 FROM users
-                WHERE email != '".$this->emailUser."'
+
             ";
 
 
-        if ($category != "" && $category != "*") {
+        $where = "";
+
+        if($_SESSION != 'Admin')
+        {
+            $sentence .= "WHERE typeUser = 'User'";
+        }
+        else
+            $where = "WHERE";
+
+        if ($category != "" && $category != "*")
+        {
             $sentence .= " ORDER BY `" . $category."` DESC";
         }
 
         elseif($search != "")
         {
-            $sentence .=  $this->getSearchLikeFormat($filterData, $search);
+            $sentence .=  $this->getSearchLikeFormat($filterData, $search, $where);
         }
 
 
@@ -232,7 +320,8 @@ class Librarian extends User{
                 $this->select($sentence),
                 true,
                 true,
-                false,
+                true,
+                "Reserve",
                 "User",
                 ["Email"],
                 false,
@@ -242,16 +331,17 @@ class Librarian extends User{
         );
     }
 
-    public function showAdministrateBooks($category = "", $search = ""){
+    public function showAdministrateBooks($category = "", $search = "")
+    {
         $_SESSION['menu'] = "Books";
 
         $filterData = array
         (
-            "isbn"                           => "ISBN",
-            "title"                          => "Title",
-            "author"                         => "Author",
-            "description"                    => "Description",
-            "category"                       => "Category"
+            "isbn"                           => "'ISBN'",
+            "title"                          => "'Title'",
+            "author"                         => "'Author'",
+            "description"                    => "'Description'",
+            "category"                       => "'Category'"
         );
 
 
@@ -267,7 +357,8 @@ class Librarian extends User{
         }
 
 
-        if ($category != "" && $category != "*") {
+        if ($category != "" && $category != "*")
+        {
             $sentence .= " ORDER BY `" . $category."` DESC";
         }
 
@@ -289,6 +380,7 @@ class Librarian extends User{
                 true,
                 true,
                 true,
+                "Copy",
                 "Book",
                 ["ISBN"],
                 false,
@@ -298,9 +390,138 @@ class Librarian extends User{
         );
     }
 
-    public function showAdministrateCopies(){}
+    public function showAdministrateCopies($category = "", $search = "")
+    {
+        $_SESSION['menu'] = "Books";
 
-    public function showAdministrateUsersReserves(){}
+        $filterData = array
+        (
+            "isbn"            => "'ISBN'",
+            "id"              => "'ID Copy'",
+            "title"           => "'Title'",
+            "author"          => "'Author'",
+            "category"        => "'Category'",
+            "status"          => "'Status'"
+        );
+
+
+        $sentence =
+            "
+                SELECT ".$this->getQueryNamesFormat($filterData)."
+                FROM (copybooks LEFT JOIN books ON book = isbn) LEFT JOIN reserves ON copybook = id
+            ";
+
+        if($search != "")
+        {
+            $sentence .=  $this->getSearchLikeFormat($filterData, $search, "WHERE");
+        }
+
+        $sentence .= " GROUP BY id";
+
+        if ($category != "" && $category != "*")
+        {
+            $sentence .= " ORDER BY `" . $category."` DESC";
+        }
+        else
+            $sentence .= " ORDER BY `isbn`,`id`";
+
+        $this->setContent(
+            stylesUser::filterMenu
+            (
+                "Order by",
+                "Default",
+                $filterData,
+                "Search...",
+                "showAdministrateCopies",
+                $this->sid
+            ).
+
+            stylesUser::table
+            (
+                $this->select($sentence),
+                true,
+                true,
+                false,
+                "",
+                "Copy",
+                ["ID Copy"],
+                false,
+                0,
+                $this->sid
+            )
+        );
+    }
+
+    public function showAdministrateUsersReserves($category = "", $search = "")
+    {
+        $_SESSION['menu'] = "Reserves";
+
+        $filterData = array
+        (
+            "user"          => "'User'",
+            "copyBook"      => "'ID Copy'",
+            "isbn"          => "'ISBN'",
+            "title"         => "'Title'",
+            "date_start"    => "'Start'",
+            "date_finish"   => "'End'",
+            "sent"          => "'Sent'",
+            "received"      => "'Received'"
+        );
+
+
+        $sentence =
+            "
+                SELECT ".$this->getQueryNamesFormat($filterData)."
+                FROM ((reserves LEFT JOIN copybooks ON copybook = id ) LEFT JOIN books ON book = isbn) LEFT JOIN users ON user = email
+            ";
+
+        $where = "";
+
+        if($_SESSION != 'Admin')
+        {
+            $sentence .= "WHERE typeUser = 'User'";
+        }
+        else
+            $where = "WHERE";
+
+
+        if ($category != "" && $category != "*") {
+            $sentence .= " ORDER BY `" . $category."` DESC";
+        }
+
+        if($search != "")
+        {
+            $sentence .=  $this->getSearchLikeFormat($filterData, $search, $where);
+        }
+
+
+
+        $this->setContent(
+            stylesUser::filterMenu
+            (
+                "Order by",
+                "Default",
+                $filterData,
+                "Search...",
+                "showAdministrateUsersReserves",
+                $this->sid
+            ).
+
+            stylesUser::table
+            (
+                $this->select($sentence),
+                true,
+                true,
+                false,
+                "",
+                "UserReserve",
+                ["ID Copy"],
+                true,
+                $this->MAX_DAYS_RESERVE,
+                $this->sid
+            )
+        );
+    }
 
 
 
@@ -332,7 +553,10 @@ class Librarian extends User{
         );
     }
 
-    public function showAddBook(){
+    public function showAddBook()
+    {
+        $_SESSION['menu'] = "Books";
+
         $this->setContent
         (
             stylesUser::contentForm
@@ -347,7 +571,9 @@ class Librarian extends User{
         );
     }
 
-    public function showAddCopy($isbn){
+    public function showAddCopy($isbn)
+    {
+        $_SESSION['menu'] = "Books";
 
         $isbn['isbn'] = $isbn['ISBN'];
 
@@ -373,6 +599,12 @@ class Librarian extends User{
     {
         $_SESSION['menu'] = "Users";
 
+        $sentence = "";
+        if($_SESSION != 'Admin')
+        {
+            $sentence .= "AND typeUser = 'User'";
+        }
+
 
         $user = mysqli_fetch_assoc
         (
@@ -380,9 +612,10 @@ class Librarian extends User{
             ("
                 SELECT email, name, surname, telephone, home, typeUser
                 FROM users
-                WHERE email = '".$request['Email']."' AND typeUser = 'User'
+                WHERE email = '".$request['Email']."'".$sentence."
             ")
         );
+
 
         $this->setContent
         (
@@ -421,21 +654,47 @@ class Librarian extends User{
                 $this->sid,
                 (isset($request['error'])),
                 "update",
-                "setUpdateBook"
+                "setUpdateBook&primaryISBN=".$book['isbn']
             )
         );
     }
 
-    public function showEditCopy(){}
+    public function showEditCopy($request)
+    {
+        $_SESSION['menu'] = "Books";
+
+
+        $data = mysqli_fetch_assoc($this->select("SELECT * FROM copybooks WHERE id = ".$request['IDCopy']));
+
+
+        $this->setContent
+        (
+            stylesUser::contentForm
+            (
+                "Edit Copy",
+                stylesLibrarian::formCopy($data),
+                $this->sid,
+                "",
+                "update",
+                "setUpdateCopy&id=".$request['IDCopy']
+            )
+        );
+    }
 
     public function showEditUserReserves(){}
 
 
 
-    public function setInsertUser($request){
+    public function setInsertUser($request)
+    {
+        $_SESSION['menu'] = "Users";
+
+        if($_SESSION != 'Admin')
+        {
+            $request['typeUser'] = "User";
+        }
 
         $request['registered'] = date('Y-m-d');
-        $request['typeUser'] = "User";
         $request['pwd'] = md5($request['pwd']);
 
         return $this->insert("users",$request);
@@ -445,7 +704,10 @@ class Librarian extends User{
 
     }
 
-    public function setInsertCopy($copy){
+    public function setInsertCopy($copy)
+    {
+        $_SESSION['menu'] = "Books";
+
         return $this->insert("copybooks",$copy);
     }
 
@@ -453,17 +715,25 @@ class Librarian extends User{
 
 
 
-    public function setUpdateUser($request){
+    public function setUpdateUser($request)
+    {
+        $_SESSION['menu'] = "Users";
 
-        unset($request['typeUser'], $request['registered']);
+
+        if($_SESSION != 'Admin')
+        {
+            unset($request['typeUser'], $request['registered']);
+        }
 
 
-        if(isset($request['pwd']) && ($request['pwd'] == "" || $request['pwd'] == " ")){
+        if(isset($request['pwd']) && ($request['pwd'] == "" || $request['pwd'] == " "))
+        {
             unset($request['pwd']);
         }
         else
             $request['pwd'] = md5($request['pwd']);
 
+        
 
         $where = "email = '".$request['previousEmail']."'";
         unset($request['previousEmail']);
@@ -472,24 +742,57 @@ class Librarian extends User{
         return ($this->update("users",$request,$where));
     }
 
-    public function setUpdateBook(){}
+    public function setUpdateBook($request)
+    {
+        $where = "isbn = ".$request['primaryISBN'];
 
-    public function setUpdateCopy(){}
+        unset($request['img'],$request['primaryISBN']);
+
+        return $this->update("books",$request,$where);
+    }
+
+    public function setUpdateCopy($request)
+    {
+        $where = "id = ".$request['id'];
+        unset($request['id']);
+
+        return $this->update("copybooks", $request,$where);
+    }
 
     public function setUpdateUserReserve(){}
 
 
 
-    public function setDeleteUser($email){
+    public function setDeleteUser($email)
+    {
+        $_SESSION['menu'] = "Users";
 
-        if($email != $this->emailUser)
+        $isPosbible = false;
+
+        if($_SESSION['typeUser'] != "Admin")
+        {
+            $tmp = mysqli_fetch_assoc($this->select("SELECT typeUser FROM users WHERE email = '".$email."'"));
+
+            if($tmp['typeUser'] == "User")
+                $isPosbible = true;
+        }
+        else
+            $isPosbible = true;
+
+        if($isPosbible)
            $this->delete("users","email = '".$email."'");
 
     }
 
-    public function setDeleteBook(){}
+    public function setDeleteBook($request)
+    {
+        $this->delete("books", "isbn = ".$request['ISBN']);
+    }
 
-    public function setDeleteCopy(){}
+    public function setDeleteCopy($request)
+    {
+        $this->delete("copybooks", "id = ".$request['IDCopy']);
+    }
 
     public function setDeleteUserReserve(){}
 

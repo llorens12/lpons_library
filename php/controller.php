@@ -11,20 +11,23 @@ include_once "objects/Ajax.php";
 session_cache_limiter('nocache,private');
 session_start();
 
-if (!isset($_SESSION['email'], $_SESSION['typeUser'], $_SESSION['name'], $_SESSION['home'])) {
-
+if (!isset($_SESSION['email'], $_SESSION['typeUser'], $_SESSION['name'], $_SESSION['home']))
     header('Location: index.php');
 
-}
+
 
 
 //register_shutdown_function('fatalErrorHandler');
 
 
-if (isset($_REQUEST['ajax'])) {
+if (isset($_REQUEST['ajax']))
+{
     $ajax = new Ajax();
+    $option = $_REQUEST['ajax'];
+    unset($_REQUEST['ajax']);
 
-    switch ($_REQUEST['ajax']) {
+    switch ($option) {
+
         case "emailDisponibility":
 
             $ajax->email($_REQUEST['email']);
@@ -32,8 +35,12 @@ if (isset($_REQUEST['ajax'])) {
 
         case "reserveDisponibility":
 
-            unset($_REQUEST['ajax']);
             $ajax->reserveDisponibility($_REQUEST);
+            break;
+
+        case "book":
+
+            $ajax->book($_REQUEST);
             break;
     }
 }
@@ -43,8 +50,24 @@ else {
 
     if (isset($_REQUEST['method']))
     {
+
         $method = $_REQUEST['method'];
         unset($_REQUEST['method']);
+
+        $category = "";
+        $search   = "";
+
+
+
+        if(isset($_REQUEST['category']))
+            $category = $_REQUEST['category'];
+
+        elseif(isset($_REQUEST['btnCategory']))
+            $category = $_REQUEST['btnCategory'];
+
+        if(isset($_REQUEST['search']))
+            $search = $_REQUEST['search'];
+        
 
         switch ($method)
         {
@@ -89,39 +112,17 @@ else {
 
             case "showBooks":
 
-                $category = "";
-                $search   = "";
-
-                if(isset($_REQUEST['btnCategory']))
-                    $category = $_REQUEST['btnCategory'];
-
-                elseif(isset($_REQUEST['category']))
-                    $category = $_REQUEST['category'];
-
-                if(isset($_REQUEST['search']))
-                    $search = $_REQUEST['search'];
-
-
                 $user->showBooks($category,$search);
                 break;
 
             case "showReserves":
-
-                $category = "";
-                $search   = "";
-
-                if(isset($_REQUEST['category']))
-                    $category = $_REQUEST['category'];
-
-                if(isset($_REQUEST['search']))
-                    $search = $_REQUEST['search'];
 
                 $user->showReserves($category,$search);
                 break;
 
             case "showMyProfile":
 
-                $user->showMyProfile((isset($_REQUEST['error']))? "error" : "");
+                $user->showMyProfile((isset($_REQUEST['error'])));
                 break;
 
 
@@ -137,85 +138,45 @@ else {
 
             case "showTableUsers":
 
+                $user->showTableUsers($category,$search);
+                break;
+
             case "showTableDefaulters":
-
-                $category = "";
-                $search   = "";
-
-                if(isset($_REQUEST['category']))
-                    $category = $_REQUEST['category'];
-
-                if(isset($_REQUEST['search']))
-                    $search = $_REQUEST['search'];
 
                 $user->showTableDefaulters($category,$search);
                 break;
 
             case "showTableBooks":
 
-                $category = "";
-                $search   = "";
-
-                if(isset($_REQUEST['category']))
-                    $category = $_REQUEST['category'];
-
-                if(isset($_REQUEST['search']))
-                    $search = $_REQUEST['search'];
-
                 $user->showTableBooks($category,$search);
                 break;
 
             case "showTableCopies":
 
-                $category = "";
-                $search   = "";
-
-                if(isset($_REQUEST['category']))
-                    $category = $_REQUEST['category'];
-
-                if(isset($_REQUEST['search']))
-                    $search = $_REQUEST['search'];
-
                 $user->showTableCopies($category,$search);
                 break;
-
-            case "showTableUsersReserves":
 
 
 
             case "showAdministrateUsers":
-
-                $category = "";
-                $search   = "";
-
-                if(isset($_REQUEST['category']))
-                    $category = $_REQUEST['category'];
-
-                if(isset($_REQUEST['search'])) {
-                    $search = $_REQUEST['search'];
-                }
 
                 $user->showAdministrateUsers($category,$search);
                 break;
 
             case "showAdministrateBooks":
 
-                $category = "";
-                $search   = "";
-
-                if(isset($_REQUEST['category']))
-                    $category = $_REQUEST['category'];
-
-                if(isset($_REQUEST['search'])) {
-                    $search = $_REQUEST['search'];
-                }
-
                 $user->showAdministrateBooks($category,$search);
                 break;
 
             case "showAdministrateCopies":
 
+                $user->showAdministrateCopies($category,$search);
+                break;
+
             case "showAdministrateUsersReserves":
+
+                $user->showAdministrateUsersReserves($category,$search);
+                break;
 
 
 
@@ -248,6 +209,9 @@ else {
                 break;
 
             case "showEditCopy":
+
+                $user->showEditCopy($_REQUEST);
+                break;
 
             case "showEditUserReserves":
 
@@ -288,13 +252,13 @@ else {
             case "setInsertDefaultReserve":
 
                 $user->setInsertDefaultReserve($_REQUEST);
-                header('Location: controller.php?method=showReserves'.htmlspecialchars(SID))
+                header('Location: controller.php?method=showReserves'.htmlspecialchars(SID));
                 break;
 
             case "setInsertPersonalizedReserve":
 
                 $user->setInsertPersonalizedReserve($_REQUEST);
-                header('Location: controller.php?method=showReserves'.htmlspecialchars(SID))
+                header('Location: controller.php?method=showReserves'.htmlspecialchars(SID));
                 break;
 
 
@@ -315,7 +279,7 @@ else {
             case "setInsertCopy":
 
                 $user->setInsertCopy($_REQUEST);
-                header('Location: controller.php?method=showAdministrateCopies&search='.$_REQUEST['isbn'].htmlspecialchars(SID));
+                header('Location: controller.php?method=showAdministrateCopies&search='.$_REQUEST['book'].htmlspecialchars(SID));
                 break;
 
             case "setInsertUserReserve":
@@ -335,35 +299,15 @@ else {
             case "setUpdateReserve":
 
                 if($user->setUpdateReserve($_REQUEST))
-                {
                     header('Location: controller.php?method=showReserves&search='.$_REQUEST['isbn']. htmlspecialchars(SID));
-                }
-                else
-                {
-                    if(strpos($_SERVER['HTTP_REFERER'], "&error="))
-                        header('Location: '.$_SERVER['HTTP_REFERER'].htmlspecialchars(SID));
 
-                    else
-                        header('Location: '.$_SERVER['HTTP_REFERER'].'&error=""'.htmlspecialchars(SID));
-                }
                 break;
 
             case "setUpdateMyProfile":
 
-                unset($_REQUEST['update']);
                 if($user->setUpdateMyProfile($_REQUEST))
-                {
                     header('Location: controller.php?method=showMyProfile'. htmlspecialchars(SID));
 
-                }
-                else
-                {
-                    if(strpos($_SERVER['HTTP_REFERER'], "&error="))
-                        header('Location: '.$_SERVER['HTTP_REFERER'].htmlspecialchars(SID));
-
-                    else
-                        header('Location: '.$_SERVER['HTTP_REFERER'].'&error=""'.htmlspecialchars(SID));
-                }
                 break;
 
 
@@ -371,30 +315,28 @@ else {
 
             case "setUpdateUser":
 
-                unset($_REQUEST['update']);
                 if($user->setUpdateUser($_REQUEST))
-                {
                     header('Location: controller.php?method=showTableUsers&search='.$_REQUEST['Email']. htmlspecialchars(SID));
 
-                }
-                else
-                {
-                    if(strpos($_SERVER['HTTP_REFERER'], "&error="))
-                        header('Location: '.$_SERVER['HTTP_REFERER'].htmlspecialchars(SID));
-
-                    else
-                        header('Location: '.$_SERVER['HTTP_REFERER'].'&error=""'.htmlspecialchars(SID));
-                }
                 break;
 
             case "setUpdateBook":
 
+                if($user->setUpdateBook($_REQUEST))
+                    header('Location: controller.php?method=showTableBooks&search='.$_REQUEST['isbn']. htmlspecialchars(SID));
+
+                break;
+
             case "setUpdateCopy":
+
+                $user->setUpdateCopy();
+                break;
 
             case "setUpdateUserReserve":
 
 
         }
+        setError();
     }
     elseif(isset($_REQUEST['delete']))
     {
@@ -425,7 +367,7 @@ else {
 
             case "setDeleteCopy":
 
-                $user->setDeleteCopy($_REQUEST['id']);
+                $user->setDeleteCopy($_REQUEST);
                 header('Location: controller.php?method=showAdministrateCopies'.htmlspecialchars(SID));
                 break;
 
@@ -436,9 +378,19 @@ else {
                 break;
         }
     }
+
     echo $user;
 }
 
+
+    function setError()
+    {
+        if(strpos($_SERVER['HTTP_REFERER'], "&error="))
+            header('Location: '.$_SERVER['HTTP_REFERER'].htmlspecialchars(SID));
+
+        else
+            header('Location: '.$_SERVER['HTTP_REFERER'].'&error=""'.htmlspecialchars(SID));
+    }
 
 
 /**
