@@ -12,6 +12,11 @@
     margin-right:-4px;
 }
 
+/*Bootstrap override*/
+.input-group{
+    text-align: left;
+}
+
 *{
     margin: 0;
     padding: 0;

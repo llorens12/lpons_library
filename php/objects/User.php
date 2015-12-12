@@ -200,9 +200,32 @@ class User extends Template{
         );
     }
 
-    public function showMyProfile($error){
+    public function showMyProfile($request)
+    {
+        $_SESSION['menu'] = "";
 
-        $this->myProfile($error);
+        $currentUser = mysqli_fetch_assoc
+        (
+            $this->select
+            ("
+                        SELECT email, name, surname, telephone, home, typeUser
+                        FROM users
+                        WHERE email = '{$this->emailUser}'
+                    ")
+        );
+
+        $this->setContent
+        (
+            stylesUser::contentForm
+            (
+                "My Profile",
+                stylesUser::formAdministrateUser($currentUser),
+                $this->sid,
+                (isset($request['error'])),
+                "update",
+                "setUpdateMyProfile"
+            )
+        );
     }
 
 
@@ -211,17 +234,14 @@ class User extends Template{
 
         $_SESSION['menu'] = "Reserves";
 
-        if(!isset($request['email']))
-            $email = $this->emailUser;
+        $email = $this->emailUser;
 
-        else
-            $email = $request['email'];
 
         $reserve = mysqli_fetch_assoc
         (
             $this->select
             ("
-                SELECT isbn, title, author, category, date_start, date_finish, copybook, sent
+                SELECT isbn, title, author, category, date_start, date_finish, copybook, sent, received
                 FROM (
                 reserves
                 JOIN copybooks ON copybook = id
@@ -241,7 +261,6 @@ class User extends Template{
             stylesUser::contentFormEditReserves
             (
                 $reserve,
-                $_SESSION['typeUser'],
                 (isset($request['error'])),
                 $this->sid
             )
@@ -250,45 +269,16 @@ class User extends Template{
 
 
 
-    public function setInsertDefaultReserve($request){
-
+    public function setInsertDefaultReserve($request)
+    {
         $request['user'] = $_SESSION['email'];
-
-        $returnament = $this->insertDeffaultReserve($request);
-
-        if($returnament === true)
-        {
-            return true;
-        }
-        elseif($returnament === false)
-        {
-            $this->showError("It hasn't been possible perform the reserve");
-        }
-        else
-            $this->showError($returnament);
-
-        return false;
+        return $this->insertDeffaultReserve($request);
     }
 
     public function setInsertPersonalizedReserve($request)
     {
         $request['user'] = $_SESSION['email'];
-
-
-        $returnament = $this->insertPersonalizedReserve($request);
-
-        if($returnament === true)
-        {
-            return true;
-        }
-        elseif($returnament === false)
-        {
-            $this->showError("It hasn't been possible perform the reserve");
-        }
-        else
-            $this->showError($returnament);
-
-        return false;
+        return $this->insertPersonalizedReserve($request);
     }
 
 
@@ -325,10 +315,24 @@ class User extends Template{
 
 
 
-    public function setDeleteReserve($request){
+    public function setDeleteReserve($request)
+    {
         $request['email'] = $this->emailUser;
 
-        return $this->deleteReserve($request);
+        $copyBook = mysqli_fetch_assoc
+        (
+            $this->select
+            ("
+                SELECT id
+                FROM reserves
+                JOIN copybooks ON copybook = id
+                WHERE user =  '".$request['email']."'
+                AND book =  '".$request['ISBN']."'
+                AND date_start =  '".$request['Start']."'
+            ")
+        )['id'];
+
+        return $this->delete("reserves","copybook = '".$copyBook."' AND date_start = '".$request['Start']."'");
     }
 
 
@@ -344,37 +348,10 @@ class User extends Template{
         };
     }
 
-
-
-    protected function myProfile($error){
-
-        $_SESSION['menu'] = "";
-
-        $currentUser = mysqli_fetch_assoc
-        (
-            $this->select
-            ("
-                        SELECT email, name, surname, telephone, home, typeUser
-                        FROM users
-                        WHERE email = '{$this->emailUser}'
-                    ")
-        );
-
-        $this->setContent
-        (
-            stylesUser::contentForm
-            (
-                "My Profile",
-                stylesUser::formAdministrateUser($currentUser),
-                $this->sid,
-                $error,
-                "update",
-                "setUpdateMyProfile"
-            )
-        );
-    }
-
     protected function updateReserve($reserve){
+
+        if(!isset($reserve['date_start']))
+            $reserve['date_start'] = $reserve['firstDateStart'];
 
         $difference = $this->getDateDifference($reserve['date_start'],$reserve['date_finish']);
 
@@ -403,9 +380,7 @@ class User extends Template{
                 )
         ";
 
-        $select = $this->select($sentence);
-
-        if(mysqli_num_rows($select) != 0)
+        if(mysqli_num_rows($this->select($sentence)) != 0)
             return false;
 
         $where =
@@ -422,44 +397,10 @@ class User extends Template{
         return $this->update("reserves", $reserve, $where);
     }
 
-    protected function deleteReserve($request){
-
-        $copyBook = mysqli_fetch_assoc
-        (
-            $this->select
-            ("
-                SELECT id
-                FROM reserves
-                JOIN copybooks ON copybook = id
-                WHERE user =  '".$request['email']."'
-                AND book =  '".$request['ISBN']."'
-                AND date_start =  '".$request['Start']."'
-            ")
-        )['id'];
-
-        return $this->delete("reserves","copybook = '".$copyBook."' AND date_start = '".$request['Start']."'");
-    }
-
-    protected function insertDeffaultReserve($request){
-
-        $existsReserve = mysqli_fetch_assoc($this->select
-        ("
-            SELECT copybook
-            FROM reserves
-            JOIN copybooks ON copybook = id
-            WHERE
-                user =  '".$request['user']."'
-            AND
-                book =  '".$request['isbn']."'
-            AND
-                date_finish > ".str_replace("-","",date('Y-m-d'))."
-         "));
-
-        if(count($existsReserve) > 0){
-            return "You have already reserved book";
-        }
-        unset($existsReserve);
-
+    protected function insertDeffaultReserve($request)
+    {
+        if($this->existsReserve($request['user'], $request['isbn']))
+            return false;
 
         if(isset($request['days_reserve']))
         {
@@ -467,7 +408,7 @@ class User extends Template{
             unset($request['days_reserve']);
         }
         else
-            $days_reserve = $this->DEFAULT_DAYS_RESERVE-1;
+            $days_reserve = ($this->DEFAULT_DAYS_RESERVE-1);
 
         $request['date_start'] = date('Y-m-d');
         $request['date_finish']= date('Y-m-d', strtotime ('+'.$days_reserve.' day', strtotime($request['date_start'])));
@@ -588,30 +529,14 @@ class User extends Template{
 
     protected function insertPersonalizedReserve($reserve)
     {
-        $existsReserve = mysqli_fetch_assoc($this->select
-        ("
-            SELECT copybook
-            FROM reserves
-            JOIN copybooks ON copybook = id
-            WHERE
-                user =  '".$reserve['user']."'
-            AND
-                book =  '".$reserve['isbn']."'
-            AND
-                date_finish > ".str_replace("-","",date('Y-m-d'))."
-         "));
-
-        if(count($existsReserve) > 0){
-            return "You have already reserved book";
-        }
-        unset($existsReserve);
+        if($this->existsReserve($reserve['user'], $reserve['isbn']))
+            return false;
 
 
         $reserve = $this->getReserveToformatValid($reserve);
         if($reserve == false){
             return false;
         }
-
 
 
         $reserve['copybook'] = mysqli_fetch_assoc
@@ -651,6 +576,29 @@ class User extends Template{
         }
 
         return $reserve;
+    }
+
+    protected function existsReserve($user, $isbn)
+    {
+        $existsReserve = mysqli_fetch_assoc($this->select
+        ("
+            SELECT copybook
+            FROM reserves
+            JOIN copybooks ON copybook = id
+            WHERE
+                user =  '".$user."'
+            AND
+                book =  '".$isbn."'
+            AND
+                date_finish > ".str_replace("-","",date('Y-m-d'))."
+         "));
+
+
+        if(count($existsReserve) > 0)
+            return true;
+
+        else
+            return false;
     }
 
     protected function getBookDisponibility($isbn, $dateStart, $dateFinish){

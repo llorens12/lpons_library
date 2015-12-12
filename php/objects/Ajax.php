@@ -28,6 +28,13 @@ class Ajax
 
         $isbn = $request['isbn'];
 
+
+        if(isset($request['user']))
+            $user = $request['user'];
+
+        else
+            $user = $_SESSION['email'];
+
         $dateFinish = str_replace("-", "", $request['dateFinish']);
         $dateStart = str_replace("-", "", $request['dateStart']);
 
@@ -51,7 +58,23 @@ class Ajax
                 )
                 ORDER BY status DESC
         ");
-        if (count(mysqli_fetch_assoc($result)) > 0) {
+
+        $existsReserve = mysqli_fetch_assoc($this->select
+        ("
+            SELECT copybook
+            FROM reserves
+            JOIN copybooks ON copybook = id
+            WHERE
+                user =  '".$user."'
+            AND
+                book =  '".$isbn."'
+            AND
+                date_finish > ".str_replace("-","",date('Y-m-d'))."
+         "));
+
+
+
+        if (count(mysqli_fetch_assoc($result)) > 0 && count($existsReserve) == 0) {
             echo "true";
         } else {
             echo "false";

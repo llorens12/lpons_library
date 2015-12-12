@@ -41,6 +41,12 @@ $(document).ready(function()
         });
 
 
+        $('#date-start, #date-finish').attr("value", function(){
+
+            var currentDate = new Date();
+            return currentDate.getFullYear() + "-" + (currentDate.getMonth() +1) + "-" + currentDate.getDate();
+        });
+
         var email = $('#email').val();
 
         $('#email').blur(function(){
@@ -75,7 +81,7 @@ $(document).ready(function()
 
 );
 
-function checkRegisterContent(event){
+function checkRegisterContent(){
 
     var pwd = $('#pwd');
     var pwd1 = $('#pwd1');
@@ -96,8 +102,8 @@ function checkReserveDisponibility(){
     var valDateStart  = $("#date-start").val();
     var valDateFinish = $("#date-finish").val();
 
-    var dataCheck = "ajax=reserveDisponibility&isbn="+$('#personalized-reserve').children('form').attr('isbn')+"&dateStart="+valDateStart+"&dateFinish="+valDateFinish;
-
+    var dataCheck = "ajax=reserveDisponibility&isbn="+$('form[isbn]').attr('isbn')+"&dateStart="+valDateStart+"&dateFinish="+valDateFinish;
+console.log(dataCheck);
     if(disponibilityAjax(dataCheck)){
         return true;
     }

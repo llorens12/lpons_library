@@ -122,7 +122,7 @@ else {
 
             case "showMyProfile":
 
-                $user->showMyProfile((isset($_REQUEST['error'])));
+                $user->showMyProfile($_REQUEST);
                 break;
 
 
@@ -195,7 +195,10 @@ else {
                 $user->showAddCopy($_REQUEST);
                 break;
 
-            case "showAddReserves":
+            case "showAddUserReserve":
+
+                $user->showAddUserReserve($_REQUEST);
+                break;
 
 
 
@@ -213,7 +216,10 @@ else {
                 $user->showEditCopy($_REQUEST);
                 break;
 
-            case "showEditUserReserves":
+            case "showEditUserReserve":
+
+                $user->showEditUserReserve($_REQUEST);
+                break;
 
 
 
@@ -301,13 +307,16 @@ else {
                 if($user->setUpdateReserve($_REQUEST))
                     header('Location: controller.php?method=showReserves&search='.$_REQUEST['isbn']. htmlspecialchars(SID));
 
+                else
+                    setError();
                 break;
 
             case "setUpdateMyProfile":
 
                 if($user->setUpdateMyProfile($_REQUEST))
                     header('Location: controller.php?method=showMyProfile'. htmlspecialchars(SID));
-
+                else
+                    setError();
                 break;
 
 
@@ -317,14 +326,16 @@ else {
 
                 if($user->setUpdateUser($_REQUEST))
                     header('Location: controller.php?method=showTableUsers&search='.$_REQUEST['Email']. htmlspecialchars(SID));
-
+                else
+                    setError();
                 break;
 
             case "setUpdateBook":
 
                 if($user->setUpdateBook($_REQUEST))
                     header('Location: controller.php?method=showTableBooks&search='.$_REQUEST['isbn']. htmlspecialchars(SID));
-
+                else
+                    setError();
                 break;
 
             case "setUpdateCopy":
@@ -336,7 +347,6 @@ else {
 
 
         }
-        setError();
     }
     elseif(isset($_REQUEST['delete']))
     {

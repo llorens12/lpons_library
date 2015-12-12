@@ -321,7 +321,7 @@ class Librarian extends User{
                 true,
                 true,
                 true,
-                "Reserve",
+                "UserReserve",
                 "User",
                 ["Email"],
                 false,
@@ -462,6 +462,8 @@ class Librarian extends User{
             "copyBook"      => "'ID Copy'",
             "isbn"          => "'ISBN'",
             "title"         => "'Title'",
+            "author"        => "'Author'",
+            "category"      => "'Category'",
             "date_start"    => "'Start'",
             "date_finish"   => "'End'",
             "sent"          => "'Sent'",
@@ -515,8 +517,8 @@ class Librarian extends User{
                 false,
                 "",
                 "UserReserve",
-                ["ID Copy"],
-                true,
+                ["User","Start","ISBN"],
+                false,
                 $this->MAX_DAYS_RESERVE,
                 $this->sid
             )
@@ -591,7 +593,19 @@ class Librarian extends User{
         );
     }
 
-    public function showAddReserves(){}
+    public function showAddUserReserve($request)
+    {
+
+    $this->setContent
+    (
+        stylesLibrarian::formAddReserve
+        (
+            $request,
+            $this->select("SELECT isbn, title FROM books"),
+            (isset($request['error']))
+        )
+    );
+    }
 
 
 
@@ -674,14 +688,51 @@ class Librarian extends User{
                 "Edit Copy",
                 stylesLibrarian::formCopy($data),
                 $this->sid,
-                "",
+                (isset($request['error'])),
                 "update",
                 "setUpdateCopy&id=".$request['IDCopy']
             )
         );
     }
 
-    public function showEditUserReserves(){}
+    public function showEditUserReserve($request)
+    {
+        $_SESSION['menu'] = "Reserves";
+
+
+        $data = mysqli_fetch_assoc
+        (
+            $this->select
+            ("
+                SELECT isbn, title, author, category, date_start, date_finish, copybook, user, sent, received
+                FROM (
+                reserves
+                JOIN copybooks ON copybook = id
+                )
+                JOIN books ON book = isbn
+                WHERE
+                user =  '".$request['User']."'
+                    AND
+                book =  '".$request['ISBN']."'
+                    AND
+                date_start =  '".$request['Start']."'
+             ")
+        );
+
+
+        $this->setContent
+        (
+            stylesUser::contentForm
+            (
+                "Edit User Reserve",
+                stylesLibrarian::formEditUserReserve($data),
+                $this->sid,
+                (isset($request['error'])),
+                "update",
+                "setUpdateUserReserve&user=".$data['user'].'&first_date_start='.$data['date_start']
+            )
+        );
+    }
 
 
 
@@ -700,9 +751,7 @@ class Librarian extends User{
         return $this->insert("users",$request);
     }
 
-    public function setInsertBook($request){
-
-    }
+    public function setInsertBook(){}
 
     public function setInsertCopy($copy)
     {

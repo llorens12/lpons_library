@@ -119,9 +119,11 @@ class stylesUser{
             foreach ($object as $column => $value)
             {
                 if ($thead)
-                {
                     $contentThead .= "<th>" . $column . "</th>";
-                }
+
+                if(is_null($value))
+                    $value = "No";
+
                 $contentTr      .= '<td title="'.$column.'">' . $value  . '</td>';
             }
 
@@ -137,24 +139,24 @@ class stylesUser{
                 . $contentTr;
 
 
-            if($reserveDelimiter
+            if($recived != ""
             && is_null($recived)
             && date_create($object['Start'])->diff(date_create($object['End']))->format("d") < $MAX_DAYS_RESERVE )
             {
                 $stateEdit = "";
             }
-            elseif($reserveDelimiter)
+            elseif($recived != "")
             {
                 $stateEdit = "not-active";
             }
 
-            if($reserveDelimiter
+            if($recived != ""
             && is_null($sent) && is_null($recived)
             && date_create($object['Start'])->diff(date_create($object['End']))->format("d") < $MAX_DAYS_RESERVE )
             {
                 $stateDelete = "";
             }
-            elseif($reserveDelimiter)
+            elseif($recived != "")
             {
                 $stateDelete = "not-active";
             }
@@ -283,20 +285,26 @@ class stylesUser{
                             <p>'.$book["summary"].'</p>
 
 
-                        '.stylesUser::optionsReserve("controller.php?insert=setInsertDefaultReserve&isbn=".$book["isbn"].$sid.'"', $DEFAULT_DAYS_RESERVE." days", $book["isbn"], $sid).'
-
+                        '.stylesUser::personalizedReserve
+                        (
+                            "setInsertDefaultReserve&isbn=".$book["isbn"].$sid.'"',
+                            'setInsertPersonalizedReserve&isbn='.$book["isbn"].$sid,
+                            $DEFAULT_DAYS_RESERVE." days",
+                            $book["isbn"],
+                            $sid
+                        ).'
 
                         </div>
                     </div>
             ';
     }
 
-    public static function optionsReserve($href, $textBtnReserve, $isbn, $sid){
+    public static function personalizedReserve($hrefDefaultReserve = "", $hrefPersonalizedReserve = "", $textBtnReserve = "", $isbn = "", $sid = ""){
         return
-        '
+            '
             <div id="options-reserves">
 
-                <a href="'.$href.'" class="btn btn-primary" id="btn-reserve-20-days" title="Set reserve">
+                <a href="controller.php?insert='.$hrefDefaultReserve.'" class="btn btn-primary" id="btn-reserve-20-days" title="Set reserve">
                 Reserve '.$textBtnReserve.'
                 </a>
 
@@ -310,19 +318,18 @@ class stylesUser{
 
             <div class="hidden" id="personalized-reserve">
 
-                <form isbn="'.$isbn.'" action="controller.php?insert=setInsertPersonalizedReserve&isbn='.$isbn.$sid.'" method="post" onsubmit="return checkReserveDisponibility()">
+                <form isbn="'.$isbn.'" action="controller.php?insert='.$hrefPersonalizedReserve.$sid.'" method="post" onsubmit="return checkReserveDisponibility()">
 
                 <div class="input-group" id="start-date-reserve-personalized">
                     <span class="input-group-addon icons"><i class="fa fa-calendar-plus-o"></i></span>
-                    <input type="date" class="form-control" placeholder="dd/mm/aaaa" name="date_start" id="date-start" required="">
+                    <input type="date" class="form-control" name="date_start" id="date-start" value="" required="">
                 </div>
                 <div class="input-group" id="finish-date-reserve-personalized">
                     <span class="input-group-addon icons"><i class="fa fa-calendar-times-o"></i></span>
-                    <input type="date" class="form-control" placeholder="dd/mm/aaaa" name="date_finish" id="date-finish"
-                           required="">
+                    <input type="date" class="form-control" name="date_finish" id="date-finish" value=""  required="">
                 </div>
 
-                <label class="label label-danger hidden" id="label-error-personalized-reserve">The reserve is not available</label>
+                <label class="label label-danger hidden" id="label-error-personalized-reserve">The reserve is not available or already reserved book</label>
                 <br>
                 <button type="submit" class="btn btn-default">Reserve</button>
                 </form>
@@ -404,7 +411,7 @@ class stylesUser{
         ';
     }
 
-    public static function contentFormEditReserves($reserve, $typeUser, $error, $sid){
+    public static function contentFormEditReserves($reserve, $error, $sid){
 
         $hidden = "hidden";
         if($error){
@@ -419,7 +426,7 @@ class stylesUser{
                 <form class="col-lg-12 col-md-12 col-sm-12 col-xs-12 content-form" action="controller.php?update=setUpdateReserve&copyBook='.$reserve['copybook'].'&firstDateStart='.$reserve['date_start'].$sid.'" method="POST">
                     <div class="inputs-content-form">
                         <h2>Edit reserve</h2>
-                        '.stylesUser::formEditReserves($reserve, $typeUser).'
+                        '.stylesUser::formEditReserves($reserve).'
                     </div>
                     <label class="label label-danger '.$hidden.'" id="label-error-personalized-reserve">The reserve is not available</label>
                     <br>
@@ -433,35 +440,36 @@ class stylesUser{
                     ';
     }
 
-    public static function formEditReserves($reserve, $typeUser){
+    public static function formEditReserves($reserve){
 
-        ($typeUser == "user" && !is_null($reserve['sent']))? $dateStart = "disabled" : $dateStart ="";
+        (!is_null($reserve['sent']))? $dateStart = "disabled" : $dateStart ="";
+        (!is_null($reserve['received']))? $dateFinish = "disabled" : $dateFinish ="";
 
         return
         '
-            <div class="input-group">
+            <div class="input-group" title="ISBN">
                 <span class="input-group-addon icons" title="ISBN"><i class="fa fa-barcode"></i></span>
-                <input type="text" class="form-control" value="'.$reserve['isbn'].'" disabled title="ISBN">
+                <input type="text" class="form-control" value="'.$reserve['isbn'].'" disabled >
             </div>
-            <div class="input-group">
+            <div class="input-group" title="Title">
                 <span class="input-group-addon icons" title="Title"><i class="fa fa-book"></i></span>
-                <input maxlength="50" type="text" class="form-control" value="'.$reserve['title'].'" disabled title="Title">
+                <input maxlength="50" type="text" class="form-control" value="'.$reserve['title'].'" disabled >
             </div>
-            <div class="input-group">
+            <div class="input-group" title="Author">
                 <span class="input-group-addon icons" title="Author"><i class="fa fa-pencil"></i></span>
-                <input type="text" class="form-control" value="'.$reserve['author'].'" disabled title="Author">
+                <input type="text" class="form-control" value="'.$reserve['author'].'" disabled >
             </div>
-            <div class="input-group">
-                <span class="input-group-addon icons" title="Category"><i class="fa fa-hashtag"></i></span>
-                <input type="text" class="form-control" value="'.$reserve['category'].'" disabled title="Category">
+            <div class="input-group" title="Category">
+                <span class="input-group-addon icons" title="Category"><i class="fa fa-copyright"></i></span>
+                <input type="text" class="form-control" value="'.$reserve['category'].'" disabled >
             </div>
-            <div class="input-group">
-                <span class="input-group-addon icons" title="Date Start"><i class="fa fa-calendar-plus-o"></i></span>
-                <input type="date" class="form-control" name="date_start" value="'.$reserve['date_start'].'" '.$dateStart.' title="Date Start">
+            <div class="input-group" title="Date Start">
+                <span class="input-group-addon icons"><i class="fa fa-calendar-plus-o"></i></span>
+                <input type="date" class="form-control" name="date_start" value="'.$reserve['date_start'].'" '.$dateStart.' >
             </div>
-            <div class="input-group">
-                <span class="input-group-addon icons" title="Date Finish"><i class="fa fa-calendar-times-o"></i></span>
-                <input type="date" class="form-control" name="date_finish" value="'.$reserve['date_finish'].'" title="Date Finish">
+            <div class="input-group" title="Date Finish">
+                <span class="input-group-addon icons"><i class="fa fa-calendar-times-o"></i></span>
+                <input type="date" class="form-control" name="date_finish" value="'.$reserve['date_finish'].'" '.$dateFinish.'>
             </div>
                     ';
     }
@@ -483,7 +491,7 @@ class stylesUser{
                         <h2>'.$title.'</h2>
                         '.$form.'
                     </div>
-                    <label class="label label-danger '.$hidden.'" id="label-error-personalized-reserve">The email is not aviable</label>
+                    <label class="label label-danger '.$hidden.'" id="label-error-personalized-reserve">This option is not aviable</label>
                     <br>
                     <div class="form-group btn-content-form">
                         <button type="submit" class="btn btn-default active" title="Save">
@@ -758,6 +766,119 @@ class stylesLibrarian
                 </select>
             </div>
         ';
+    }
+
+    public static function formEditUserReserve($data){
+
+        return
+            '
+            <div class="input-group" title="User">
+                <span class="input-group-addon icons"><i class="fa fa-user"></i></span>
+                <input type="text" class="form-control" value="'.$data['user'].'" title="User" disabled/>
+            </div>
+            <div class="input-group" title="ID Copy" >
+                <span class="input-group-addon icons"><i class="fa fa-hashtag"></i></span>
+                <input type="text" class="form-control" value="'.$data['copybook'].'" disabled/>
+            </div>'
+
+        .stylesUser::formEditReserves($data)
+
+        .stylesLibrarian::formUserReserveStatus($data);
+
+
+
+    }
+
+    public static function formUserReserveStatus($data = ""){
+
+        $sent = "";
+        $received = "";
+
+        if($data != "")
+        {
+            if (!is_null($data['sent']))
+                $sent = "checked disabled";
+
+            if (!is_null($data['received']))
+                $received = "checked disabled";
+
+        }
+        else
+            $received = "disabled";
+
+        return
+            '
+            <div class="input-group">
+                <span class="input-group-addon icons"><i class="fa fa-sign-out"></i></span>
+                <div class="checkbox form-control commited-reserves"  '.$sent.'>
+                    <label>
+                        <input type="checkbox" name="sent" id="status-sent" value="true" '.$sent.'>
+                        Sent?
+                    </label>
+                </div>
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon icons"><i class="fa fa-sign-in"></i></i></span>
+                <div class="checkbox form-control commited-reserves" '.$received.'>
+                    <label>
+                        <input type="checkbox" name="received" value="true" '.$received.'>
+                        Received?
+                    </label>
+                </div>
+            </div>
+        ';
+    }
+
+    public static function formAddReserve($data, $books, $error){
+
+        $hidden = "hidden";
+
+        if($error){
+            $hidden = "";
+        }
+
+        $optionsBooks = "";
+
+        while($currentBook = mysqli_fetch_assoc($books))
+        {
+            $optionsBooks .= '<option VALUE="'.$currentBook['isbn'].'">'.$currentBook['isbn'].' '.$currentBook['title'].'</option>';
+        }
+
+
+
+        return
+        '
+            <div class="row row-centered container-form" id="form-add-user-reserve">
+
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 content-form">
+                    <div class="inputs-content-form">
+                        <h2>Add User Reserve</h2>
+
+                            <div class="input-group" title="User">
+                                <span class="input-group-addon icons"><i class="fa fa-user"></i></span>
+                                <input type="text" class="form-control" placeholder="'.$data['Email'].'" title="User" disabled/>
+                            </div>
+                            <div class="input-group" title="Book">
+                                <span class="input-group-addon icons"><i class="fa fa-book"></i></span>
+                                <select class="form-control" id="select-book">
+                                    '.$optionsBooks.'
+                                </select>
+                            </div>
+                            <div class="input-group" title="Total days reserve">
+                                <span class="input-group-addon icons"><i class="fa fa-calendar"></i></span>
+                                <input type="text" id="totalDays" class="form-control" />
+                            </div>
+
+                            '.stylesLibrarian::formUserReserveStatus().'
+
+                    </div>
+                    <label class="label label-danger '.$hidden.'" id="label-error-personalized-reserve">This option is not aviable</label>
+                    <br>
+                </div>
+            </div>
+        '.
+        stylesUser::personalizedReserve();
+
     }
 
 }

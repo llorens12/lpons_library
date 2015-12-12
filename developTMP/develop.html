@@ -105,38 +105,30 @@ Lorenzo
 
                     <div class="input-group">
                         <span class="input-group-addon icons"><i class="fa fa-user"></i></span>
-                        <select class="form-control" name="user">
-                            <option VALUE="abc"> ABC</option>
-                            <option VALUE="def"> def</option>
-                            <option VALUE="hij"> hij</option>
-                        </select>
+                        <input type="text" class="form-control" name="user" disabled title="User"/>
                     </div>
                     <div class="input-group">
                         <span class="input-group-addon icons"><i class="fa fa-book"></i></span>
-                        <select class="form-control" name="book">
+                        <select class="form-control" name="book" disabled>
                             <option VALUE="abc"> ABC</option>
                             <option VALUE="def"> def</option>
                             <option VALUE="hij"> hij</option>
                         </select>
                     </div>
                     <div class="input-group">
-                        <span class="input-group-addon icons"><i class="fa fa-calendar-plus-o"></i></span>
-                        <input type="date" class="form-control" placeholder="dd/mm/aaaa" name="date_start"  required="">
-                    </div>
-                    <div class="input-group">
-                        <span class="input-group-addon icons"><i class="fa fa-calendar-times-o"></i></span>
-                        <input type="date" class="form-control" placeholder="dd/mm/aaaa" name="date_finish" required="">
+                        <span class="input-group-addon icons"><i class="fa fa-calendar"></i></span>
+                        <input type="text" id="totalDays" class="form-control" title="Total days reserve"/>
                     </div>
                     <div class="input-group">
                         <span class="input-group-addon icons"><i class="fa fa-sign-out"></i></span>
                         <div class="checkbox form-control commited-reserves">
                             <label>
-                                <input type="checkbox" name="committed" value="true">
-                                Committed?
+                                <input type="checkbox" name="sent" value="true" checked disabled>
+                                Sent?
                             </label>
                         </div>
                     </div>
-                    <div class="input-group">
+                    <div class="input-group" >
                         <span class="input-group-addon icons"><i class="fa fa-sign-in"></i></i></span>
                         <div class="checkbox form-control commited-reserves" >
                             <label>
