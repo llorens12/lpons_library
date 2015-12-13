@@ -12,6 +12,36 @@ class Librarian extends User{
 
 
 
+    public function showMyProfile($request)
+    {
+        $_SESSION['menu'] = "";
+
+        $currentUser = mysqli_fetch_assoc
+        (
+            $this->select
+            ("
+                        SELECT email, name, surname, telephone, home, typeUser
+                        FROM users
+                        WHERE email = '{$this->emailUser}'
+                    ")
+        );
+
+        $this->setContent
+        (
+            stylesUser::contentForm
+            (
+                "My Profile",
+                stylesLibrarian::formAdministrateUser($currentUser),
+                $this->sid,
+                (isset($request['error'])),
+                "update",
+                "setUpdateMyProfile"
+            )
+        );
+    }
+
+
+
     public function showTableUsers($category = "", $search = "")
     {
         $_SESSION['menu'] = "Users";
@@ -24,10 +54,10 @@ class Librarian extends User{
             "telephone"     => "'Telephone'",
             "typeUser"      => "'Type User'",
             "registered"    => "'Registered'",
+            "CONCAT((curdate() - registered), ' days')" => "'Seniority'",
             "COUNT(user)"   => "'Total Reserves'",
-            "SUM(IF((curdate() < date_finish), 1, 0))" => "'After Reserves'",
-            "SUM(if(((curdate() between date_start AND date_finish) AND sent IS NOT null), 1, 0))" => "'Books in House'",
-            "SUM(IF(received > date_finish, 1, 0))" => "'Total Delays'",
+            "SUM(if(((curdate() between date_start AND date_finish) AND sent IS NOT null AND received IS null), 1, 0))" => "'Books in House'",
+            "SUM(IF((curdate() < date_start), 1, 0))" => "'Next Reserves'",
             "IF((SUM(IF((date_finish < curdate() AND sent IS NOT null AND received IS null), 1, 0)) != 0), 'Yes', 'No')" => "'Defaulter?'"
         );
 
@@ -67,6 +97,7 @@ class Librarian extends User{
         $this->setContent(
             stylesUser::filterMenu
             (
+                "Info Users",
                 "Order by",
                 "Default",
                 $filterData,
@@ -98,7 +129,7 @@ class Librarian extends User{
             "title"         => "'Title'",
             "sent"          => "'Date Send'",
             "date_finish"   => "'Teoric Received'",
-            'trim("-" FROM (date_finish - curdate()))' => "'Days Elapsed'"
+            'CONCAT(trim("-" FROM (date_finish - curdate())), " days")' => "'Days Elapsed'"
         );
 
 
@@ -139,6 +170,7 @@ class Librarian extends User{
         $this->setContent(
             stylesUser::filterMenu
             (
+                "Info Defaulters",
                 "Order by",
                 "Default",
                 $filterData,
@@ -195,6 +227,7 @@ class Librarian extends User{
         $this->setContent(
             stylesUser::filterMenu
             (
+                "Info Books",
                 "Order by",
                 "Default",
                 $filterData,
@@ -251,6 +284,7 @@ class Librarian extends User{
         $this->setContent(
             stylesUser::filterMenu
             (
+                "Info Copies",
                 "Order by",
                 "Default",
                 $filterData,
@@ -318,6 +352,7 @@ class Librarian extends User{
         $this->setContent(
             stylesUser::filterMenu
             (
+                "Administrate Users",
                 "Order by",
                 "Default",
                 $filterData,
@@ -378,6 +413,7 @@ class Librarian extends User{
         $this->setContent(
             stylesUser::filterMenu
             (
+                "Administrate Books",
                 "Order by",
                 "Default",
                 $filterData,
@@ -441,6 +477,7 @@ class Librarian extends User{
         $this->setContent(
             stylesUser::filterMenu
             (
+                "Administrate Copies",
                 "Order by",
                 "Default",
                 $filterData,
@@ -520,6 +557,7 @@ class Librarian extends User{
         $this->setContent(
             stylesUser::filterMenu
             (
+                "Administrate Users Reserves",
                 "Order by",
                 "Default",
                 $filterData,
@@ -664,7 +702,7 @@ class Librarian extends User{
             stylesUser::contentForm
             (
                 "Edit ".$user['name'],
-                stylesUser::formAdministrateUser($user),
+                stylesLibrarian::formAdministrateUser($user),
                 $this->sid,
                 (isset($request['error'])),
                 "update",
@@ -781,6 +819,8 @@ class Librarian extends User{
     {
         if (!$this->issetBook($request['isbn']) && $this->uploadIMG($file,$request['isbn']))
             return $this->insert("books",$request);
+
+        return false;
     }
 
     public function setInsertCopy($copy)
@@ -851,12 +891,12 @@ class Librarian extends User{
     public function setUpdateUserReserve($request)
     {
         if(isset($request['received']))
-            $request['date_start'] = $request['received'];
+            $request['date_finish'] = $request['received'];
 
         $where = "copybook = '".$request['copybook']."' AND date_start = '".$request['firstDateStart']."'";
         unset($request['copybook'], $request['firstDateStart']);
 
-        $this->update("reserves", $request, $where);
+        return $this->update("reserves", $request, $where);
     }
 
 

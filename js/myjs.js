@@ -22,8 +22,8 @@ $(document).ready(function()
             if (!thisBtn.hasClass('show-personalized'))
             {
                 thisBtn.addClass("show-personalized");
-                personalizedReserve.removeClass("not-active");
-                btn20days.attr("disabled",true).unbind('click', false);
+                personalizedReserve.removeClass("hidden");
+                btn20days.attr("disabled",true).addClass("not-active");
 
                 if(isFormUserReserve){
                     $('#totalDays').attr("disabled",true).val("");
@@ -33,8 +33,8 @@ $(document).ready(function()
             else
             {
                 thisBtn.removeClass("show-personalized");
-                personalizedReserve.addClass("not-active");
-                btn20days.attr("disabled",false).bind('click', false);
+                personalizedReserve.addClass("hidden");
+                btn20days.attr("disabled",false).removeClass("not-active");
 
                 if(isFormUserReserve){
                     $('#totalDays').attr("disabled",false);
@@ -142,9 +142,18 @@ function checkReserveDisponibility(){
     if(isbn == ""){
         isbn = $('#select-book').val();
         user = "&user="+$('#reserve-user').attr("value");
+        var sent = "";
 
-        form.attr('action', function(){
-            return "controller.php?insert=setInsertUserPersonalizedReserve&isbn="+isbn+user;
+
+        if($("#status-sent").is(':checked'))
+        {
+            var currentDate = new Date();
+            sent = "&sent="+currentDate.getFullYear() + "-" + (currentDate.getMonth() +1) + "-" + currentDate.getDate();
+        }
+
+        form.attr('action', function()
+        {
+            return "controller.php?insert=setInsertUserPersonalizedReserve&isbn="+isbn+user+sent;
         });
     }
 

@@ -24,6 +24,7 @@ class User extends Template{
         (
             stylesUser::filterMenu
             (
+                "Details Book",
                 "Select Category",
                 "Default",
                 $this->getArrayToResult
@@ -94,6 +95,7 @@ class User extends Template{
 
         $content .= stylesUser::filterMenu
         (
+            "Books",
             ($category != "" && $category != "*")? $category : "Select Category",
             "All",
             $this->getArrayToResult
@@ -176,6 +178,7 @@ class User extends Template{
         $this->setContent(
             stylesUser::filterMenu
             (
+                "My Reserves",
                 "Order by",
                 "Default",
                 $filterData,

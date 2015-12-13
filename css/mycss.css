@@ -207,7 +207,7 @@ footer{
 
     float: left;
     border-radius: 7px;
-    border: 1px #82a9ff solid;
+    border: 3px #000000 solid;
     background-color: whitesmoke;
     padding: 1%;
 }
@@ -397,4 +397,12 @@ footer{
 
 .btn-content-form button{
     margin-right: 3%;
+}
+
+#titleFilterMenu{
+    width: 100%;
+    font-size: 320%;
+    text-align: center;
+    font-weight: bold;
+    text-decoration: underline;
 }

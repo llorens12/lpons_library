@@ -1,6 +1,9 @@
 <?php
 include_once "styles/Template.php";
-include_once "styles/usersCommonStyles.php";
+include_once "styles/stylesAnonimous.php";
+include_once "styles/stylesUser.php";
+include_once "styles/stylesLibrarian.php";
+include_once "styles/stylesAdmin.php";
 include_once "trait/DBController.php";
 include_once "objects/Anonimous.php";
 include_once "objects/User.php";
@@ -356,7 +359,7 @@ else {
             case "setUpdateUser":
 
                 if($user->setUpdateUser($_REQUEST))
-                    header('Location: controller.php?method=showTableUsers&search='.$_REQUEST['Email']. htmlspecialchars(SID));
+                    header('Location: controller.php?method=showAdministrateUsers&search='.$_REQUEST['email']. htmlspecialchars(SID));
                 else
                     setError();
                 break;
@@ -381,7 +384,7 @@ else {
             case "setUpdateUserReserve":
 
                 if($user->setUpdateUserReserve($_REQUEST))
-                    header('Location: controller.php?method=showAdministrateReserves&search='.$_REQUEST['user']. htmlspecialchars(SID));
+                    header('Location: controller.php?method=showAdministrateUsersReserves&search='.$_REQUEST['user']. htmlspecialchars(SID));
                 else
                     setError();
                 break;
