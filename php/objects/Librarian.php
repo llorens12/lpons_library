@@ -2,6 +2,8 @@
 
 class Librarian extends User{
 
+
+
     public function __construct($nameUser, $emailUser, $home, $sid)
     {
         parent::__construct($nameUser, $emailUser, $home, $sid);
@@ -20,6 +22,7 @@ class Librarian extends User{
             "surname"       => "'Surname'",
             "email"         => "'Email'",
             "telephone"     => "'Telephone'",
+            "typeUser"      => "'Type User'",
             "registered"    => "'Registered'",
             "COUNT(user)"   => "'Total Reserves'",
             "SUM(IF((curdate() < date_finish), 1, 0))" => "'After Reserves'",
@@ -28,6 +31,8 @@ class Librarian extends User{
             "IF((SUM(IF((date_finish < curdate() AND sent IS NOT null AND received IS null), 1, 0)) != 0), 'Yes', 'No')" => "'Defaulter?'"
         );
 
+        if($_SESSION['typeUser'] != 'Admin')
+            unset($filterData['typeUser']);
 
         $sentence =
             "
@@ -37,7 +42,7 @@ class Librarian extends User{
 
         $where = "";
 
-        if($_SESSION != 'Admin')
+        if($_SESSION['typeUser'] != 'Admin')
         {
             $sentence .= "WHERE typeUser = 'User'";
         }
@@ -87,6 +92,7 @@ class Librarian extends User{
             "surname"       => "'Surname'",
             "email"         => "'Email'",
             "telephone"     => "'Telephone'",
+            "typeUser"      => "'Type User'",
             "isbn"          => "'ISBN'",
             "id"            => "'ID Copy'",
             "title"         => "'Title'",
@@ -95,6 +101,9 @@ class Librarian extends User{
             'trim("-" FROM (date_finish - curdate()))' => "'Days Elapsed'"
         );
 
+
+        if($_SESSION['typeUser'] != 'Admin')
+            unset($filterData['typeUser']);
 
         $sentence =
             "
@@ -109,10 +118,9 @@ class Librarian extends User{
             ";
 
 
-        if($_SESSION != 'Admin')
-        {
+        if($_SESSION['typeUser'] != 'Admin')
             $sentence .= "AND typeUser = 'User'";
-        }
+
 
 
         if($search != "")
@@ -168,7 +176,7 @@ class Librarian extends User{
         $sentence =
             "
                 SELECT ".$this->getQueryNamesFormat($filterData)."
-                FROM (copybooks LEFT JOIN books ON book = isbn) LEFT JOIN reserves ON copybook = id
+                FROM (copybooks RIGHT JOIN books ON book = isbn) LEFT JOIN reserves ON copybook = id
             ";
 
         if($search != "")
@@ -260,7 +268,6 @@ class Librarian extends User{
 
 
 
-
     public function showAdministrateUsers($category = "", $search = "")
     {
         $_SESSION['menu'] = "Users";
@@ -271,10 +278,14 @@ class Librarian extends User{
             "surname"       => "'Surname'",
             "email"         => "'Email'",
             "telephone"     => "'Telephone'",
+            "typeUser"      => "'Type User'",
             "registered"    => "'Registered'",
             "home"          => "'Home'"
         );
 
+
+        if($_SESSION['typeUser'] != 'Admin')
+            unset($filterData['typeUser']);
 
         $sentence =
             "
@@ -286,7 +297,7 @@ class Librarian extends User{
 
         $where = "";
 
-        if($_SESSION != 'Admin')
+        if($_SESSION['typeUser'] != 'Admin')
         {
             $sentence .= "WHERE typeUser = 'User'";
         }
@@ -324,6 +335,7 @@ class Librarian extends User{
                 "UserReserve",
                 "User",
                 ["Email"],
+                false,
                 false,
                 0,
                 $this->sid
@@ -383,6 +395,7 @@ class Librarian extends User{
                 "Copy",
                 "Book",
                 ["ISBN"],
+                false,
                 false,
                 0,
                 $this->sid
@@ -446,6 +459,7 @@ class Librarian extends User{
                 "Copy",
                 ["ID Copy"],
                 false,
+                false,
                 0,
                 $this->sid
             )
@@ -459,6 +473,7 @@ class Librarian extends User{
         $filterData = array
         (
             "user"          => "'User'",
+            "typeUser"      => "'Type User'",
             "copyBook"      => "'ID Copy'",
             "isbn"          => "'ISBN'",
             "title"         => "'Title'",
@@ -471,6 +486,10 @@ class Librarian extends User{
         );
 
 
+        if($_SESSION['typeUser'] != "Admin")
+            unset($filterData['typeUser']);
+
+
         $sentence =
             "
                 SELECT ".$this->getQueryNamesFormat($filterData)."
@@ -479,7 +498,7 @@ class Librarian extends User{
 
         $where = "";
 
-        if($_SESSION != 'Admin')
+        if($_SESSION['typeUser'] != 'Admin')
         {
             $sentence .= "WHERE typeUser = 'User'";
         }
@@ -517,7 +536,8 @@ class Librarian extends User{
                 false,
                 "",
                 "UserReserve",
-                ["User","Start","ISBN"],
+                ["ID Copy", "Start"],
+                true,
                 false,
                 $this->MAX_DAYS_RESERVE,
                 $this->sid
@@ -548,7 +568,7 @@ class Librarian extends User{
                 "New User",
                 stylesUser::formAdministrateUser($user),
                 $this->sid,
-                "",
+                (isset($_REQUEST['error'])),
                 "insert",
                 "setInsertUser"
             )
@@ -566,7 +586,7 @@ class Librarian extends User{
                 "Add Book",
                 stylesLibrarian::formBook(),
                 $this->sid,
-                "",
+                (isset($_REQUEST['error'])),
                 "insert",
                 "setInsertBook"
             )
@@ -586,7 +606,7 @@ class Librarian extends User{
                 "Add Copy",
                 stylesLibrarian::formCopy($isbn),
                 $this->sid,
-                "",
+                (isset($_REQUEST['error'])),
                 "insert",
                 "setInsertCopy&book=".$isbn['isbn']
             )
@@ -595,13 +615,22 @@ class Librarian extends User{
 
     public function showAddUserReserve($request)
     {
+        $_SESSION['menu'] = "Reserves";
 
     $this->setContent
     (
         stylesLibrarian::formAddReserve
         (
             $request,
-            $this->select("SELECT isbn, title FROM books"),
+            $this->select
+            ("
+                SELECT isbn, title FROM books WHERE  isbn IN
+                (
+                    SELECT   book
+                    FROM     copybooks
+                    GROUP BY book
+                )
+            "),
             (isset($request['error']))
         )
     );
@@ -613,12 +642,10 @@ class Librarian extends User{
     {
         $_SESSION['menu'] = "Users";
 
-        $sentence = "";
-        if($_SESSION != 'Admin')
-        {
-            $sentence .= "AND typeUser = 'User'";
-        }
 
+        $typeUser = "";
+        if($_SESSION['typeUser'] != "Admin")
+            $typeUser = "AND typeUser = 'User'";
 
         $user = mysqli_fetch_assoc
         (
@@ -626,10 +653,11 @@ class Librarian extends User{
             ("
                 SELECT email, name, surname, telephone, home, typeUser
                 FROM users
-                WHERE email = '".$request['Email']."'".$sentence."
+                WHERE
+                    email = '".$request['Email']."'
+                ".$typeUser."
             ")
         );
-
 
         $this->setContent
         (
@@ -711,9 +739,7 @@ class Librarian extends User{
                 )
                 JOIN books ON book = isbn
                 WHERE
-                user =  '".$request['User']."'
-                    AND
-                book =  '".$request['ISBN']."'
+                copybook =  '".$request['IDCopy']."'
                     AND
                 date_start =  '".$request['Start']."'
              ")
@@ -729,7 +755,7 @@ class Librarian extends User{
                 $this->sid,
                 (isset($request['error'])),
                 "update",
-                "setUpdateUserReserve&user=".$data['user'].'&first_date_start='.$data['date_start']
+                "setUpdateUserReserve&copybook=".$data['copybook'].'&firstDateStart='.$data['date_start']
             )
         );
     }
@@ -740,7 +766,7 @@ class Librarian extends User{
     {
         $_SESSION['menu'] = "Users";
 
-        if($_SESSION != 'Admin')
+        if($_SESSION['typeUser'] != 'Admin')
         {
             $request['typeUser'] = "User";
         }
@@ -751,28 +777,37 @@ class Librarian extends User{
         return $this->insert("users",$request);
     }
 
-    public function setInsertBook(){}
+    public function setInsertBook($request, $file)
+    {
+        if (!$this->issetBook($request['isbn']) && $this->uploadIMG($file,$request['isbn']))
+            return $this->insert("books",$request);
+    }
 
     public function setInsertCopy($copy)
     {
-        $_SESSION['menu'] = "Books";
-
         return $this->insert("copybooks",$copy);
     }
 
-    public function setInsertUserReserve(){}
+    public function setInsertUserPersonalizedReserve($request)
+    {
+        return $this->insertPersonalizedReserve($request);
+    }
+
+    public function setInsertUserDefaultReserve($request)
+    {
+        return $this->insertDeffaultReserve($request);
+    }
 
 
 
     public function setUpdateUser($request)
     {
-        $_SESSION['menu'] = "Users";
-
-
-        if($_SESSION != 'Admin')
+        if($_SESSION['typeUser'] != 'Admin')
         {
-            unset($request['typeUser'], $request['registered']);
+            unset($request['typeUser']);
         }
+
+        unset($request['registered']);
 
 
         if(isset($request['pwd']) && ($request['pwd'] == "" || $request['pwd'] == " "))
@@ -791,31 +826,43 @@ class Librarian extends User{
         return ($this->update("users",$request,$where));
     }
 
-    public function setUpdateBook($request)
+    public function setUpdateBook($request, $file)
     {
-        $where = "isbn = ".$request['primaryISBN'];
+        if(is_uploaded_file($_FILES['cover']['tmp_name']))
+        {
+            unlink("../img/books/".$request['primaryISBN'].".jpg");
+            $this->uploadIMG($file, $request['isbn']);
+        }
 
-        unset($request['img'],$request['primaryISBN']);
+        $where = "isbn = '".$request['primaryISBN']."'";
+        unset($request['primaryISBN']);
 
         return $this->update("books",$request,$where);
     }
 
     public function setUpdateCopy($request)
     {
-        $where = "id = ".$request['id'];
-        unset($request['id']);
+        $where = "id = '".$request['IDCopy']."'";
+        unset($request['IDCopy']);
 
         return $this->update("copybooks", $request,$where);
     }
 
-    public function setUpdateUserReserve(){}
+    public function setUpdateUserReserve($request)
+    {
+        if(isset($request['received']))
+            $request['date_start'] = $request['received'];
+
+        $where = "copybook = '".$request['copybook']."' AND date_start = '".$request['firstDateStart']."'";
+        unset($request['copybook'], $request['firstDateStart']);
+
+        $this->update("reserves", $request, $where);
+    }
 
 
 
     public function setDeleteUser($email)
     {
-        $_SESSION['menu'] = "Users";
-
         $isPosbible = false;
 
         if($_SESSION['typeUser'] != "Admin")
@@ -833,17 +880,58 @@ class Librarian extends User{
 
     }
 
-    public function setDeleteBook($request)
+    public function setDeleteBook($isbn)
     {
-        $this->delete("books", "isbn = ".$request['ISBN']);
+        $this->delete("books", "isbn = '".$isbn."'");
     }
 
     public function setDeleteCopy($request)
     {
-        $this->delete("copybooks", "id = ".$request['IDCopy']);
+        $this->delete("copybooks", "id = '".$request['IDCopy']."'");
     }
 
-    public function setDeleteUserReserve(){}
+    public function setDeleteUserReserve($request)
+    {
+        $this->delete("reserves","copybook = '".$request['IDCopy']."' AND date_start = '".$request['Start']."'");
+    }
+
+
+
+
+
+    protected function uploadIMG($img, $isbn)
+    {
+
+        $cover = $img['cover']['tmp_name'];
+
+        if (is_uploaded_file($cover))
+        {
+            copy($cover, "../img/books/".$isbn.".jpg");
+            echo true;
+            return true;
+        }
+        else {
+            echo false;
+            return false;
+        }
+    }
+
+    protected function issetBook($isbn){
+        $answer = mysqli_fetch_assoc
+        (
+            $this->select
+            ("
+                SELECT title
+                FROM books
+                WHERE isbn='" . $isbn . "'
+            ")
+        );
+echo count($answer);
+        if (count($answer) != 0)
+            return true;
+        else
+            return false;
+    }
 
 
 

@@ -14,8 +14,6 @@ trait DBController{
 
     protected function select($sentence)
     {
-
-        //echo $sentence;
         $this->startConnection();
         return $this->connection->query($sentence);
     }
@@ -28,16 +26,11 @@ trait DBController{
 
         foreach($data as $column => $value){
             $columns .= $column.", ";
-            $valuesColumns .= "'".$value."', ";
+            $valuesColumns .= '"'.str_replace('"',"'",$value).'", ';
         }
 
         $columns = trim($columns, ", ");
         $valuesColumns = trim($valuesColumns, ", ");
-
-        echo "
-            INSERT INTO {$table} ({$columns})
-            VALUES ({$valuesColumns});
-        ";
 
 
         return $this->connection->query
@@ -53,16 +46,11 @@ trait DBController{
         $set="";
 
         foreach($data as $column => $value){
-            $set .= $column."='".$value."', ";
+            $set .= $column.'="'.str_replace('"',"'",$value).'", ';
         }
 
         $set = trim($set, ", ");
 
-        echo "
-            UPDATE {$table}
-            SET    {$set}
-            WHERE  {$where};
-        ";
         return $this->connection->query
         ("
             UPDATE {$table}
@@ -74,11 +62,6 @@ trait DBController{
     protected function delete($table, $where)
     {
         $this->startConnection();
-
-        echo "
-            DELETE FROM {$table}
-            WHERE  {$where};
-        ";
 
         return $this->connection->query
         ("

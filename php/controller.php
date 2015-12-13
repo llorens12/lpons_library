@@ -257,14 +257,20 @@ else {
 
             case "setInsertDefaultReserve":
 
-                $user->setInsertDefaultReserve($_REQUEST);
-                header('Location: controller.php?method=showReserves'.htmlspecialchars(SID));
+                if($user->setInsertDefaultReserve($_REQUEST))
+                    header('Location: controller.php?method=showReserves'.htmlspecialchars(SID));
+
+                else
+                    setError();
                 break;
 
             case "setInsertPersonalizedReserve":
 
-                $user->setInsertPersonalizedReserve($_REQUEST);
-                header('Location: controller.php?method=showReserves'.htmlspecialchars(SID));
+                if($user->setInsertPersonalizedReserve($_REQUEST))
+                    header('Location: controller.php?method=showReserves'.htmlspecialchars(SID));
+
+                else
+                    setError();
                 break;
 
 
@@ -272,23 +278,48 @@ else {
 
             case "setInsertUser":
 
-                $user->setInsertUser($_REQUEST);
-                header('Location: controller.php?method=showAdministrateUsers&search='.$_REQUEST['email'].htmlspecialchars(SID));
+                if($user->setInsertUser($_REQUEST))
+                    header('Location: controller.php?method=showAdministrateUsers&search='.$_REQUEST['email'].htmlspecialchars(SID));
+
+                else
+                    setError();
                 break;
 
             case "setInsertBook":
 
-                $user->setInsertBook($_REQUEST);
-                header('Location: controller.php?method=showAdministrateBooks&search='.$_REQUEST['isbn'].htmlspecialchars(SID));
+                if($user->setInsertBook($_REQUEST, $_FILES));
+                   /* header('Location: controller.php?method=showAdministrateBooks&search='.$_REQUEST['isbn'].htmlspecialchars(SID));
+
+                else
+                    setError();*/
                 break;
 
             case "setInsertCopy":
 
-                $user->setInsertCopy($_REQUEST);
-                header('Location: controller.php?method=showAdministrateCopies&search='.$_REQUEST['book'].htmlspecialchars(SID));
+                if($user->setInsertCopy($_REQUEST))
+                    header('Location: controller.php?method=showAdministrateCopies&search='.$_REQUEST['book'].htmlspecialchars(SID));
+
+                else
+                    setError();
                 break;
 
-            case "setInsertUserReserve":
+            case "setInsertUserPersonalizedReserve":
+
+                if($user->setInsertUserPersonalizedReserve($_REQUEST))
+                    header('Location: controller.php?method=showAdministrateUsersReserves&search='.$_REQUEST['user'].htmlspecialchars(SID));
+
+                else
+                    setError();
+                break;
+
+            case "setInsertUserDefaultReserve":
+
+                if($user->setInsertUserDefaultReserve($_REQUEST))
+                    header('Location: controller.php?method=showAdministrateUsersReserves&search='.$_REQUEST['user'].htmlspecialchars(SID));
+
+                else
+                    setError();
+                break;
 
 
 
@@ -332,18 +363,28 @@ else {
 
             case "setUpdateBook":
 
-                if($user->setUpdateBook($_REQUEST))
+                if($user->setUpdateBook($_REQUEST, $_FILES))
                     header('Location: controller.php?method=showTableBooks&search='.$_REQUEST['isbn']. htmlspecialchars(SID));
+
                 else
                     setError();
                 break;
 
             case "setUpdateCopy":
 
-                $user->setUpdateCopy();
+                if($user->setUpdateCopy($_REQUEST))
+                    header('Location: controller.php?method=showTableCopies&search='.$_REQUEST['IDCopy']. htmlspecialchars(SID));
+                else
+                    setError();
                 break;
 
             case "setUpdateUserReserve":
+
+                if($user->setUpdateUserReserve($_REQUEST))
+                    header('Location: controller.php?method=showAdministrateReserves&search='.$_REQUEST['user']. htmlspecialchars(SID));
+                else
+                    setError();
+                break;
 
 
         }
@@ -357,34 +398,49 @@ else {
 
             case "setDeleteReserve":
 
-                $user->setDeleteReserve($_REQUEST);
-                header('Location: controller.php?method=showReserves'.htmlspecialchars(SID));
+                if($user->setDeleteReserve($_REQUEST))
+                    header('Location: controller.php?method=showReserves'.htmlspecialchars(SID));
+
+                else
+                    setError();
                 break;
 
 
 
             case "setDeleteUser":
 
-                $user->setDeleteUser($_REQUEST['Email']);
-                header('Location: controller.php?method=showAdministrateUsers'.htmlspecialchars(SID));
+                if($user->setDeleteUser($_REQUEST['Email']))
+                    header('Location: controller.php?method=showAdministrateUsers'.htmlspecialchars(SID));
+
+                else
+                    setError();
                 break;
 
             case "setDeleteBook":
 
-                $user->setDeleteBook($_REQUEST['ISBN']);
-                header('Location: controller.php?method=showAdministrateBooks'.htmlspecialchars(SID));
+                if($user->setDeleteBook($_REQUEST['ISBN']))
+                    header('Location: controller.php?method=showAdministrateBooks'.htmlspecialchars(SID));
+
+                else
+                    setError();
                 break;
 
             case "setDeleteCopy":
 
-                $user->setDeleteCopy($_REQUEST);
-                header('Location: controller.php?method=showAdministrateCopies'.htmlspecialchars(SID));
+                if($user->setDeleteCopy($_REQUEST))
+                    header('Location: controller.php?method=showAdministrateCopies'.htmlspecialchars(SID));
+
+                else
+                    setError();
                 break;
 
             case "setDeleteUserReserve":
 
-                $user->setDeleteUserReserve($_REQUEST);
-                header('Location: controller.php?method=showAdministrateUsersReserves'.htmlspecialchars(SID));
+                if($user->setDeleteUserReserve($_REQUEST))
+                    header('Location: controller.php?method=showAdministrateUsersReserves'.htmlspecialchars(SID));
+
+                else
+                    setError();
                 break;
         }
     }

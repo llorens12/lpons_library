@@ -1,5 +1,8 @@
 $(document).ready(function()
     {
+         var isFormUserReserve = ($('#form-user-reserve').length > 0);
+
+
          $('.sub-menu').hover(function()
          {
              $(this).addClass('open');
@@ -19,18 +22,33 @@ $(document).ready(function()
             if (!thisBtn.hasClass('show-personalized'))
             {
                 thisBtn.addClass("show-personalized");
-                personalizedReserve.removeClass("hidden");
-                btn20days.attr("disabled",true);
+                personalizedReserve.removeClass("not-active");
+                btn20days.attr("disabled",true).unbind('click', false);
+
+                if(isFormUserReserve){
+                    $('#totalDays').attr("disabled",true).val("");
+                }
 
             }
             else
             {
                 thisBtn.removeClass("show-personalized");
-                personalizedReserve.addClass("hidden");
-                btn20days.attr("disabled",false);
+                personalizedReserve.addClass("not-active");
+                btn20days.attr("disabled",false).bind('click', false);
+
+                if(isFormUserReserve){
+                    $('#totalDays').attr("disabled",false);
+                }
             }
 
         });
+
+
+        if(isFormUserReserve){
+            $('#btn-reserve-20-days').click(function(){
+                $(this).attr("href",linkDefaultReserve());
+            });
+        }
 
         $("#search").keypress(function(e)
         {
@@ -41,7 +59,7 @@ $(document).ready(function()
         });
 
 
-        $('#date-start, #date-finish').attr("value", function(){
+        $('.current-date').attr("value", function(){
 
             var currentDate = new Date();
             return currentDate.getFullYear() + "-" + (currentDate.getMonth() +1) + "-" + currentDate.getDate();
@@ -67,7 +85,7 @@ $(document).ready(function()
         $('#isbn-form').blur(function(){
 
 
-            if($(this).val() != isbn && !disponibilityAjax("ajax=book&isbn="+$(this).val()))
+            if($(this).val() != isbn && $(this).val() != "" && !disponibilityAjax("ajax=book&isbn="+$(this).val()))
             {
                 $(this).attr("placeholder","This ISBN is not available").val("").parent().addClass("has-error");
             }
@@ -97,13 +115,42 @@ function checkRegisterContent(){
 }
 
 
+function linkDefaultReserve() {
+
+    var user = "&user="+$('#reserve-user').attr("value");
+    var isbn = "&isbn="+$('#select-book').val();
+    var daysReserve = "&days_reserve="+$('#totalDays').val();
+    var sent = "";
+
+
+    if($("#status-sent").is(':checked')) {
+        var currentDate = new Date();
+        sent = "&sent="+currentDate.getFullYear() + "-" + (currentDate.getMonth() +1) + "-" + currentDate.getDate();
+    }
+
+    return "controller.php?insert=setInsertUserDefaultReserve"+user+isbn+daysReserve+sent;
+}
+
 function checkReserveDisponibility(){
 
     var valDateStart  = $("#date-start").val();
     var valDateFinish = $("#date-finish").val();
+    var form          = $('form[isbn]');
+    var user          = "";
+    var isbn          = form.attr('isbn');
 
-    var dataCheck = "ajax=reserveDisponibility&isbn="+$('form[isbn]').attr('isbn')+"&dateStart="+valDateStart+"&dateFinish="+valDateFinish;
-console.log(dataCheck);
+    if(isbn == ""){
+        isbn = $('#select-book').val();
+        user = "&user="+$('#reserve-user').attr("value");
+
+        form.attr('action', function(){
+            return "controller.php?insert=setInsertUserPersonalizedReserve&isbn="+isbn+user;
+        });
+    }
+
+
+    var dataCheck = "ajax=reserveDisponibility&isbn="+isbn+"&dateStart="+valDateStart+"&dateFinish="+valDateFinish+user;
+
     if(disponibilityAjax(dataCheck)){
         return true;
     }

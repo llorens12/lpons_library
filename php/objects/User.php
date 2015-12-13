@@ -194,6 +194,7 @@ class User extends Template{
                 "Reserve",
                 ["ISBN","Start"],
                 true,
+                true,
                 $this->MAX_DAYS_RESERVE,
                 $this->sid
             )
@@ -404,7 +405,12 @@ class User extends Template{
 
         if(isset($request['days_reserve']))
         {
-            $days_reserve = ($request['days_reserve']-1);
+            if($request['days_reserve'] > 0)
+                $days_reserve = ($request['days_reserve']-1);
+
+            else
+                $days_reserve = ($this->DEFAULT_DAYS_RESERVE-1);
+
             unset($request['days_reserve']);
         }
         else

@@ -3,7 +3,7 @@
 
 class stylesUser{
 
-    public static function table($data, $edit = false, $drop = false, $add = false, $objectAdd = "", $typeObject = "", $primaryKeys = "", $reserveDelimiter = false, $MAX_DAYS_RESERVE = 0, $sid = "")
+    public static function table($data, $edit = false, $drop = false, $add = false, $objectAdd = "", $typeObject = "", $primaryKeys = "", $reserveDelimiter = false, $showColumnSentReceived = false, $MAX_DAYS_RESERVE = 0, $sid = "")
     {
         $contentThead   = "<th>#</th>";
         $objectNumber   = 1;
@@ -12,6 +12,7 @@ class stylesUser{
         $stateEdit      = "";
         $stateDelete    = "";
         $valueLink      = "";
+
 
 
 
@@ -108,10 +109,14 @@ class stylesUser{
             $sent = "";
 
 
-            if($reserveDelimiter){
+            if($reserveDelimiter)
+            {
                 $recived = $object['Received'];
                 $sent = $object['Sent'];
+            }
 
+            if($showColumnSentReceived )
+            {
                 unset($object['Received']);
                 unset($object['Sent']);
             }
@@ -139,24 +144,24 @@ class stylesUser{
                 . $contentTr;
 
 
-            if($recived != ""
+            if($reserveDelimiter
             && is_null($recived)
             && date_create($object['Start'])->diff(date_create($object['End']))->format("d") < $MAX_DAYS_RESERVE )
             {
                 $stateEdit = "";
             }
-            elseif($recived != "")
+            elseif($reserveDelimiter)
             {
                 $stateEdit = "not-active";
             }
 
-            if($recived != ""
+            if($reserveDelimiter
             && is_null($sent) && is_null($recived)
             && date_create($object['Start'])->diff(date_create($object['End']))->format("d") < $MAX_DAYS_RESERVE )
             {
                 $stateDelete = "";
             }
-            elseif($recived != "")
+            elseif($reserveDelimiter)
             {
                 $stateDelete = "not-active";
             }
@@ -300,11 +305,16 @@ class stylesUser{
     }
 
     public static function personalizedReserve($hrefDefaultReserve = "", $hrefPersonalizedReserve = "", $textBtnReserve = "", $isbn = "", $sid = ""){
+
+        $url = "controller.php?insert=";
+        if($hrefDefaultReserve == "" && $hrefPersonalizedReserve == "")
+            $url = "";
+
         return
             '
             <div id="options-reserves">
 
-                <a href="controller.php?insert='.$hrefDefaultReserve.'" class="btn btn-primary" id="btn-reserve-20-days" title="Set reserve">
+                <a href="'.$url.$hrefDefaultReserve.'" class="btn btn-primary" id="btn-reserve-20-days" title="Set reserve">
                 Reserve '.$textBtnReserve.'
                 </a>
 
@@ -318,15 +328,15 @@ class stylesUser{
 
             <div class="hidden" id="personalized-reserve">
 
-                <form isbn="'.$isbn.'" action="controller.php?insert='.$hrefPersonalizedReserve.$sid.'" method="post" onsubmit="return checkReserveDisponibility()">
+                <form isbn="'.$isbn.'" action="'.$url.$hrefPersonalizedReserve.$sid.'" method="post" onsubmit="return checkReserveDisponibility()">
 
                 <div class="input-group" id="start-date-reserve-personalized">
                     <span class="input-group-addon icons"><i class="fa fa-calendar-plus-o"></i></span>
-                    <input type="date" class="form-control" name="date_start" id="date-start" value="" required="">
+                    <input type="date" class="form-control current-date" name="date_start" id="date-start" value="" required="">
                 </div>
                 <div class="input-group" id="finish-date-reserve-personalized">
                     <span class="input-group-addon icons"><i class="fa fa-calendar-times-o"></i></span>
-                    <input type="date" class="form-control" name="date_finish" id="date-finish" value=""  required="">
+                    <input type="date" class="form-control  current-date" name="date_finish" id="date-finish" value=""  required="">
                 </div>
 
                 <label class="label label-danger hidden" id="label-error-personalized-reserve">The reserve is not available or already reserved book</label>
@@ -486,7 +496,7 @@ class stylesUser{
             '
             <div class="row row-centered container-form">
 
-                <form class="col-lg-12 col-md-12 col-sm-12 col-xs-12 content-form" action="controller.php?'.$sentenceType.'='.$sentence.$sid.'" method="POST">
+                <form class="col-lg-12 col-md-12 col-sm-12 col-xs-12 content-form" enctype="multipart/form-data" action="controller.php?'.$sentenceType.'='.$sentence.$sid.'" method="POST">
                     <div class="inputs-content-form">
                         <h2>'.$title.'</h2>
                         '.$form.'
@@ -685,7 +695,8 @@ class stylesLibrarian
             "title"         => "",
             "description"   => "",
             "summary"       => "",
-            "category"      => "",
+            "author"        => "",
+            "category"      => ""
         );
 
         if($data != "")
@@ -701,29 +712,33 @@ class stylesLibrarian
 
         return
         '
-            <div class="input-group">
-                <span class="input-group-addon icons" title="ISBN"><i class="fa fa-barcode"></i></span>
-                <input type="text" class="form-control" placeholder="ISBN" name="isbn" id="isbn-form" required="" title="ISBN" value="'.$vars['isbn'].'">
+            <div class="input-group" title="ISBN">
+                <span class="input-group-addon icons"><i class="fa fa-barcode"></i></span>
+                <input type="text" class="form-control" placeholder="ISBN" name="isbn" id="isbn-form" required="" value="'.$vars['isbn'].'">
             </div>
-            <div class="input-group">
-                <span class="input-group-addon icons" title="Title"><i class="fa fa-book"></i></span>
-                <input maxlength="50" type="text" class="form-control" placeholder="Title" name="title" required="" title="Title" value="'.$vars['title'].'">
+            <div class="input-group" title="Title">
+                <span class="input-group-addon icons"><i class="fa fa-book"></i></span>
+                <input maxlength="50" type="text" class="form-control" placeholder="Title" name="title" required="" value="'.$vars['title'].'">
             </div>
-            <div class="input-group">
-                <span class="input-group-addon icons" title="Description"><i class="fa fa-text-height"></i></span>
-                <textarea maxlength="250" rows="2" class="form-control" placeholder="Desctiption..." name="description" required="" title="Description" >'.$vars['description'].'</textarea>
+            <div class="input-group" title="Description">
+                <span class="input-group-addon icons"><i class="fa fa-text-height"></i></span>
+                <textarea maxlength="250" rows="2" class="form-control" placeholder="Desctiption..." name="description" required="">'.$vars['description'].'</textarea>
             </div>
-            <div class="input-group">
-                <span class="input-group-addon icons" title="Summary"><i class="fa fa-text-height"></i></span>
-                <textarea maxlength="3000" rows="5" class="form-control" placeholder="Summary..." name="summary" required="" title="Summary">'.$vars['summary'].'</textarea>
+            <div class="input-group" title="Summary">
+                <span class="input-group-addon icons"><i class="fa fa-text-height"></i></span>
+                <textarea maxlength="3000" rows="5" class="form-control" placeholder="Summary..." name="summary" required="">'.$vars['summary'].'</textarea>
             </div>
-            <div class="input-group">
-                <span class="input-group-addon icons" title="Category"><i class="fa fa-hashtag"></i></span>
-                <input type="text" class="form-control" placeholder="Category: Action, Adventure, Comedy..." name="category" required="" title="Category" value="'.$vars['category'].'">
+            <div class="input-group" title="Author book">
+                <span class="input-group-addon icons"><i class="fa fa-user"></i></span>
+                <input type="text" class="form-control" placeholder="Author" name="author" required="" value="'.$vars['author'].'">
             </div>
-            <div class="input-group">
-                <span class="input-group-addon icons" title="Cover"><i class="fa fa-file-image-o"></i></span>
-                <input type="file" class="form-control" name="img" '.$required.' title="Cover">
+            <div class="input-group" title="Category">
+                <span class="input-group-addon icons"><i class="fa fa-hashtag"></i></span>
+                <input type="text" class="form-control" placeholder="Category: Action, Adventure, Comedy..." name="category" required="" value="'.$vars['category'].'">
+            </div>
+            <div class="input-group" title="Cover">
+                <span class="input-group-addon icons"><i class="fa fa-file-image-o"></i></span>
+                <input type="file" class="form-control" name="cover" '.$required.'>
             </div>
         ';
     }
@@ -789,12 +804,13 @@ class stylesLibrarian
 
     }
 
-    public static function formUserReserveStatus($data = ""){
+    public static function formUserReserveStatus($data = NULL){
 
         $sent = "";
         $received = "";
+        $showReceived = "";
 
-        if($data != "")
+        if($data != null)
         {
             if (!is_null($data['sent']))
                 $sent = "checked disabled";
@@ -804,24 +820,27 @@ class stylesLibrarian
 
         }
         else
+        {
             $received = "disabled";
+            $showReceived = "hidden";
+        }
 
         return
             '
-            <div class="input-group">
+            <div class="input-group" title="Book sent?">
                 <span class="input-group-addon icons"><i class="fa fa-sign-out"></i></span>
                 <div class="checkbox form-control commited-reserves"  '.$sent.'>
                     <label>
-                        <input type="checkbox" name="sent" id="status-sent" value="true" '.$sent.'>
+                        <input type="checkbox" name="sent" id="status-sent" value="'.date('Y-m-d').'" '.$sent.'>
                         Sent?
                     </label>
                 </div>
             </div>
-            <div class="input-group">
+            <div class="input-group '.$showReceived.'" title="Book received?">
                 <span class="input-group-addon icons"><i class="fa fa-sign-in"></i></i></span>
                 <div class="checkbox form-control commited-reserves" '.$received.'>
                     <label>
-                        <input type="checkbox" name="received" value="true" '.$received.'>
+                        <input type="checkbox" name="received" value="'.date('Y-m-d').'" '.$received.'>
                         Received?
                     </label>
                 </div>
@@ -851,12 +870,12 @@ class stylesLibrarian
             <div class="row row-centered container-form" id="form-add-user-reserve">
 
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 content-form">
-                    <div class="inputs-content-form">
-                        <h2>Add User Reserve</h2>
+                    <div class="inputs-content-form" id="form-user-reserve">
+                            <h2>Add User Reserve</h2>
 
                             <div class="input-group" title="User">
                                 <span class="input-group-addon icons"><i class="fa fa-user"></i></span>
-                                <input type="text" class="form-control" placeholder="'.$data['Email'].'" title="User" disabled/>
+                                <input type="text" class="form-control" value="'.$data['Email'].'" id="reserve-user" title="User" disabled/>
                             </div>
                             <div class="input-group" title="Book">
                                 <span class="input-group-addon icons"><i class="fa fa-book"></i></span>
@@ -864,9 +883,9 @@ class stylesLibrarian
                                     '.$optionsBooks.'
                                 </select>
                             </div>
-                            <div class="input-group" title="Total days reserve">
+                            <div class="input-group" title="Number days of reserve">
                                 <span class="input-group-addon icons"><i class="fa fa-calendar"></i></span>
-                                <input type="text" id="totalDays" class="form-control" />
+                                <input type="text" id="totalDays" placeholder="Number days of reserve" class="form-control" />
                             </div>
 
                             '.stylesLibrarian::formUserReserveStatus().'
@@ -995,6 +1014,34 @@ class stylesAnonimous{
                     <input type="password" class="form-control" placeholder="Password" name="pwd" id="pwd" '.$required.'>
                 </div>
             ';
+    }
+}
+
+class stylesAdmin
+{
+    public static function formUser($data = ""){
+
+        $User = "";
+        $Librarian = "";
+        $Admin = "";
+
+        if(isset($data['typeUser']))
+            $$data['typeUser'] = "selected";
+
+
+        return
+        '
+            <div class="input-group" title="Book">
+                <span class="input-group-addon icons"><i class="fa fa-book"></i></span>
+                <select class="form-control" id="select-book">
+                    <option value="User" '.$User.'>User</option>
+                    <option value="Librarian" '.$Librarian.'>Librarian</option>
+                    <option value="Admin" '.$Admin.'>Admin</option>
+                </select>
+            </div>
+        '.
+        stylesUser::formAdministrateUser($data);
+
     }
 }
 
