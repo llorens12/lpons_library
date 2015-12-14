@@ -1,30 +1,58 @@
 <?php
 
 /**
- * Class Template: This class is the base of the structure with page
+ * Class Template, this class is the base of the structure with page
  */
 class Template
 {
     /**
-     * @var string: This var contains the name of the project.
+     * @var string $nameProject *Description*: this var contains the name of the project.
      */
     protected $nameProject = "Alaior Library";
 
+    /**
+     * @var string $nameUser *Description*: contains the name of the user.
+     * @var string $emailUser *Description*: contains the email of user.
+     * @var string $home *Description*: contains the url at home.
+     * @var string $sid *Description*: contains the session id.
+     */
     protected $nameUser, $emailUser, $home, $sid;
 
+    /**
+     * @var bool $includeSection *Description*: if is true, add section in the main, else not.
+     * @var string $textButton *Description*: contains the text of the right top button.
+     * @var string $linkButton *Description*: contains the url of the right top button.
+     * @var string $linkTerms *Description*: contains the url of the bottom link Terms&Conditions
+     * @var string $linkContact *Description*: contains the url of the bottom link Contact.
+     */
     protected $includeSection, $textButton, $linkButton, $linkTerms, $linkContact;
 
+    /**
+     * @var string $contentMenu *Description*: contains the user menu.
+     */
     private   $contentMenu = "";
-    private   $userMenuTop = "";
-
-    private   $content = "";
 
     /**
-     * @param $typePage:                 Specific type of page (Common,Login,Register)
-     * @param string $nameUser:          Name of User
-     * @param string $emailUser:         E-mail of User
-     * @param string $permision:         If is user, libraryan or Admin
-     * @param string $currentOptionMenu: Actual section of menu
+     * @var string $userMenuTop *Description*: contains the options of the right top menu.
+     */
+    private   $userMenuTop = "";
+
+    /**
+     * @var string $content *Description*: contains the content web page.
+     */
+    private   $content = "";
+
+
+
+    /**
+     * Template constructor.
+     *
+     * *Description*: this object is the base of the web page, contains the base of web page.
+     *
+     * @param string $nameUser *Description*: contains the name of the user.
+     * @param string $emailUser *Description*: contains the email of the user.
+     * @param string $home *Description*: contains the url home of this user.
+     * @param $sid  *Description*: contains the session id of the user.
      */
     function __construct($nameUser, $emailUser, $home, $sid)
     {
@@ -47,6 +75,14 @@ class Template
 
     }
 
+
+
+
+
+    /**
+     * This method contains the all web page.
+     * @return string *Description*: return all web page.
+     */
     protected function html()
     {
         return
@@ -56,6 +92,10 @@ class Template
             '</html>';
     }
 
+    /**
+     * This method contains the head of web page.
+     * @return string *Description*: return the web page head.
+     */
     private function head()
     {
         return '
@@ -89,6 +129,10 @@ class Template
         ';
     }
 
+    /**
+     * This method contains all styles of the body.
+     * @return string *Description*: return the web page body.
+     */
     private function body()
     {
         return
@@ -103,6 +147,10 @@ class Template
             '</body>';
     }
 
+    /**
+     * This method contains the nav bar.
+     * @return string *Description*: return the nav bar.
+     */
     private function header()
     {
         return
@@ -134,6 +182,10 @@ class Template
             ';
     }
 
+    /**
+     * This method contains all styles of tag main.
+     * @return string *Description*: return the web page main.
+     */
     private function main()
     {
         $section = "";
@@ -157,6 +209,10 @@ class Template
             ';
     }
 
+    /**
+     * This method contains the web page section.
+     * @return string *Description*: return the web page section.
+     */
     private function section()
     {
         return
@@ -177,6 +233,10 @@ class Template
             ';
     }
 
+    /**
+     * This method contains the footer of web page.
+     * @return string *Description*: return the web page footer.
+     */
     private function footer()
     {
         return
@@ -205,7 +265,9 @@ class Template
     }
 
     /**
-     * @param string $contentMenu
+     *  This method add content menu of the web page.
+     * @param string $contentMenu *Description*: set the content menu.
+     * @void method.
      */
     protected function setMenuContent($contentMenu)
     {
@@ -218,7 +280,9 @@ class Template
     }
 
     /**
-     * @param string $userMenuTop
+     * This method add the top right menu, this menu contains the options of my profile.
+     * @param string $userMenuTop *Description*: set the value  menu top.
+     * @void method.
      */
     protected function setMenuTop($userMenuTop)
     {
@@ -231,7 +295,8 @@ class Template
     }
 
     /**
-     * @return string
+     * This method return the var content.
+     * @return string *Description*: return var content.
      */
     protected function getContent()
     {
@@ -239,7 +304,9 @@ class Template
     }
 
     /**
-     * @param string $content
+     * This method set the web page content.
+     * @param string $content *Description*: set value of var content.
+     * @void method.
      */
     protected function setContent($content)
     {
@@ -248,10 +315,19 @@ class Template
 
 
 
+    /**
+     * This method send an error at the web page content.
+     * @param string $error *Description*: contains the text of error.
+     * @void method.
+     */
     public function showError($error = "Has occurred an error, please try again"){
         $this->content = "<h1 class='text-center'><span class='label label-danger'>".$error."</span></h1>";
     }
 
+    /**
+     * Override the parent method, this insert the content of web page and close the connection of Database.
+     * @return string *Description*: return all content web page.
+     */
     public function __toString()
     {
         return utf8_encode($this->html());

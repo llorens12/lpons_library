@@ -1,9 +1,20 @@
 <?php
 
+/**
+ * Class Ajax, this class runs the ajax requests.
+ */
 class Ajax
 {
+    /**
+     * Used to connect the Database.
+     */
     use DBController;
 
+    /**
+     * Check the email availability.
+     * @param string $email *Description*: contains the email request.
+     * @echo if the email exists or not.
+     */
     public function email($email)
     {
         $answer = mysqli_fetch_assoc
@@ -19,15 +30,18 @@ class Ajax
 
         if (count($answer) == 0)
             echo "true";
+
         else
             echo "false";
     }
 
+    /**
+     * This method check if the reserve is possible or not.
+     * @param array $request *Description*: contains the data of reserve.
+     */
     public function reserveDisponibility($request)
     {
-
         $isbn = $request['isbn'];
-
 
         if(isset($request['user']))
             $user = $request['user'];
@@ -38,8 +52,10 @@ class Ajax
         $dateFinish = str_replace("-", "", $request['dateFinish']);
         $dateStart = str_replace("-", "", $request['dateStart']);
 
-        $result = $this->select
-        ("
+        $result = mysqli_fetch_assoc
+        (
+            $this->select
+            ("
                 SELECT id
                 FROM reserves RIGHT JOIN copybooks ON copybook = id
                 WHERE book = '" . $isbn . "' AND
@@ -57,31 +73,38 @@ class Ajax
                     )
                 )
                 ORDER BY status DESC
-        ");
+            ")
+        );
 
-        $existsReserve = mysqli_fetch_assoc($this->select
-        ("
-            SELECT copybook
-            FROM reserves
-            JOIN copybooks ON copybook = id
-            WHERE
-                user =  '".$user."'
-            AND
-                book =  '".$isbn."'
-            AND
-                date_finish > ".str_replace("-","",date('Y-m-d'))."
-         "));
+        $existsReserve = mysqli_fetch_assoc
+        (
+            $this->select
+            ("
+                SELECT copybook
+                FROM reserves
+                JOIN copybooks ON copybook = id
+                WHERE
+                    user =  '".$user."'
+                AND
+                    book =  '".$isbn."'
+                AND
+                    date_finish > ".str_replace("-","",date('Y-m-d'))."
+            ")
+        );
 
 
-
-        if (count(mysqli_fetch_assoc($result)) > 0 && count($existsReserve) == 0) {
+        if (count($result) > 0 && count($existsReserve) == 0)
             echo "true";
-        } else {
+
+        else
             echo "false";
-        }
+
     }
 
-
+    /**
+     * This method check if the request isbn is availability or not.
+     * @param array $request *Description*: contains the book isbn availability.
+     */
     public function book($request)
     {
         $answer = mysqli_fetch_assoc
@@ -97,6 +120,7 @@ class Ajax
 
         if (count($answer) == 0)
             echo "true";
+
         else
             echo "false";
     }

@@ -1,11 +1,25 @@
 <?php
 
-/* Tot el que un usuari no autentificat pugui realitzar anira aqui */
-
-class Anonimous extends Template{
-
+/**
+ * Class Anonimous, this class extends of template and contains all options of not authenticated user.
+ */
+class Anonimous extends Template
+{
+    /**
+     * Used to connect the Database.
+     */
     use DBController;
 
+    /**
+     * Anonimous constructor.
+     *
+     * *Description*: call the parent construct and insert the user data.
+     *
+     * @param string $nameUser *Description*: contains the name of the user.
+     * @param string $emailUser *Description*: contains the email of the user.
+     * @param string $home *Description*: contains the url home of this user.
+     * @param $sid  *Description*: contains the session id of the user.
+     */
     public function __construct($nameUser, $emailUser, $home, $sid)
     {
         parent::__construct($nameUser, $emailUser, $home, $sid);
@@ -14,6 +28,11 @@ class Anonimous extends Template{
 
 
 
+    /**
+     * This method insert the login content.
+     * @param string $error *Description*: if exists error, print the error.
+     * @void method.
+     */
     public function showLogin($error = ""){
 
         $this->includeSection = false;
@@ -26,6 +45,11 @@ class Anonimous extends Template{
         );
     }
 
+    /**
+     * This method insert the register content.
+     * @param string $error *Description*: if exists error, print the error.
+     * @void method.
+     */
     public function showRegister($error = "")
     {
         $this->includeSection = false;
@@ -38,6 +62,12 @@ class Anonimous extends Template{
     }
 
 
+
+    /**
+     * This method start the user session.
+     * @param array $request *Description*: contains the data necessary to start session.
+     * @return bool *Description*: return if start session or not.
+     */
     public function startSession($request)
     {
         if (isset($_COOKIE['email'], $_COOKIE['pwd']))
@@ -73,6 +103,11 @@ class Anonimous extends Template{
         } else  return false;
     }
 
+    /**
+     * This method register a new user.
+     * @param array $request *Description*: contains all data of the user.
+     * @return bool *Description*: return if the insert are success or not.
+     */
     public function insertUser($request)
     {
         $request['pwd']         = md5($request['pwd']);
@@ -87,6 +122,11 @@ class Anonimous extends Template{
 
 
 
+
+    /**
+     * Override the parent method and this insert the content of web page.
+     * @return string *Description*: return all content web page.
+     */
     public function __toString()
     {
         if($this->getContent() == "")

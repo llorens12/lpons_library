@@ -1,12 +1,38 @@
 <?php
 
-class User extends Template{
-
+/**
+ * Class User, this class extends of template and contains all options to custom user.
+ */
+class User extends Template
+{
+    /**
+     * Used to connect the Database.
+     */
     use DBController;
 
+    /**
+     * @var int *Description*: this var contains the global value of default reserve.
+     */
     protected $DEFAULT_DAYS_RESERVE = 20;
+
+    /**
+     * @var int *Description*: this var contains the global value of delimiter max days of reserve
+     * (personalized or default).
+     */
     protected $MAX_DAYS_RESERVE     = 59;//The reserve is the 60 days because the 0 count
 
+
+
+    /**
+     * User constructor.
+     *
+     * *Description*: this object call of the parent construct and generate the web page.
+     *
+     * @param string $nameUser *Description*: contains the name of the user.
+     * @param string $emailUser *Description*: contains the email of the user.
+     * @param string $home *Description*: contains the url home of this user.
+     * @param $sid  *Description*: contains the session id of the user.
+     */
     public function __construct($nameUser, $emailUser, $home, $sid)
     {
         parent::__construct($nameUser, $emailUser, $home, $sid);
@@ -15,6 +41,11 @@ class User extends Template{
 
 
 
+    /**
+     * This method show details of specific book and contains the form to reserve book.
+     * @param string $isbn *Description*: contains the book isbn to see.
+     * @void method.
+     */
     public function showBook($isbn)
     {
 
@@ -24,7 +55,7 @@ class User extends Template{
         (
             stylesUser::filterMenu
             (
-                "Details Book",
+                "",
                 "Select Category",
                 "Default",
                 $this->getArrayToResult
@@ -60,6 +91,12 @@ class User extends Template{
         );
     }
 
+    /**
+     * This method print all information to the books.
+     * @param string $category *Description*: execute a filter of category.
+     * @param string $search *Description*: search a specific user.
+     * @void method.
+     */
     public function showBooks($category = "", $search = "")
     {
         $_SESSION['menu']="Books";
@@ -95,7 +132,7 @@ class User extends Template{
 
         $content .= stylesUser::filterMenu
         (
-            "Books",
+            "",
             ($category != "" && $category != "*")? $category : "Select Category",
             "All",
             $this->getArrayToResult
@@ -131,6 +168,12 @@ class User extends Template{
         $this->setContent($content);
     }
 
+    /**
+     * This method print all information of the user reserves.
+     * @param string $category *Description*: execute a filter of category.
+     * @param string $search *Description*: search a specific user.
+     * @void method.
+     */
     public function showReserves($category = "",$search = "")
     {
         $_SESSION['menu'] = "Reserves";
@@ -204,6 +247,11 @@ class User extends Template{
         );
     }
 
+    /**
+     * This method print the form to edit user profile.
+     * @param array $request *Description*: contains all user data.
+     * @void method.
+     */
     public function showMyProfile($request)
     {
         $_SESSION['menu'] = "";
@@ -234,6 +282,10 @@ class User extends Template{
 
 
 
+    /**
+     * This method print the form to edit user reserve.
+     * @param array $request *Description*: contains all reserve information.
+     */
     public function showEditReserve($request){
 
         $_SESSION['menu'] = "Reserves";
@@ -262,23 +314,36 @@ class User extends Template{
 
         $this->setContent
         (
-            stylesUser::contentFormEditReserves
+            stylesUser::contentForm
             (
-                $reserve,
+                "Edit Reserve",
+                stylesUser::formEditReserves($reserve),
+                $this->sid,
                 (isset($request['error'])),
-                $this->sid
+                "update",
+                'setUpdateReserve&copyBook='.$reserve['copybook'].'&firstDateStart='.$reserve['date_start']
             )
         );
     }
 
 
 
+    /**
+     * This method insert a new default reserve.
+     * @param array $request *Description*: contains all reserve data.
+     * @return bool *Description*: if insert is success or not.
+     */
     public function setInsertDefaultReserve($request)
     {
         $request['user'] = $_SESSION['email'];
         return $this->insertDeffaultReserve($request);
     }
 
+    /**
+     * This method insert a new personalized reserve.
+     * @param array $request *Description*: contains all reserve data.
+     * @return bool *Description*: if insert is success or not.
+     */
     public function setInsertPersonalizedReserve($request)
     {
         $request['user'] = $_SESSION['email'];
@@ -287,12 +352,22 @@ class User extends Template{
 
 
 
+    /**
+     * This method update an existing reserve.
+     * @param array $request *Description*: contains all new data of reserve.
+     * @return bool *Description*: if update is success or not.
+     */
     public function setUpdateReserve($request){
 
         $request['email'] = $this->emailUser;
         return $this->updateReserve($request);
     }
 
+    /**
+     * This method update a user profile.
+     * @param array $request *Description*: contains all new data of user profile.
+     * @return bool *Description*: if update is success or not.
+     */
     public function setUpdateMyProfile($request){
 
         unset($request['typeUser'], $request['registered']);
@@ -319,6 +394,11 @@ class User extends Template{
 
 
 
+    /**
+     * This method delete an a user reserve.
+     * @param array $request *Description*: contains all reserve data.
+     * @return bool *Description*: if delete is success or not.
+     */
     public function setDeleteReserve($request)
     {
         $request['email'] = $this->emailUser;
@@ -341,7 +421,10 @@ class User extends Template{
 
 
 
-
+    /**
+     * This method broken the current session.
+     * @void method.
+     */
     public function logOut()
     {
         session_destroy();
@@ -352,8 +435,16 @@ class User extends Template{
         };
     }
 
-    protected function updateReserve($reserve){
 
+
+
+    /**
+     * This method is common with Librarian and Admin and update reserves.
+     * @param array $reserve *Description*: contains all reserve data.
+     * @return bool *Description*: if update is succes or not.
+     */
+    protected function updateReserve($reserve)
+    {
         if(!isset($reserve['date_start']))
             $reserve['date_start'] = $reserve['firstDateStart'];
 
@@ -396,11 +487,20 @@ class User extends Template{
                 copybook = '".$reserve['copyBook']."'
         ";
 
+
+        if(isset($request['received']))
+            $request['date_finish'] = $request['received'];
+
         unset($reserve['email'], $reserve['firstDateStart'], $reserve['copyBook']);
 
         return $this->update("reserves", $reserve, $where);
     }
 
+    /**
+     * This method is common and insert an a default reserve.
+     * @param array $request *Description*: contains all default reserve data.
+     * @return bool *Description*: if insert is success or not.
+     */
     protected function insertDeffaultReserve($request)
     {
         if($this->existsReserve($request['user'], $request['isbn']))
@@ -426,7 +526,15 @@ class User extends Template{
          * if it's now possible, insert reserve
          */
 
-        $copyBookAvailable = mysqli_fetch_assoc($this->getBookDisponibility($request['isbn'], $request['date_start'],$request['date_finish']))['id'];
+        $copyBookAvailable = mysqli_fetch_assoc
+        (
+            $this->getBookDisponibility
+            (
+                $request['isbn'],
+                $request['date_start'],
+                $request['date_finish']
+            )
+        )['id'];
 
         if(count($copyBookAvailable) > 0)
         {
@@ -536,6 +644,11 @@ class User extends Template{
 
     }
 
+    /**
+     * This method is common and insert an a personalized reserve.
+     * @param array $reserve *Description*: contains all data of the personalized reserve.
+     * @return bool *Description*: if insert is success or not.
+     */
     protected function insertPersonalizedReserve($reserve)
     {
         if($this->existsReserve($reserve['user'], $reserve['isbn']))
@@ -564,7 +677,11 @@ class User extends Template{
 
 
 
-
+    /**
+     * This function is common and return the reserve to valid format.
+     * @param array $reserve *Description*: contains all data of reserve.
+     * @return object  *Description*: return a reserve in a valid format.
+     */
     protected function getReserveToformatValid($reserve)
     {
 
@@ -587,6 +704,12 @@ class User extends Template{
         return $reserve;
     }
 
+    /**
+     * This method check if the user already have one reserve of this book.
+     * @param string $user *Description*: contains the email of user.
+     * @param string $isbn *Description*: contains the isbn of the book.
+     * @return bool *Description*: if the user has already reserve of this book or not.
+     */
     protected function existsReserve($user, $isbn)
     {
         $existsReserve = mysqli_fetch_assoc($this->select
@@ -610,6 +733,13 @@ class User extends Template{
             return false;
     }
 
+    /**
+     * This method obtains all books copies that is available.
+     * @param string $isbn *Description*: contains book isbn.
+     * @param string $dateStart *Description*: contains the start date.
+     * @param string $dateFinish *Description*: contains the finish date.
+     * @return array *Description*: all books copies available.
+     */
     protected function getBookDisponibility($isbn, $dateStart, $dateFinish){
 
         $dateFinish = str_replace("-","",$dateFinish);
@@ -638,46 +768,76 @@ class User extends Template{
         ");
     }
 
+    /**
+     * This method calculate the difference of two dates.
+     * @param string $dateStart *Description*: contains the start date.
+     * @param string $dateFinish *Description*: contains the finish date.
+     * @return int *Description*: the difference to the dates.
+     */
     protected function getDateDifference($dateStart, $dateFinish){
         return str_replace("-", "", $dateFinish) - str_replace("-", "", $dateStart);
     }
 
+    /**
+     * This method transform mysqli object on a simple array
+     * @param array $result *Description*: is an mysqli object.
+     * @return array *Description*: simple array
+     */
     protected function getArrayToResult($result){
 
         $array = array();
 
         while($p = mysqli_fetch_assoc($result))
-        {
             foreach($p as $value)
             {
                 array_push($array,$value);
             }
-        }
+
 
         return $array;
     }
 
+    /**
+     * This method return the unknown array key of the know value.
+     * @param array $array *Description*: contains the key to search.
+     * @param string $value *Description*: contains the know value.
+     * @return string *Description*: key of the value.
+     */
     protected function getKeyToValue($array, $value){
 
-        foreach($array as $k => $v){
+        foreach($array as $k => $v)
+        {
             if($v == $value)
                 return $k;
         }
         return "";
     }
 
+    /**
+     * Transform array on a sql select string.
+     * @param array $array *Description*: contains the values to transform.
+     * @return string *Description*: simple select string. (Ejem: books AS 'Books', user AS 'User',...)
+     */
     protected function getQueryNamesFormat($array){
 
         $nameFormat = "";
 
-        foreach($array as $key => $value){
-            $nameFormat .= $key." AS ".$value.", ";
-        }
+        foreach($array as $key => $value)
+            $nameFormat .= $key." AS '".$value."', ";
+
 
         $nameFormat = trim($nameFormat,", ");
         return $nameFormat;
     }
 
+    /**
+     * This method generate sql LIKE sentence.
+     * @param array $filterData *Description*: array to contains the columns to search.
+     * @param string $search *Description*: value to search.
+     * @param string $type *Description*: if not contains string,
+     * generate "AND" search else, insert options "WHERE" or "OR".
+     * @return string *Description*: contains the sentence.
+     */
     protected function getSearchLikeFormat($filterData, $search, $type = ""){
 
         if($type == "")
@@ -685,7 +845,8 @@ class User extends Template{
 
         $sentence =  " ".$type." ( ";
 
-        foreach($filterData as $key =>$value){
+        foreach($filterData as $key =>$value)
+        {
             if(strpos($key,'(') || strpos($key,'()'))
                 $sentence .= " LOWER(".$value.")   LIKE LOWER('%" . $search . "%') OR";
 
@@ -701,6 +862,12 @@ class User extends Template{
     }
 
 
+
+
+    /**
+     * Override the parent method, this insert the content of web page and close the connection of Database.
+     * @return string *Description*: return all content web page.
+     */
     public function __toString()
     {
         $this->close();
@@ -722,11 +889,8 @@ class User extends Template{
             )
         );
 
-        ($this->getContent() == "")?
-
-            $this->showError("ERROR: action not found")
-            :
-            NULL;
+        if($this->getContent() == "")
+            $this->showError("ERROR: action not found");
 
         return utf8_encode($this->html());
     }

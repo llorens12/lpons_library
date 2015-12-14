@@ -17,12 +17,12 @@ session_start();
 if (!isset($_SESSION['email'], $_SESSION['typeUser'], $_SESSION['name'], $_SESSION['home']))
     header('Location: index.php');
 
+register_shutdown_function('fatalErrorHandler');
 
 
-
-//register_shutdown_function('fatalErrorHandler');
-
-
+/**
+ * Options of ajax request
+ */
 if (isset($_REQUEST['ajax']))
 {
     $ajax = new Ajax();
@@ -41,6 +41,9 @@ if (isset($_REQUEST['ajax']))
             $ajax->reserveDisponibility($_REQUEST);
             break;
 
+        /**
+         * Return if isset isbn
+         */
         case "book":
 
             $ajax->book($_REQUEST);
@@ -49,8 +52,15 @@ if (isset($_REQUEST['ajax']))
 }
 else {
 
+    /**
+     * Create the object based on the type of user
+     */
     $user  = new $_SESSION['typeUser']($_SESSION['name'], $_SESSION['email'], $_SESSION['home'], SID);
 
+
+    /**
+     * View options
+     */
     if (isset($_REQUEST['method']))
     {
 
@@ -61,7 +71,9 @@ else {
         $search   = "";
 
 
-
+        /**
+         * Gets the value of a filter or search
+         */
         if(isset($_REQUEST['category']))
             $category = $_REQUEST['category'];
 
@@ -70,11 +82,17 @@ else {
 
         if(isset($_REQUEST['search']))
             $search = $_REQUEST['search'];
-        
 
+
+        /**
+         * Check option
+         */
         switch ($method)
         {
 
+            /**
+             * Options of Anonimous type
+             */
             case "showLogin":
 
                 $user->showLogin();
@@ -87,26 +105,25 @@ else {
 
             case "startSession":
 
-                if ($user->startSession($_REQUEST)) {
-
+                if ($user->startSession($_REQUEST))
                     header('Location: ' . $_SESSION['home'] . htmlspecialchars(SID));
-                }
+
                 else
-                {
                     $user->showLogin("Incorrect E-mail or Password");
-                }
                 break;
 
+
+
+
+
+            /**
+             * Options of User, Librarian and Admin type
+             */
             case "logOut":
 
                 $user->logOut();
                 header('Location: ../index.php');
                 break;
-
-
-
-
-
 
             case "showBook":
 
@@ -128,8 +145,6 @@ else {
                 $user->showMyProfile($_REQUEST);
                 break;
 
-
-
             case "showEditReserve":
 
                 $user->showEditReserve($_REQUEST);
@@ -139,6 +154,9 @@ else {
 
 
 
+            /**
+             * Options of Librarian and Admin type
+             */
             case "showTableUsers":
 
                 $user->showTableUsers($category,$search);
@@ -240,14 +258,24 @@ else {
 
         }
     }
+
+    /**
+     * Insert options
+     */
     elseif(isset($_REQUEST['insert']))
     {
         $insert = $_REQUEST['insert'];
         unset($_REQUEST['insert']);
 
+        /**
+         * Check option
+         */
         switch ($insert)
         {
 
+            /**
+             * Options of Anonimous type
+             */
             case "insertUser":
 
                 (!$user->insertUser($_REQUEST))?
@@ -258,6 +286,9 @@ else {
 
 
 
+            /**
+             * Options of User, Librarian and Admin type
+             */
             case "setInsertDefaultReserve":
 
                 if($user->setInsertDefaultReserve($_REQUEST))
@@ -278,7 +309,9 @@ else {
 
 
 
-
+            /**
+             * Options of Librarian and Admin type
+             */
             case "setInsertUser":
 
                 if($user->setInsertUser($_REQUEST))
@@ -290,11 +323,11 @@ else {
 
             case "setInsertBook":
 
-                if($user->setInsertBook($_REQUEST, $_FILES));
-                   /* header('Location: controller.php?method=showAdministrateBooks&search='.$_REQUEST['isbn'].htmlspecialchars(SID));
+                if($user->setInsertBook($_REQUEST, $_FILES))
+                    header('Location: controller.php?method=showAdministrateBooks&search='.$_REQUEST['isbn'].htmlspecialchars(SID));
 
                 else
-                    setError();*/
+                    setError();
                 break;
 
             case "setInsertCopy":
@@ -324,22 +357,30 @@ else {
                     setError();
                 break;
 
-
-
         }
     }
+
+    /**
+     * Update options
+     */
     elseif(isset($_REQUEST['update']))
     {
         $update = $_REQUEST['update'];
         unset($_REQUEST['update']);
 
+        /**
+         * Check option
+         */
         switch($update)
         {
 
+            /**
+             * Options of User, Librarian and Admin type
+             */
             case "setUpdateReserve":
 
                 if($user->setUpdateReserve($_REQUEST))
-                    header('Location: controller.php?method=showReserves&search='.$_REQUEST['isbn']. htmlspecialchars(SID));
+                    header('Location: controller.php?method=showReserves&search='.$_REQUEST['Start']. htmlspecialchars(SID));
 
                 else
                     setError();
@@ -355,7 +396,9 @@ else {
 
 
 
-
+            /**
+             * Options of Librarian and Admin type
+             */
             case "setUpdateUser":
 
                 if($user->setUpdateUser($_REQUEST))
@@ -389,16 +432,26 @@ else {
                     setError();
                 break;
 
-
         }
     }
+
+    /**
+     * Delete options
+     */
     elseif(isset($_REQUEST['delete']))
     {
         $delete = $_REQUEST['delete'];
         unset($_REQUEST['delete']);
 
-        switch ($delete) {
+        /**
+         * Check option
+         */
+        switch ($delete)
+        {
 
+            /**
+             * Options of User, Librarian and Admin type
+             */
             case "setDeleteReserve":
 
                 if($user->setDeleteReserve($_REQUEST))
@@ -410,6 +463,9 @@ else {
 
 
 
+            /**
+             * Options of Librarian and Admin type
+             */
             case "setDeleteUser":
 
                 if($user->setDeleteUser($_REQUEST['Email']))
@@ -445,13 +501,20 @@ else {
                 else
                     setError();
                 break;
+
         }
     }
 
+    /**
+     * Print web page
+     */
     echo $user;
 }
 
 
+/**
+ * Function redirect in error case
+ */
     function setError()
     {
         if(strpos($_SERVER['HTTP_REFERER'], "&error="))
@@ -463,11 +526,8 @@ else {
 
 
 /**
- *
  * Handling fatal error
- *
  */
-
     function fatalErrorHandler()
     {
         $error = error_get_last();

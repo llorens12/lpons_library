@@ -1,7 +1,32 @@
 <?php
 
+/**
+ * Class stylesUser, this class is static and contains all styles of user User
+ */
 class stylesUser{
 
+    /**
+     * This method generate a table, in the parameters you can remodel the appearance of the table. If you are only
+     * declare the data, only show data.
+     * @param mysqli $data *Description*: contains all data to show in the table.
+     * @param bool|false $edit *Description*: if is true, add column edit, else not.
+     * @param bool|false $drop *Description*: if is true, add column drop, else not.
+     * @param bool|false $add  *Description*: if is true, add column add, else not.
+     * @param string $objectAdd *Description*: contains the url to redirect in column add.
+     *  (He include controller.php?method=showAdd{this include your url})
+     * @param string $typeObject *Description*: contains the url to redirect in the columns edit and drop.
+     *  (In edit he include: controller.php?method=showEdit{this include your url}) and
+     *  (In drop he include: controller.php?delete=setDelete{this include your url}).
+     * @param array|string $primaryKeys *Description*: this array contains the names of the columns that are
+     *  primary keys (Example: ["user","Books","ID Copy",...])
+     * @param bool|false $reserveDelimiter *Description*: in the case of reserves, if the reserve is sent you can't
+     *  delete and is received nor can edit reserve. Select true if you want this option. (NOTE: this option not delete
+     *  the columns sent and received, this is the next option)
+     * @param bool|false $showColumnSentReceived *Description*: select true if you don't want show columns sent and true.
+     * @param int $MAX_DAYS_RESERVE *Description*: contains the max days of reserve.
+     * @param $sid *Description*: this contains the session id.
+     * @return string *Description*: return the table.
+     */
     public static function table($data, $edit = false, $drop = false, $add = false, $objectAdd = "", $typeObject = "", $primaryKeys = "", $reserveDelimiter = false, $showColumnSentReceived = false, $MAX_DAYS_RESERVE = 0, $sid = "")
     {
         $contentThead   = "<th>#</th>";
@@ -21,30 +46,32 @@ class stylesUser{
 
         $theadOptions = function ($edit, $drop, $add)
         {
-
             $contentThead = "";
 
-            if($add){
+            if($add)
+            {
                 $contentThead .=
-                    "
+                "
                     <th>
                         Add
                     </th>
                 ";
             }
 
-            if($edit) {
+            if($edit)
+            {
                 $contentThead .=
-                    "
+                "
                     <th>
                         Edit
                     </th>
                 ";
             }
 
-            if($drop) {
+            if($drop)
+            {
                 $contentThead .=
-                    "
+                "
                     <th>
                         Remove
                     </th>
@@ -54,13 +81,14 @@ class stylesUser{
             return $contentThead;
         };
 
-        $tbodyOptions = function ($edit, $drop, $add, $objectAdd, $typeObject, $valueLink, $stateEdit, $stateDelete, $sid){
-
+        $tbodyOptions = function ($edit, $drop, $add, $objectAdd, $typeObject, $valueLink, $stateEdit, $stateDelete, $sid)
+        {
             $contentTbody = "";
 
-            if($add){
+            if($add)
+            {
                 $contentTbody .=
-                    '
+                '
                     <td>
                         <a href="controller.php?method=showAdd'.$objectAdd.'&' . $valueLink . $sid.'" title="Add new '.$objectAdd.'">
                             <i class="fa fa-plus"></i>
@@ -70,21 +98,23 @@ class stylesUser{
             }
 
 
-            if($edit) {
+            if($edit)
+            {
                 $contentTbody .=
-                    '
+                '
                     <td>
                         <a href="controller.php?method=showEdit' . $typeObject . '&' . $valueLink . $sid.'" title="Edit" class="'.$stateEdit.'">
                             <span class="glyphicon glyphicon-edit"></span>
                         </a>
                     </td>
-                    ';
+                ';
             }
 
 
-            if($drop) {
+            if($drop)
+            {
                 $contentTbody .=
-                    '
+                '
                     <td>
                         <a href="controller.php?delete=setDelete' . $typeObject . '&' . $valueLink . $sid.'" title="Delete" class="'.$stateDelete.'">
                             <span class="glyphicon glyphicon-remove"></span>
@@ -97,9 +127,9 @@ class stylesUser{
         };
 
 
-        if(mysqli_num_rows($data) == 0){
+        if(mysqli_num_rows($data) == 0)
             return "<h1 style='width: 100%; text-align: center'>".$typeObject." is empty</h1>";
-        }
+
 
         while ($object = mysqli_fetch_assoc($data))
         {
@@ -134,45 +164,46 @@ class stylesUser{
             $thead = false;
 
             $contentTbody .=
-                '    <tr>
+                '
+                    <tr>
+                        <th scope="row">'
+                            . $objectNumber .
+                        '</th>'
 
-                    <th scope="row">'
-                . $objectNumber .
-                '</th>'
-
-                . $contentTr;
+                    . $contentTr;
 
 
-            if($reserveDelimiter
+            if
+            (
+                $reserveDelimiter
                 && is_null($recived)
-                && date_create($object['Start'])->diff(date_create($object['End']))->format("d") < $MAX_DAYS_RESERVE )
-            {
+                && date_create($object['Start'])->diff(date_create($object['End']))->format("d") < $MAX_DAYS_RESERVE
+            )
                 $stateEdit = "";
-            }
-            elseif($reserveDelimiter)
-            {
-                $stateEdit = "not-active";
-            }
 
-            if($reserveDelimiter
-                && is_null($sent) && is_null($recived)
-                && date_create($object['Start'])->diff(date_create($object['End']))->format("d") < $MAX_DAYS_RESERVE )
-            {
-                $stateDelete = "";
-            }
             elseif($reserveDelimiter)
-            {
+                $stateEdit = "not-active";
+
+
+            if
+            (
+                $reserveDelimiter
+                && is_null($sent) && is_null($recived)
+                && date_create($object['Start'])->diff(date_create($object['End']))->format("d") < $MAX_DAYS_RESERVE
+            )
+                $stateDelete = "";
+
+            elseif($reserveDelimiter)
                 $stateDelete = "not-active";
-            }
+
 
             $valueLink = "";
 
-            if(is_array($primaryKeys)) {
-
-
-                foreach ($primaryKeys as $singleKey) {
+            if(is_array($primaryKeys))
+            {
+                foreach ($primaryKeys as $singleKey)
                     $valueLink .= str_replace(' ', '', $singleKey) . "=" . $object[$singleKey] . "&";
-                }
+
                 $valueLink = trim($valueLink, "&");
             }
 
@@ -180,9 +211,9 @@ class stylesUser{
 
 
             $contentTbody .=
-                '
+            '
                   </tr>
-                ';
+            ';
 
             $objectNumber++;
         }
@@ -190,22 +221,35 @@ class stylesUser{
 
         $contentThead .= $theadOptions($edit, $drop, $add);
 
-        return '
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    ' . $contentThead . '
-                </tr>
-            </thead>
-            <tbody>
-                ' . $contentTbody . '
-            </tbody>
-        </table>
+        return
+        '
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        ' . $contentThead . '
+                    </tr>
+                </thead>
+                <tbody>
+                    ' . $contentTbody . '
+                </tbody>
+            </table>
         ';
     }
 
-    public static function filterMenu($titleFilter, $nameFilter, $filterDefault, $filterData, $placeHolderSearch, $method, $sid){
-
+    /**
+     * This method generate the form to select category and search in the content.
+     * @param string $titleFilter *Description*: contains the title of the content.
+     * @param string $nameFilter *Description*: contains the first name to view in the input select.
+     * @param string $filterDefault *Description*: contains the name of the option to return the select all.
+     * @param array $filterData *Description*: contains all options in the input select.
+     * @param string $placeHolderSearch *Description*: contains the text to view in the search placeholder.
+     * @param string $method *Description*: contains the url to redirect.
+     *  (He include: controller.php?method={this include your option]).
+     * @param $sid *Description*: contains the session id.
+     * @return string *Description*: menu form filter.
+     */
+    public static function filterMenu($titleFilter, $nameFilter, $filterDefault, $filterData, $placeHolderSearch, $method, $sid)
+    {
         if($nameFilter == "Order by")
             $valueButtonFilter = "";
 
@@ -267,49 +311,66 @@ class stylesUser{
                 ';
     }
 
-    public static function book($book, $DEFAULT_DAYS_RESERVE, $sid){
+    /**
+     * This method generate the all style to vew a book details.
+     * @param array $book *Description*: contains all book data.
+     * @param int $DEFAULT_DAYS_RESERVE *Description*: contains the number that you see in the button default reserve.
+     * @param $sid *Description*: contains the session id.
+     * @return string *Description*:  all style to show the book details.
+     */
+    public static function book($book, $DEFAULT_DAYS_RESERVE, $sid)
+    {
         return
             '
-                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" id="div-details-books">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" id="div-details-books">
 
-                        <div id="img-details-books">
+                <div id="img-details-books">
 
-                            <img class="details-img" src="../img/books/'.$book["isbn"].'.jpg"/>
+                    <img class="details-img" src="../img/books/' .$book["isbn"]. '.jpg"/>
 
-                            <label class="label label-default">ISBN: <label id="book-isbn">'.$book["isbn"].'</label></label>
-                            <br><br>
-                            <label class="label label-default">Category: '.$book["category"].'</label>
-                            <br><br>
-                            <label class="label label-default">Author: '.$book["author"].'</label>
+                    <label class="label label-default">ISBN: <label id="book-isbn">' .$book["isbn"]. '</label></label>
+                    <br><br>
+                    <label class="label label-default">Category: ' .$book["category"]. '</label>
+                    <br><br>
+                    <label class="label label-default">Author: ' .$book["author"]. '</label>
 
-                        </div>
-
-
-                        <div id="text-details-books">
+                </div>
 
 
-                            <h1>'.$book["title"].'</h1>
+                <div id="text-details-books">
 
 
-                            <p>'.$book["summary"].'</p>
+                    <h1>' .$book["title"]. '</h1>
 
 
-                        '.stylesUser::personalizedReserve
-            (
-                "setInsertDefaultReserve&isbn=".$book["isbn"].$sid.'"',
-                'setInsertPersonalizedReserve&isbn='.$book["isbn"].$sid,
-                $DEFAULT_DAYS_RESERVE." days",
-                $book["isbn"],
-                $sid
-            ).'
+                    <p>' .$book["summary"]. '</p>
 
-                        </div>
-                    </div>
-            ';
+
+                    ' .stylesUser::personalizedReserve
+                        (
+                            "setInsertDefaultReserve&isbn=".$book["isbn"].$sid.'"',
+                            'setInsertPersonalizedReserve&isbn='.$book["isbn"].$sid,
+                            $DEFAULT_DAYS_RESERVE." days",
+                            $book["isbn"],
+                            $sid
+                        ). '
+
+                </div>
+            </div>
+                        ';
     }
 
-    public static function personalizedReserve($hrefDefaultReserve = "", $hrefPersonalizedReserve = "", $textBtnReserve = "", $isbn = "", $sid = ""){
-
+    /**
+     * This method contains the personalized reserve form.
+     * @param string $hrefDefaultReserve *Description*: contains the url to send default reserve.
+     * @param string $hrefPersonalizedReserve *Description*: contains the url to send personalized reserve.
+     * @param string $textBtnReserve *Description*: contains the text that you see in the button default reserve.
+     * @param string $isbn *Description*: contains the book isbn.
+     * @param string $sid *Description*: contains the session id.
+     * @return string *Description*: return the form to show personalized reserve.
+     */
+    public static function personalizedReserve($hrefDefaultReserve = "", $hrefPersonalizedReserve = "", $textBtnReserve = "", $isbn = "", $sid = "")
+    {
         $url = "controller.php?insert=";
         if($hrefDefaultReserve == "" && $hrefPersonalizedReserve == "")
             $url = "";
@@ -352,8 +413,15 @@ class stylesUser{
         ';
     }
 
-    public static function books($book, $DEFAULT_DAYS_RESERVE, $sid){
-
+    /**
+     * This method contains the all style to show the books. This is the "layout" of each book.
+     * @param array $book *Description*: contains all book data.
+     * @param int $DEFAULT_DAYS_RESERVE *Description*: contains the number to send a default reserve.
+     * @param $sid *Description*: contains the session id.
+     * @return string *Description*: return style of "layout" with book data.
+     */
+    public static function books($book, $DEFAULT_DAYS_RESERVE, $sid)
+    {
         return
             '
             <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 show-books">
@@ -379,10 +447,16 @@ class stylesUser{
                 </div>
             </div>
         ';
-
     }
 
-    public static function menuTop($nameUser, $sid){
+    /**
+     * This method contains the style of the my profile menu.
+     * @param string $nameUser *Description*: contains the name of the user.
+     * @param $sid *Description*: contains the session id.
+     * @return string *Description*: all style of my profile menu.
+     */
+    public static function menuTop($nameUser, $sid)
+    {
         return
             '
             <span class="dropdown-toggle">
@@ -400,8 +474,13 @@ class stylesUser{
         ';
     }
 
-    public static function menuContent($sid){
-
+    /**
+     * This method contains all style of the content menu.
+     * @param $sid *Description*: contains the session id.
+     * @return string *Description*: all style of the content menu.
+     */
+    public static function menuContent($sid)
+    {
         $Books = "default";
         $Reserves = "default";
 
@@ -425,42 +504,18 @@ class stylesUser{
         ';
     }
 
-    public static function contentFormEditReserves($reserve, $error, $sid){
-
-        $hidden = "hidden";
-        if($error){
-            $hidden = "";
-        }
-
-
-        return
-            '
-            <div class="row row-centered container-form">
-
-                <form class="col-lg-12 col-md-12 col-sm-12 col-xs-12 content-form" action="controller.php?update=setUpdateReserve&copyBook='.$reserve['copybook'].'&firstDateStart='.$reserve['date_start'].$sid.'" method="POST">
-                    <div class="inputs-content-form">
-                        <h2>Edit reserve</h2>
-                        '.stylesUser::formEditReserves($reserve).'
-                    </div>
-                    <label class="label label-danger '.$hidden.'" id="label-error-personalized-reserve">The reserve is not available</label>
-                    <br>
-                    <div class="form-group btn-content-form">
-                        <button type="submit" class="btn btn-default active" title="Save">
-                            Save
-                        </button>
-                    </div>
-                </form>
-            </div>
-                    ';
-    }
-
-    public static function formEditReserves($reserve){
-
+    /**
+     * This method contains the form to edit reserves. (Not include the tag form)
+     * @param array $reserve *Description*: contains all reserve data.
+     * @return string *Description*: return the edit reserves form with the data.
+     */
+    public static function formEditReserves($reserve)
+    {
         (!is_null($reserve['sent']))? $dateStart = "disabled" : $dateStart ="";
         (!is_null($reserve['received']))? $dateFinish = "disabled" : $dateFinish ="";
 
         return
-            '
+        '
             <div class="input-group" title="ISBN">
                 <span class="input-group-addon icons" title="ISBN"><i class="fa fa-barcode"></i></span>
                 <input type="text" class="form-control" value="'.$reserve['isbn'].'" disabled >
@@ -485,9 +540,19 @@ class stylesUser{
                 <span class="input-group-addon icons"><i class="fa fa-calendar-times-o"></i></span>
                 <input type="date" class="form-control" name="date_finish" value="'.$reserve['date_finish'].'" '.$dateFinish.'>
             </div>
-                    ';
+        ';
     }
 
+    /**
+     * This method contains the tag form and you edit options.
+     * @param string $title *Description*: contains the title of the form.
+     * @param string $form *Description*: contains content to form.
+     * @param $sid *Description*: contains the session id.
+     * @param bool $error *Description*: if is true, show label error, else not.
+     * @param string $sentenceType *Description*: this contains the name of sentence (Example: update)
+     * @param string $sentence *Description*: this contains the url to redirect.
+     * @return string *Description*: return a tag form with the content form.
+     */
     public static function contentForm($title, $form, $sid, $error, $sentenceType, $sentence){
 
         $hidden = "hidden";
@@ -517,6 +582,12 @@ class stylesUser{
                     ';
     }
 
+    /**
+     * This method contains the form to administrate user. (Edit my profile and edit existing user)
+     * @param array $currentUser *Description*: contains all user data.
+     * @param string $otherOptionsHome *Description*: contains the new options of the tag select.
+     * @return string *Description*: return a content form with data.
+     */
     public static function formAdministrateUser($currentUser, $otherOptionsHome = ""){
 
         $User =

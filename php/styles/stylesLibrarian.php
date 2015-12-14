@@ -1,26 +1,41 @@
 <?php
 
-
+/**
+ * Class stylesLibrarian, this class is static and contains all styles of user Librarian
+ */
 class stylesLibrarian
 {
 
-    public static function menuTop($nameUser, $sid){
+    /**
+     * This method contains the style of the my profile menu.
+     * @param string $nameUser *Description*: contains the name of the user.
+     * @param $sid *Description*: contains the session id.
+     * @return string *Description*: all style of my profile menu.
+     */
+    public static function menuTop($nameUser, $sid)
+    {
         return stylesUser::menuTop($nameUser, $sid);
     }
 
+    /**
+     * This method contains all style of the content menu.
+     * @param $sid *Description*: contains the session id.
+     * @return string *Description*: all style of the content menu.
+     */
     public static function menuContent($sid)
     {
-        $Users = "default";
-        $Books = "default";
+        $Users    = "default";
+        $Books    = "default";
         $Reserves = "default";
 
         $$_SESSION['menu'] = "primary active";
 
 
-        return '
+        return
+        '
             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
                 <div class="btn-group btn-menu sub-menu">
-                    <a href="controller.php?method=showDefaulters'.$sid.'" class="btn btn-'.$Users.' btn-lg  dropdown-toggle" >
+                    <a href="controller.php?method=showTableUsers'.$sid.'" class="btn btn-'.$Users.' btn-lg  dropdown-toggle" >
                         Users
                         <span class="caret"></span>
                     </a>
@@ -113,10 +128,16 @@ class stylesLibrarian
                     </ul>
                 </div>
             </div>
-            ';
+        ';
     }
 
-    public static function formBook($data = ""){
+    /**
+     * This method contains the form of the book.
+     * @param array|string $data *Description*: contains or not all book data.
+     * @return string *Description*: form with or not book data.
+     */
+    public static function formBook($data = "")
+    {
         $defaults = array
         (
             "isbn"          => "",
@@ -139,14 +160,14 @@ class stylesLibrarian
         }
 
         return
-            '
+        '
             <div class="input-group" title="ISBN">
                 <span class="input-group-addon icons"><i class="fa fa-barcode"></i></span>
                 <input type="text" class="form-control" placeholder="ISBN" name="isbn" id="isbn-form" required="" value="'.$vars['isbn'].'">
             </div>
             <div class="input-group" title="Title">
                 <span class="input-group-addon icons"><i class="fa fa-book"></i></span>
-                <input maxlength="50" type="text" class="form-control" placeholder="Title" name="title" required="" value="'.$vars['title'].'">
+                <input maxlength="40" type="text" class="form-control" placeholder="Title" name="title" required="" value="'.$vars['title'].'">
             </div>
             <div class="input-group" title="Description">
                 <span class="input-group-addon icons"><i class="fa fa-text-height"></i></span>
@@ -171,34 +192,39 @@ class stylesLibrarian
         ';
     }
 
-    public static function formCopy($data){
-
-        $New  = "";
-        $Good = "";
-        $Bad  = "";
+    /**
+     * This method contains the form of the book copy.
+     * @param array|string $data *Description*: contains or not all book copy data.
+     * @return string *Description*: form with or not book copy data.
+     */
+    public static function formCopy($data = "")
+    {
+        $New    = "";
+        $Good   = "";
+        $Bad    = "";
         $formId = "";
 
-        if(isset($data['status'])){
+        if(isset($data['status']))
             $$data['status'] = "selected";
-        }
 
 
         if(isset($data['id']))
+        {
             $formId .=
-                '
-            <div class="input-group">
-                <span class="input-group-addon icons" title="ID Copy"><i class="fa fa-hashtag"></i></span>
-                <input type="text" class="form-control" placeholder="ID Copy"   title="ID Copy" value="'.$data['id'].'" disabled>
-            </div>
-            ';
-
-
-        return
-            $formId.
             '
+                <div class="input-group">
+                    <span class="input-group-addon icons" title="ID Copy"><i class="fa fa-hashtag"></i></span>
+                    <input type="text" class="form-control" placeholder="ID Copy"   title="ID Copy" value="' . $data['id'] . '" disabled>
+                </div>
+            ';
+        }
+
+
+        return $formId.
+        '
             <div class="input-group">
                 <span class="input-group-addon icons" title="ISBN"><i class="fa fa-barcode"></i></span>
-                <input type="text" class="form-control" placeholder="ISBN" name="book" required="" title="ISBN" value="'.$data['isbn'].'" disabled>
+                <input type="text" class="form-control" placeholder="ISBN" name="book" required="" title="ISBN" value="'.$data['book'].'" disabled>
             </div>
             <div class="input-group">
                 <span class="input-group-addon icons" title="Status"><i class="fa fa-clock-o"></i></span>
@@ -211,10 +237,15 @@ class stylesLibrarian
         ';
     }
 
-    public static function formEditUserReserve($data){
-
+    /**
+     * This method contains the form with edit an a user reserve.
+     * @param array $data *Description*: contains all user reserve data.
+     * @return string *Description*: form with all user reserve data.
+     */
+    public static function formEditUserReserve($data)
+    {
         return
-            '
+        '
             <div class="input-group" title="User">
                 <span class="input-group-addon icons"><i class="fa fa-user"></i></span>
                 <input type="text" class="form-control" value="'.$data['user'].'" title="User" disabled/>
@@ -228,14 +259,17 @@ class stylesLibrarian
 
             .stylesLibrarian::formUserReserveStatus($data);
 
-
-
     }
 
-    public static function formUserReserveStatus($data = NULL){
-
-        $sent = "";
-        $received = "";
+    /**
+     * This method contains the piece form to send reserve status
+     * @param array $data *Description*: contains or not all reserve information.
+     * @return string *Description*: the piece form to send reserve status.
+     */
+    public static function formUserReserveStatus($data = NULL)
+    {
+        $sent         = "";
+        $received     = "";
         $showReceived = "";
 
         if($data != null)
@@ -254,7 +288,7 @@ class stylesLibrarian
         }
 
         return
-            '
+        '
             <div class="input-group" title="Book sent?">
                 <span class="input-group-addon icons"><i class="fa fa-sign-out"></i></span>
                 <div class="checkbox form-control commited-reserves"  '.$sent.'>
@@ -276,25 +310,29 @@ class stylesLibrarian
         ';
     }
 
-    public static function formAddReserve($data, $books, $error){
-
+    /**
+     * This method contains the all style to add a new user reserve.
+     * @param array $data *Description*: contains the user data.
+     * @param mysqli $books *Description*: contains the isbn and title of the all books.
+     * @param bool $error *Description*: if is false, not show error and else show error.
+     * @return string *Description*: all style form to add new user reserve.
+     */
+    public static function formAddReserve($data, $books, $error)
+    {
         $hidden = "hidden";
 
-        if($error){
+        if($error)
             $hidden = "";
-        }
+
 
         $optionsBooks = "";
 
         while($currentBook = mysqli_fetch_assoc($books))
-        {
             $optionsBooks .= '<option VALUE="'.$currentBook['isbn'].'">'.$currentBook['isbn'].' '.$currentBook['title'].'</option>';
-        }
-
 
 
         return
-            '
+        '
             <div class="row row-centered container-form" id="form-add-user-reserve">
 
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 content-form">
@@ -328,30 +366,35 @@ class stylesLibrarian
 
     }
 
+    /**
+     * This method contains the form to administrate user. (Edit my profile and edit existing user)
+     * @param array $currentUser *Description*: contains all user data.
+     * @return string form to edit my profile or custom user.
+     */
     public static function formAdministrateUser($currentUser)
     {
         $Librarian =
-            '
-          <optgroup label="Users">
-            <option value="showTableUsers">Info Users</option>
-            <option value="showTableDefaulters">Info Defaulters</option>
-            <option value="showAdministrateUsers">Administrate Users</option>
-            <option value="showAddUser">Add User</option>
-          </optgroup>
+        '
+              <optgroup label="Users">
+                <option value="showTableUsers">Info Users</option>
+                <option value="showTableDefaulters">Info Defaulters</option>
+                <option value="showAdministrateUsers">Administrate Users</option>
+                <option value="showAddUser">Add User</option>
+              </optgroup>
 
-          <optgroup label="Books">
-            <option value="showBooks">Show Books</option>
-            <option value="showTableBooks">Info Books</option>
-            <option value="showTableCopies">Info Copies</option>
-            <option value="showAdministrateBooks">Administrate Books</option>
-            <option value="showAdministrateCopies">Administrate Copies</option>
-            <option value="showAddBook">Add Book</option>
-          </optgroup>
+              <optgroup label="Books">
+                <option value="showBooks">Show Books</option>
+                <option value="showTableBooks">Info Books</option>
+                <option value="showTableCopies">Info Copies</option>
+                <option value="showAdministrateBooks">Administrate Books</option>
+                <option value="showAdministrateCopies">Administrate Copies</option>
+                <option value="showAddBook">Add Book</option>
+              </optgroup>
 
-          <optgroup label="Reserves">
-            <option value="showReserves">My Reserves</option>
-            <option value="showAdministrateReserves">Administrate Reserves</option>
-          </optgroup>
+              <optgroup label="Reserves">
+                <option value="showReserves">My Reserves</option>
+                <option value="showAdministrateReserves">Administrate Reserves</option>
+              </optgroup>
         ';
 
         if($currentUser['typeUser'] != 'User')
