@@ -78,7 +78,7 @@ class User extends Template
                     ("
                         SELECT isbn, title, summary, category, author
                         FROM books
-                        WHERE isbn = ".$isbn
+                        WHERE isbn = '".$isbn."'"
                     )
                 )
                 ,
