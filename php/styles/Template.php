@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Class Template, this class is the base of the structure with page
  */
@@ -43,7 +42,6 @@ class Template
     private   $content = "";
 
 
-
     /**
      * Template constructor.
      *
@@ -74,8 +72,6 @@ class Template
 
 
     }
-
-
 
 
 
@@ -312,7 +308,6 @@ class Template
     {
         $this->content = $content;
     }
-
 
 
     /**

@@ -1,4 +1,7 @@
 <?php
+/**
+ * This is the responsible of the all web page control
+ */
 include_once "styles/Template.php";
 include_once "styles/stylesAnonimous.php";
 include_once "styles/stylesUser.php";
@@ -17,6 +20,9 @@ session_start();
 if (!isset($_SESSION['email'], $_SESSION['typeUser'], $_SESSION['name'], $_SESSION['home']))
     header('Location: index.php');
 
+/**
+ * This controls the fatal errors.
+ */
 register_shutdown_function('fatalErrorHandler');
 
 
@@ -512,6 +518,7 @@ else {
 }
 
 
+
 /**
  * Function redirect in error case
  */
@@ -523,7 +530,6 @@ else {
         else
             header('Location: '.$_SERVER['HTTP_REFERER'].'&error=""'.htmlspecialchars(SID));
     }
-
 
 /**
  * Handling fatal error

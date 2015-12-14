@@ -163,7 +163,6 @@ $(document).ready
 );
 
 
-
 /**
  * Check if the register form is correct or not.
  * @returns {boolean}
@@ -183,7 +182,6 @@ function checkRegisterContent()
     }
     return true;
 }
-
 
 
 /**
@@ -206,7 +204,6 @@ function linkDefaultReserve()
 
     return "controller.php?insert=setInsertUserDefaultReserve"+user+isbn+daysReserve+sent;
 }
-
 
 
 /**
@@ -255,7 +252,6 @@ function checkReserveDisponibility()
         return false;
     }
 }
-
 
 
 /**

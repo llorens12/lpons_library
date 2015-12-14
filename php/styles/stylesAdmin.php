@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Class stylesAdmin, this class is static and contains all styles of user Admin
  */
@@ -33,4 +32,5 @@ class stylesAdmin
             stylesLibrarian::formAdministrateUser($data);
 
     }
+
 }

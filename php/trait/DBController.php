@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Class DBController, this trait is responsible to the all connections of Database.
  */
@@ -87,7 +86,6 @@ trait DBController
             WHERE  {$where};
         ");
     }
-
 
     /**
      * This method is the responsible of the all deletes sql sentences.

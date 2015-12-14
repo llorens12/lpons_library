@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Class Admin, this class extends of Librarian, gets all methods and contains all options of this type user.
  */
@@ -19,7 +18,6 @@ class Admin extends Librarian
     {
         parent::__construct($nameUser, $emailUser, $home, $sid);
     }
-
 
 
     /**
@@ -89,7 +87,6 @@ class Admin extends Librarian
     }
 
 
-
     /**
      * Override the parent method, this insert the content of web page and close the connection of Database.
      * @return string *Description*: return all content web page.
@@ -121,4 +118,5 @@ class Admin extends Librarian
 
         return utf8_encode($this->html());
     }
+
 }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Class stylesUser, this class is static and contains all styles of user User
  */
@@ -424,7 +423,7 @@ class stylesUser{
     {
         return
             '
-            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 show-books">
+            <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 show-books">
                 <div>
                     <a href="controller.php?method=showBook&isbn='.$book["isbn"].$sid.'" title="Show details">
                         <div class="img-show-books">
@@ -620,4 +619,5 @@ class stylesUser{
             </div>
         ';
     }
+
 }

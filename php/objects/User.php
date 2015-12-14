@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Class User, this class extends of template and contains all options to custom user.
  */
@@ -22,7 +21,6 @@ class User extends Template
     protected $MAX_DAYS_RESERVE     = 59;//The reserve is the 60 days because the 0 count
 
 
-
     /**
      * User constructor.
      *
@@ -37,7 +35,6 @@ class User extends Template
     {
         parent::__construct($nameUser, $emailUser, $home, $sid);
     }
-
 
 
 
@@ -281,7 +278,6 @@ class User extends Template
     }
 
 
-
     /**
      * This method print the form to edit user reserve.
      * @param array $request *Description*: contains all reserve information.
@@ -327,7 +323,6 @@ class User extends Template
     }
 
 
-
     /**
      * This method insert a new default reserve.
      * @param array $request *Description*: contains all reserve data.
@@ -349,7 +344,6 @@ class User extends Template
         $request['user'] = $_SESSION['email'];
         return $this->insertPersonalizedReserve($request);
     }
-
 
 
     /**
@@ -393,7 +387,6 @@ class User extends Template
     }
 
 
-
     /**
      * This method delete an a user reserve.
      * @param array $request *Description*: contains all reserve data.
@@ -420,7 +413,6 @@ class User extends Template
     }
 
 
-
     /**
      * This method broken the current session.
      * @void method.
@@ -434,7 +426,6 @@ class User extends Template
             setcookie("pwd"  , "", 0, "/");
         };
     }
-
 
 
 
@@ -676,7 +667,6 @@ class User extends Template
     }
 
 
-
     /**
      * This function is common and return the reserve to valid format.
      * @param array $reserve *Description*: contains all data of reserve.
@@ -774,8 +764,12 @@ class User extends Template
      * @param string $dateFinish *Description*: contains the finish date.
      * @return int *Description*: the difference to the dates.
      */
-    protected function getDateDifference($dateStart, $dateFinish){
-        return str_replace("-", "", $dateFinish) - str_replace("-", "", $dateStart);
+    protected function getDateDifference($dateStart, $dateFinish)
+    {
+        $datetime1 = new DateTime($dateStart);
+        $datetime2 = new DateTime($dateFinish);
+
+        return $datetime2->diff($datetime1)->format('Y-m-d');
     }
 
     /**
@@ -847,10 +841,7 @@ class User extends Template
 
         foreach($filterData as $key =>$value)
         {
-            if(strpos($key,'(') || strpos($key,'()'))
-                $sentence .= " LOWER(".$value.")   LIKE LOWER('%" . $search . "%') OR";
-
-            else
+            if(!strpos($key,'(') && !strpos($key,'()'))
                 $sentence .= " LOWER(".$key.")   LIKE LOWER('%" . $search . "%') OR";
         }
 
@@ -860,7 +851,6 @@ class User extends Template
 
         return $sentence;
     }
-
 
 
 
@@ -894,4 +884,5 @@ class User extends Template
 
         return utf8_encode($this->html());
     }
+
 }

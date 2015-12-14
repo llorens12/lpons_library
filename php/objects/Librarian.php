@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Class Librarian, this class extends of User, get all methods and contains the tools of custom users administrator.
  */
@@ -19,7 +18,6 @@ class Librarian extends User
     {
         parent::__construct($nameUser, $emailUser, $home, $sid);
     }
-
 
 
 
@@ -159,7 +157,7 @@ class Librarian extends User
             "title"         => "Title",
             "sent"          => "Date Send",
             "date_finish"   => "Teoric Received",
-            'CONCAT(trim("-" FROM (date_finish - curdate())), " days")' => "Days Elapsed"
+            'CONCAT(trim("-" FROM (DATEDIFF(date_finish, curdate()))), " days")' => "Days Elapsed"
         );
 
 
@@ -339,7 +337,6 @@ class Librarian extends User
             )
         );
     }
-
 
 
     /**
@@ -574,10 +571,9 @@ class Librarian extends User
             "copyBook"      => "ID Copy",
             "isbn"          => "ISBN",
             "title"         => "Title",
-            "author"        => "Author",
-            "category"      => "Category",
             "date_start"    => "Start",
             "date_finish"   => "End",
+            "CONCAT(DATEDIFF(date_finish,date_start),' days')" => "Time Reserve",
             "sent"          => "Sent",
             "received"      => "Received"
         );
@@ -639,7 +635,6 @@ class Librarian extends User
             )
         );
     }
-
 
 
     /**
@@ -705,7 +700,7 @@ class Librarian extends User
     {
         $_SESSION['menu'] = "Books";
 
-        $isbn['isbn'] = $isbn['ISBN'];
+        $isbn['book'] = $isbn['ISBN'];
 
         $this->setContent
         (
@@ -716,7 +711,7 @@ class Librarian extends User
                 $this->sid,
                 (isset($_REQUEST['error'])),
                 "insert",
-                "setInsertCopy&book=".$isbn['isbn']
+                "setInsertCopy&book=".$isbn['book']
             )
         );
     }
@@ -748,7 +743,6 @@ class Librarian extends User
             )
         );
     }
-
 
 
     /**
@@ -899,7 +893,6 @@ class Librarian extends User
     }
 
 
-
     /**
      * This method insert a new User.
      * @param array $request *Description*: contains all user data.
@@ -964,7 +957,6 @@ class Librarian extends User
     }
 
 
-
     /**
      * This method update an existing user.
      * @param array $request *Description*: contains all new user data.
@@ -1010,11 +1002,8 @@ class Librarian extends User
             $this->uploadIMG($file, $request['isbn']);
         }
         elseif($request['primaryISBN'] != $request['isbn'])
-        {
             rename("../img/books/".$request['primaryISBN'].".jpg", "../img/books/".$request['isbn'].".jpg");
-        }
-        else
-            return false;
+
 
         $where = "isbn = '".$request['primaryISBN']."'";
         unset($request['primaryISBN']);
@@ -1044,7 +1033,6 @@ class Librarian extends User
     {
         return $this->updateReserve($request);
     }
-
 
 
     /**
@@ -1104,7 +1092,6 @@ class Librarian extends User
     }
 
 
-
     /**
      * This method upload book cover.
      * @param array $img *Description*: contains the book cover image.
@@ -1151,7 +1138,6 @@ class Librarian extends User
         else
             return false;
     }
-
 
 
 

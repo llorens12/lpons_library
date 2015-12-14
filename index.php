@@ -1,6 +1,11 @@
 <?php
+/**
+ * *Description*: This is the index web page.
+ */
+
     session_cache_limiter ('nocache,private');
     session_start();
+
 
     /**
      * If not signed, crate Anonimous session

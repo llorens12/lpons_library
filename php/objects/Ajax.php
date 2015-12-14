@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Class Ajax, this class runs the ajax requests.
  */
@@ -9,6 +8,7 @@ class Ajax
      * Used to connect the Database.
      */
     use DBController;
+
 
     /**
      * Check the email availability.
@@ -124,4 +124,5 @@ class Ajax
         else
             echo "false";
     }
+
 }

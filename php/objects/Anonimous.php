@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Class Anonimous, this class extends of template and contains all options of not authenticated user.
  */
@@ -24,7 +23,6 @@ class Anonimous extends Template
     {
         parent::__construct($nameUser, $emailUser, $home, $sid);
     }
-
 
 
 
@@ -60,7 +58,6 @@ class Anonimous extends Template
             stylesAnonimous::contentRegister($error)
         );
     }
-
 
 
     /**
@@ -122,7 +119,6 @@ class Anonimous extends Template
 
 
 
-
     /**
      * Override the parent method and this insert the content of web page.
      * @return string *Description*: return all content web page.
@@ -133,5 +129,6 @@ class Anonimous extends Template
             $this->showLogin();
         return utf8_encode($this->html());
     }
+
 }
 

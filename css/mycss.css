@@ -3,6 +3,7 @@
 .row-centered {
     text-align:center;
 }
+
 .col-centered {
     display:inline-block;
     float:none;
@@ -16,6 +17,8 @@
 .input-group{
     text-align: left;
 }
+
+
 
 *{
     margin: 0;
@@ -74,7 +77,6 @@ footer{
     margin-left: 0
 }
 
-
 .nav-icons {
     margin-right: 3px;
 }
@@ -90,6 +92,7 @@ footer{
     margin-top: 15px;
     margin-bottom: 15px;
 }
+
 .icons {
     max-width: 39px !important;
     min-width: 39px !important;
@@ -102,6 +105,7 @@ footer{
 
     width: 80px;
 }
+
 .box{
     -webkit-box-shadow: -10px 10px 12px 0 rgba(0,0,0,0.51);
     -moz-box-shadow: -10px 10px 12px 0 rgba(0,0,0,0.51);
@@ -112,6 +116,7 @@ footer{
     margin-top: 5%;
 
 }
+
 .box-tittle{
     padding-bottom: 2%;
     width: 100%;
@@ -183,9 +188,11 @@ footer{
 .border-right{
     border-right: 1px black solid;
 }
+
 .dropdown-menu{
     margin: 0 0 0 0 !important;
 }
+
 .dropdown-toggle{
     min-width: 100%;
     width: 100%;
@@ -201,6 +208,9 @@ footer{
 
 .show-books{
     padding: 1% 1.5% 1% 1.5%;
+    margin: 0;
+    display: block;
+    min-height: 27%;
 }
 
 .show-books div{
@@ -210,6 +220,8 @@ footer{
     border: 3px #000000 solid;
     background-color: whitesmoke;
     padding: 1%;
+    min-height: 27%;
+    display: block;
 }
 
 .img-show-books{
@@ -228,6 +240,7 @@ footer{
 .data-show-books{
     float: left;
     width: 75%;
+    height: auto;
     padding: 2% !important;
     border: none !important;
 }
@@ -262,6 +275,7 @@ footer{
     float: left !important;
     margin: 0;
 }
+
 #btn-category button{
     font-weight: bold;
     color: black;
@@ -284,6 +298,7 @@ footer{
     width: 100%;
     margin-top: 3%;
 }
+
 #img-details-books{
     float: left;
     width: 25%;
@@ -311,6 +326,7 @@ footer{
     margin-bottom: 4%;
     font-size: 400%;
 }
+
 #options-reserves{
     width: 100%;
     text-align: center;
@@ -320,6 +336,7 @@ footer{
 #options-reserves button{
     margin: 2%;
 }
+
 #options-reserves a{
     margin: 2%;
 }

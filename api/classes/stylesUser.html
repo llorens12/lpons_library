@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <meta charset="utf-8"/>
+    <title>    API Documentation &raquo; \stylesUser
+</title>
+    <meta name="author" content=""/>
+    <meta name="description" content=""/>
+
+            <link href="../css/template.css" rel="stylesheet" media="all"/>
+    
+            <!--[if lt IE 9]>
+        <script src="https://html5shim.googlecode.com/svn/trunk/html5.js" type="text/javascript"></script>
+        <![endif]-->
+        <script src="../js/jquery-1.7.1.min.js" type="text/javascript"></script>
+        <script src="../js/jquery-ui-1.8.2.custom.min.js" type="text/javascript"></script>
+        <script src="../js/jquery.mousewheel.min.js" type="text/javascript"></script>
+        <script src="../js/bootstrap.js" type="text/javascript"></script>
+        <script src="../js/template.js" type="text/javascript"></script>
+        <script src="../js/prettify/prettify.min.js" type="text/javascript"></script>
+    
+            <link rel="shortcut icon" href="../img/favicon.ico"/>
+        <link rel="apple-touch-icon" href="../img/apple-touch-icon.png"/>
+        <link rel="apple-touch-icon" sizes="72x72" href="../img/apple-touch-icon-72x72.png"/>
+        <link rel="apple-touch-icon" sizes="114x114" href="../img/apple-touch-icon-114x114.png"/>
+    </head>
+<body>
+
+        <div class="navbar navbar-fixed-top">
+        <div class="navbar-inner">
+            <div class="container">
+                <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                    <span class="icon-bar"></span> <span class="icon-bar"></span>
+                    <span class="icon-bar"></span> </a>
+                <a class="brand" href="../index.html">API Documentation</a>
+
+                <div class="nav-collapse">
+                    <ul class="nav">
+                        <li class="dropdown">
+                            <a href="#api" class="dropdown-toggle" data-toggle="dropdown">
+                                API Documentation <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu">
+                                                                                            </ul>
+                        </li>
+                        <li class="dropdown" id="charts-menu">
+                            <a href="#charts" class="dropdown-toggle" data-toggle="dropdown">
+                                Charts <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="../graph_class.html">
+                                        <i class="icon-list-alt"></i>&#160;Class hierarchy diagram
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="dropdown" id="reports-menu">
+                            <a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
+                                Reports <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="../errors.html">
+                                        <i class="icon-list-alt"></i>&#160;Errors
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="../markers.html">
+                                        <i class="icon-list-alt"></i>&#160;Markers
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="../deprecated.html">
+                                        <i class="icon-list-alt"></i>&#160;Deprecated
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="go_to_top">
+            <a href="#___" style="color: inherit">Back to top&#160;&#160;<i class="icon-upload icon-white"></i></a>
+        </div>
+    </div>
+    
+    <div id="___" class="container">
+        <noscript>
+            <div class="alert alert-warning">
+                Javascript is disabled; several features are only available if Javascript is enabled.
+            </div>
+        </noscript>
+
+        
+            <style>
+        .deprecated h2 {
+            text-decoration: line-through;
+        }
+    </style>
+    <div class="row">
+        <div class="span4">
+                    <div class="btn-group view pull-right" data-toggle="buttons-radio">
+        <button class="btn details" title="Show descriptions and method names"><i class="icon-list"></i></button>
+        <button class="btn simple" title="Show only method names"><i class="icon-align-justify"></i></button>
+    </div>
+    <div class="btn-group visibility" data-toggle="buttons-checkbox">
+        <button class="btn public active" title="Show public elements">Public</button>
+        <button class="btn protected" title="Show protected elements">Protected</button>
+        <button class="btn private" title="Show private elements">Private</button>
+        <button class="btn inherited active" title="Show inherited elements">Inherited</button>
+    </div>
+
+        <ul class="side-nav nav nav-list">
+        <li class="nav-header">
+            <i class="icon-custom icon-method"></i> Methods
+            <ul>
+                                                                                                    <li class="method public">
+        <a href="#method_book" title="book :: This method generate the all style to vew a book details.">
+            <span class="description">This method generate the all style to vew a book details.</span><pre>book</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_books" title="books :: This method contains the all style to show the books. This is the &quot;layout&quot; of each book.">
+            <span class="description">This method contains the all style to show the books. This is the &quot;layout&quot; of each book.</span><pre>books</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_contentForm" title="contentForm :: This method contains the tag form and you edit options.">
+            <span class="description">This method contains the tag form and you edit options.</span><pre>contentForm</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_filterMenu" title="filterMenu :: This method generate the form to select category and search in the content.">
+            <span class="description">This method generate the form to select category and search in the content.</span><pre>filterMenu</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_formAdministrateUser" title="formAdministrateUser :: This method contains the form to administrate user. (Edit my profile and edit existing user)">
+            <span class="description">This method contains the form to administrate user. (Edit my profile and edit existing user)</span><pre>formAdministrateUser</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_formEditReserves" title="formEditReserves :: This method contains the form to edit reserves. (Not include the tag form)">
+            <span class="description">This method contains the form to edit reserves. (Not include the tag form)</span><pre>formEditReserves</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_menuContent" title="menuContent :: This method contains all style of the content menu.">
+            <span class="description">This method contains all style of the content menu.</span><pre>menuContent</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_menuTop" title="menuTop :: This method contains the style of the my profile menu.">
+            <span class="description">This method contains the style of the my profile menu.</span><pre>menuTop</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_personalizedReserve" title="personalizedReserve :: This method contains the personalized reserve form.">
+            <span class="description">This method contains the personalized reserve form.</span><pre>personalizedReserve</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_table" title="table :: This method generate a table, in the parameters you can remodel the appearance of the table. If you are only
+declare the data, only show data.">
+            <span class="description">This method generate a table, in the parameters you can remodel the appearance of the table. If you are only
+declare the data, only show data.</span><pre>table</pre>
+        </a>
+    </li>
+
+                                                </ul>
+        </li>
+        <li class="nav-header protected">» Protected
+            <ul>
+                                                                                                                                                                                                                                                                                                                                                                                                                    </ul>
+        </li>
+        <li class="nav-header private">» Private
+            <ul>
+                                                                                                                                                                                                                                                                                                                                                                                                                    </ul>
+        </li>
+        <li class="nav-header">
+            <i class="icon-custom icon-constant"></i> Constants
+            <ul>
+                            </ul>
+        </li>
+    </ul>
+
+
+        </div>
+
+        <div class="span8">
+            <div class="element class">
+                <h1>stylesUser</h1>
+                <small style="display: block; text-align: right">
+                                                        </small>
+                <p class="short_description">Class stylesUser, this class is static and contains all styles of user User</p>
+                <div class="details">
+                    <div class="long_description">
+                        
+                    </div>
+                    <table class="table table-bordered">
+                                                                                    <tr>
+                                    <th>
+                                        package
+                                                                            </th>
+                                    <td>
+                                                                                    
+                                                                                <p>Default</p>
+                                    </td>
+                                </tr>
+                                                                                                                                                                                </table>
+
+                    <h3><i class="icon-custom icon-method"></i> Methods</h3>
+                                                                <a id="method_book"></a>
+                        <div class="element clickable method public  method_book" data-toggle="collapse" data-target=".method_book .collapse">
+                            <h2>This method generate the all style to vew a book details.</h2>
+                            <pre>book(array $book, integer $DEFAULT_DAYS_RESERVE,  $sid) : string</pre>
+                            <div class="labels">
+                                                                <span class="label">static</span>                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$book</h4>
+                                                <code>array</code><p><p><em>Description</em>: contains all book data.</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$DEFAULT_DAYS_RESERVE</h4>
+                                                <code>integer</code><p><p><em>Description</em>: contains the number that you see in the button default reserve.</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$sid</h4>
+                                                <code></code><p><p><em>Description</em>: contains the session id.</p></p>
+                                            </div>
+                                                                            
+                                                                            <h3>Response</h3>
+                                        <code>string</code><p><p><em>Description</em>:  all style to show the book details.</p></p>
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_books"></a>
+                        <div class="element clickable method public  method_books" data-toggle="collapse" data-target=".method_books .collapse">
+                            <h2>This method contains the all style to show the books. This is the &quot;layout&quot; of each book.</h2>
+                            <pre>books(array $book, integer $DEFAULT_DAYS_RESERVE,  $sid) : string</pre>
+                            <div class="labels">
+                                                                <span class="label">static</span>                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$book</h4>
+                                                <code>array</code><p><p><em>Description</em>: contains all book data.</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$DEFAULT_DAYS_RESERVE</h4>
+                                                <code>integer</code><p><p><em>Description</em>: contains the number to send a default reserve.</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$sid</h4>
+                                                <code></code><p><p><em>Description</em>: contains the session id.</p></p>
+                                            </div>
+                                                                            
+                                                                            <h3>Response</h3>
+                                        <code>string</code><p><p><em>Description</em>: return style of &quot;layout&quot; with book data.</p></p>
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_contentForm"></a>
+                        <div class="element clickable method public  method_contentForm" data-toggle="collapse" data-target=".method_contentForm .collapse">
+                            <h2>This method contains the tag form and you edit options.</h2>
+                            <pre>contentForm(string $title, string $form,  $sid, boolean $error, string $sentenceType, string $sentence) : string</pre>
+                            <div class="labels">
+                                                                <span class="label">static</span>                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$title</h4>
+                                                <code>string</code><p><p><em>Description</em>: contains the title of the form.</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$form</h4>
+                                                <code>string</code><p><p><em>Description</em>: contains content to form.</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$sid</h4>
+                                                <code></code><p><p><em>Description</em>: contains the session id.</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$error</h4>
+                                                <code>boolean</code><p><p><em>Description</em>: if is true, show label error, else not.</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$sentenceType</h4>
+                                                <code>string</code><p><p><em>Description</em>: this contains the name of sentence (Example: update)</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$sentence</h4>
+                                                <code>string</code><p><p><em>Description</em>: this contains the url to redirect.</p></p>
+                                            </div>
+                                                                            
+                                                                            <h3>Response</h3>
+                                        <code>string</code><p><p><em>Description</em>: return a tag form with the content form.</p></p>
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_filterMenu"></a>
+                        <div class="element clickable method public  method_filterMenu" data-toggle="collapse" data-target=".method_filterMenu .collapse">
+                            <h2>This method generate the form to select category and search in the content.</h2>
+                            <pre>filterMenu(string $titleFilter, string $nameFilter, string $filterDefault, array $filterData, string $placeHolderSearch, string $method,  $sid) : string</pre>
+                            <div class="labels">
+                                                                <span class="label">static</span>                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$titleFilter</h4>
+                                                <code>string</code><p><p><em>Description</em>: contains the title of the content.</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$nameFilter</h4>
+                                                <code>string</code><p><p><em>Description</em>: contains the first name to view in the input select.</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$filterDefault</h4>
+                                                <code>string</code><p><p><em>Description</em>: contains the name of the option to return the select all.</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$filterData</h4>
+                                                <code>array</code><p><p><em>Description</em>: contains all options in the input select.</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$placeHolderSearch</h4>
+                                                <code>string</code><p><p><em>Description</em>: contains the text to view in the search placeholder.</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$method</h4>
+                                                <code>string</code><p><p><em>Description</em>: contains the url to redirect.
+(He include: controller.php?method={this include your option]).</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$sid</h4>
+                                                <code></code><p><p><em>Description</em>: contains the session id.</p></p>
+                                            </div>
+                                                                            
+                                                                            <h3>Response</h3>
+                                        <code>string</code><p><p><em>Description</em>: menu form filter.</p></p>
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_formAdministrateUser"></a>
+                        <div class="element clickable method public  method_formAdministrateUser" data-toggle="collapse" data-target=".method_formAdministrateUser .collapse">
+                            <h2>This method contains the form to administrate user. (Edit my profile and edit existing user)</h2>
+                            <pre>formAdministrateUser(array $currentUser, string $otherOptionsHome = &quot;&quot;) : string</pre>
+                            <div class="labels">
+                                                                <span class="label">static</span>                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$currentUser</h4>
+                                                <code>array</code><p><p><em>Description</em>: contains all user data.</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$otherOptionsHome</h4>
+                                                <code>string</code><p><p><em>Description</em>: contains the new options of the tag select.</p></p>
+                                            </div>
+                                                                            
+                                                                            <h3>Response</h3>
+                                        <code>string</code><p><p><em>Description</em>: return a content form with data.</p></p>
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_formEditReserves"></a>
+                        <div class="element clickable method public  method_formEditReserves" data-toggle="collapse" data-target=".method_formEditReserves .collapse">
+                            <h2>This method contains the form to edit reserves. (Not include the tag form)</h2>
+                            <pre>formEditReserves(array $reserve) : string</pre>
+                            <div class="labels">
+                                                                <span class="label">static</span>                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$reserve</h4>
+                                                <code>array</code><p><p><em>Description</em>: contains all reserve data.</p></p>
+                                            </div>
+                                                                            
+                                                                            <h3>Response</h3>
+                                        <code>string</code><p><p><em>Description</em>: return the edit reserves form with the data.</p></p>
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_menuContent"></a>
+                        <div class="element clickable method public  method_menuContent" data-toggle="collapse" data-target=".method_menuContent .collapse">
+                            <h2>This method contains all style of the content menu.</h2>
+                            <pre>menuContent( $sid) : string</pre>
+                            <div class="labels">
+                                                                <span class="label">static</span>                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$sid</h4>
+                                                <code></code><p><p><em>Description</em>: contains the session id.</p></p>
+                                            </div>
+                                                                            
+                                                                            <h3>Response</h3>
+                                        <code>string</code><p><p><em>Description</em>: all style of the content menu.</p></p>
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_menuTop"></a>
+                        <div class="element clickable method public  method_menuTop" data-toggle="collapse" data-target=".method_menuTop .collapse">
+                            <h2>This method contains the style of the my profile menu.</h2>
+                            <pre>menuTop(string $nameUser,  $sid) : string</pre>
+                            <div class="labels">
+                                                                <span class="label">static</span>                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$nameUser</h4>
+                                                <code>string</code><p><p><em>Description</em>: contains the name of the user.</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$sid</h4>
+                                                <code></code><p><p><em>Description</em>: contains the session id.</p></p>
+                                            </div>
+                                                                            
+                                                                            <h3>Response</h3>
+                                        <code>string</code><p><p><em>Description</em>: all style of my profile menu.</p></p>
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_personalizedReserve"></a>
+                        <div class="element clickable method public  method_personalizedReserve" data-toggle="collapse" data-target=".method_personalizedReserve .collapse">
+                            <h2>This method contains the personalized reserve form.</h2>
+                            <pre>personalizedReserve(string $hrefDefaultReserve = &quot;&quot;, string $hrefPersonalizedReserve = &quot;&quot;, string $textBtnReserve = &quot;&quot;, string $isbn = &quot;&quot;, string $sid = &quot;&quot;) : string</pre>
+                            <div class="labels">
+                                                                <span class="label">static</span>                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$hrefDefaultReserve</h4>
+                                                <code>string</code><p><p><em>Description</em>: contains the url to send default reserve.</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$hrefPersonalizedReserve</h4>
+                                                <code>string</code><p><p><em>Description</em>: contains the url to send personalized reserve.</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$textBtnReserve</h4>
+                                                <code>string</code><p><p><em>Description</em>: contains the text that you see in the button default reserve.</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$isbn</h4>
+                                                <code>string</code><p><p><em>Description</em>: contains the book isbn.</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$sid</h4>
+                                                <code>string</code><p><p><em>Description</em>: contains the session id.</p></p>
+                                            </div>
+                                                                            
+                                                                            <h3>Response</h3>
+                                        <code>string</code><p><p><em>Description</em>: return the form to show personalized reserve.</p></p>
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_table"></a>
+                        <div class="element clickable method public  method_table" data-toggle="collapse" data-target=".method_table .collapse">
+                            <h2>This method generate a table, in the parameters you can remodel the appearance of the table. If you are only
+declare the data, only show data.</h2>
+                            <pre>table(\mysqli $data, boolean|false $edit = false, boolean|false $drop = false, boolean|false $add = false, string $objectAdd = &quot;&quot;, string $typeObject = &quot;&quot;, array|string $primaryKeys = &quot;&quot;, boolean|false $reserveDelimiter = false, boolean|false $showColumnSentReceived = false, integer $MAX_DAYS_RESERVE,  $sid = &quot;&quot;) : string</pre>
+                            <div class="labels">
+                                                                <span class="label">static</span>                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$data</h4>
+                                                <code>\mysqli</code><p><p><em>Description</em>: contains all data to show in the table.</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$edit</h4>
+                                                <code>boolean|false</code><p><p><em>Description</em>: if is true, add column edit, else not.</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$drop</h4>
+                                                <code>boolean|false</code><p><p><em>Description</em>: if is true, add column drop, else not.</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$add</h4>
+                                                <code>boolean|false</code><p><p><em>Description</em>: if is true, add column add, else not.</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$objectAdd</h4>
+                                                <code>string</code><p><p><em>Description</em>: contains the url to redirect in column add.
+(He include controller.php?method=showAdd{this include your url})</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$typeObject</h4>
+                                                <code>string</code><p><p><em>Description</em>: contains the url to redirect in the columns edit and drop.
+(In edit he include: controller.php?method=showEdit{this include your url}) and
+(In drop he include: controller.php?delete=setDelete{this include your url}).</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$primaryKeys</h4>
+                                                <code>array|string</code><p><p><em>Description</em>: this array contains the names of the columns that are
+primary keys (Example: [&quot;user&quot;,&quot;Books&quot;,&quot;ID Copy&quot;,...])</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$reserveDelimiter</h4>
+                                                <code>boolean|false</code><p><p><em>Description</em>: in the case of reserves, if the reserve is sent you can't
+delete and is received nor can edit reserve. Select true if you want this option. (NOTE: this option not delete
+the columns sent and received, this is the next option)</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$showColumnSentReceived</h4>
+                                                <code>boolean|false</code><p><p><em>Description</em>: select true if you don't want show columns sent and true.</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$MAX_DAYS_RESERVE</h4>
+                                                <code>integer</code><p><p><em>Description</em>: contains the max days of reserve.</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$sid</h4>
+                                                <code></code><p><p><em>Description</em>: this contains the session id.</p></p>
+                                            </div>
+                                                                            
+                                                                            <h3>Response</h3>
+                                        <code>string</code><p><p><em>Description</em>: return the table.</p></p>
+                                                                    </div>
+                            </div>
+
+                        </div>
+                    
+                    
+                                                        </div>
+            </div>
+            <a id="\stylesUser"></a>
+            <ul class="breadcrumb">
+                <li><a href="../index.html"><i class="icon-custom icon-class"></i></a></li>
+                    
+    
+    <li><span class="divider">\</span><a href="../namespaces/default.html">\</a></li>
+
+                <li class="active"><span class="divider">\</span><a href="../classes/stylesUser.html">stylesUser</a></li>
+            </ul>
+        </div>
+    </div>
+
+    </div>
+
+        <footer class="span12">
+            Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by
+            <a href="http://glyphicons.com/">Glyphicons</a>.<br/>
+            Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and<br/>
+            generated on Mon, 14 Dec 2015 07:01:05 +0100.<br/>
+    </footer>
+    </body>
+</html>

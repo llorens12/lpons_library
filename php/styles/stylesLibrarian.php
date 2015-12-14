@@ -1,11 +1,9 @@
 <?php
-
 /**
  * Class stylesLibrarian, this class is static and contains all styles of user Librarian
  */
 class stylesLibrarian
 {
-
     /**
      * This method contains the style of the my profile menu.
      * @param string $nameUser *Description*: contains the name of the user.

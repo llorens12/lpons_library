@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Class stylesAnonimous, this class is static and contains all styles of user Anonimous
  */
@@ -135,4 +134,5 @@ class stylesAnonimous
             </div>
         ';
     }
+
 }
