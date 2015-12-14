@@ -21,7 +21,7 @@ class stylesAdmin
         return
             '
             <div class="input-group" title="Permision">
-                <span class="input-group-addon icons"><i class="fa fa-book"></i></span>
+                <span class="input-group-addon icons"><i class="fa fa-product-hunt"></i></span>
                 <select class="form-control" name="typeUser"">
                     <option value="User" '.$User.'>User</option>
                     <option value="Librarian" '.$Librarian.'>Librarian</option>
